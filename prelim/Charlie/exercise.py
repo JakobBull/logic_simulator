@@ -17,13 +17,25 @@ def open_file(path):
 
 def get_next_character(input_file):
     """Read and return the next character in input_file."""
-    fo = input_file
-    str = fo.read(1)
+    str = input_file.read(1)
     return str
 
 
 def get_next_non_whitespace_character(input_file):
     """Seek and return the next non-whitespace character in input_file."""
+    fo = input_file
+    str = fo.read(1)
+    pos = input_file.tell()
+    while str.isspace() == True:
+        
+        fo.seek(pos)
+        str = fo.read(1)
+        pos += 1
+
+    return str
+    
+        
+    
 
 
 def get_next_number(input_file):
@@ -63,9 +75,15 @@ def main():
         while x != "":
             x = get_next_character(text)
             print(x, end='')
+        
+        text.seek(0, 0)
 
         print("\nNow skipping spaces...")
         # Print out all the characters in the file, without spaces
+        x = 'hi'
+        while x != "":
+            x = get_next_non_whitespace_character(text)
+            print(x, end='')
 
         print("\nNow reading numbers...")
         # Print out all the numbers in the file
