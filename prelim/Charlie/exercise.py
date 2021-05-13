@@ -1,18 +1,41 @@
 #!/usr/bin/env python3
 """Preliminary exercises for Part IIA Project GF2."""
 import sys
+import os
 
 
 def open_file(path):
     """Open and return the file specified by path."""
+    try:
+        fo = open(path, "r")
+        return fo
+    except IOError:
+        print('Error, file cannot be opened')
+        sys.exit()
+    #print(fo.name)
+
 
 
 def get_next_character(input_file):
     """Read and return the next character in input_file."""
+    str = input_file.read(1)
+    return str
 
 
 def get_next_non_whitespace_character(input_file):
     """Seek and return the next non-whitespace character in input_file."""
+    fo = input_file
+    str = fo.read(1)
+    pos = input_file.tell()
+    while str.isspace() == True:
+        fo.seek(pos)
+        str = fo.read(1)
+        pos += 1
+
+    return str
+    
+        
+    
 
 
 def get_next_number(input_file):
@@ -20,6 +43,32 @@ def get_next_number(input_file):
 
     Return the number (or None) and the next non-numeric character.
     """
+    fo = input_file
+    str = fo.read(1)
+    pos = input_file.tell()
+    ls = []
+    empty = ""
+    number =[]
+    while str.isdigit() == False and str != "":
+        #fo.seek(pos)
+        str = fo.read(1)
+        pos += 1
+        if str == "":
+            return ['None', '']
+
+    number.append(str)
+    while True:
+        x = fo.read(1)
+        if  x.isdigit() == 1:
+            number.append(x)
+            
+        else:
+            ls = [empty.join(number), x]
+            return ls
+    
+
+    
+    
 
 
 def get_next_name(input_file):
@@ -42,16 +91,35 @@ def main():
 
         print("\nNow opening file...")
         # Print the path provided and try to open the file for reading
+        path = os.path.abspath(sys.argv[1])
+        print(path)
+        text = open_file(path)
 
         print("\nNow reading file...")
         # Print out all the characters in the file, until the end of file
+        x = 'hi'
+        while x != "":
+            x = get_next_character(text)
+            print(x, end='')
+        
+        text.seek(0, 0)
 
         print("\nNow skipping spaces...")
         # Print out all the characters in the file, without spaces
+        x = 'hi'
+        while x != "":
+            x = get_next_non_whitespace_character(text)
+            print(x, end='')
+
+        text.seek(0, 0)
 
         print("\nNow reading numbers...")
         # Print out all the numbers in the file
-
+        x = ['hi','hi']
+        while x[1] != "" and x[0] != "":
+            x = get_next_number(text)
+            print(x[0], end=', ')
+        
         print("\nNow reading names...")
         # Print out all the names in the file
 
