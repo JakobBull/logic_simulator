@@ -3,6 +3,7 @@
 import sys
 import os
 
+
 def open_file(path):
     """Open and return the file specified by path."""
     try:
@@ -27,7 +28,6 @@ def get_next_non_whitespace_character(input_file):
     str = fo.read(1)
     pos = input_file.tell()
     while str.isspace() == True:
-        
         fo.seek(pos)
         str = fo.read(1)
         pos += 1
@@ -43,6 +43,32 @@ def get_next_number(input_file):
 
     Return the number (or None) and the next non-numeric character.
     """
+    fo = input_file
+    str = fo.read(1)
+    pos = input_file.tell()
+    ls = []
+    empty = ""
+    number =[]
+    while str.isdigit() == False and str != "":
+        #fo.seek(pos)
+        str = fo.read(1)
+        pos += 1
+        if str == "":
+            return ['None', '']
+
+    number.append(str)
+    while True:
+        x = fo.read(1)
+        if  x.isdigit() == 1:
+            number.append(x)
+            
+        else:
+            ls = [empty.join(number), x]
+            return ls
+    
+
+    
+    
 
 
 def get_next_name(input_file):
@@ -85,9 +111,15 @@ def main():
             x = get_next_non_whitespace_character(text)
             print(x, end='')
 
+        text.seek(0, 0)
+
         print("\nNow reading numbers...")
         # Print out all the numbers in the file
-
+        x = ['hi','hi']
+        while x[1] != "" and x[0] != "":
+            x = get_next_number(text)
+            print(x[0], end=', ')
+        
         print("\nNow reading names...")
         # Print out all the names in the file
 
