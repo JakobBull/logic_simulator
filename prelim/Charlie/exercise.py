@@ -17,6 +17,9 @@ def open_file(path):
 
 def get_next_character(input_file):
     """Read and return the next character in input_file."""
+    fo = input_file
+    str = fo.read(1)
+    return str
 
 
 def get_next_non_whitespace_character(input_file):
@@ -52,10 +55,14 @@ def main():
         # Print the path provided and try to open the file for reading
         path = os.path.abspath(sys.argv[1])
         print(path)
-        open_file(path)
+        text = open_file(path)
 
         print("\nNow reading file...")
         # Print out all the characters in the file, until the end of file
+        x = 'hi'
+        while x != "":
+            x = get_next_character(text)
+            print(x, end='')
 
         print("\nNow skipping spaces...")
         # Print out all the characters in the file, without spaces
