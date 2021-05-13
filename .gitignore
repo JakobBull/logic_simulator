@@ -1,0 +1,5 @@
+#put files and foldersthat you want to ignore here
+
+.vscode
+.DS_Store
+.git
