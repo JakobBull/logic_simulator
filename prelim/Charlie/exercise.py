@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """Preliminary exercises for Part IIA Project GF2."""
 import sys
-
+import os
 
 def open_file(path):
     """Open and return the file specified by path."""
+    try:
+        fo = open(path, "r")
+        return fo
+    except IOError:
+        print('Error, file cannot be opened')
+        sys.exit()
+    #print(fo.name)
+
 
 
 def get_next_character(input_file):
@@ -42,6 +50,9 @@ def main():
 
         print("\nNow opening file...")
         # Print the path provided and try to open the file for reading
+        path = os.path.abspath(sys.argv[1])
+        print(path)
+        open_file(path)
 
         print("\nNow reading file...")
         # Print out all the characters in the file, until the end of file
