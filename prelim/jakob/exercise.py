@@ -2,6 +2,7 @@
 """Preliminary exercises for Part IIA Project GF2."""
 import sys
 import os
+from mynames import MyNames
 
 def open_file(path):
 
@@ -26,7 +27,6 @@ def get_next_non_whitespace_character(input_file):
     while True:
         character = input_file.read(1)
         if character.isspace():
-            #print(character)
             pass
         else:
             return character
@@ -124,12 +124,29 @@ def main():
             
             print(character_list[0], end=", ")
 
+        file.seek(0)
 
         print("\nNow censoring bad names...")
         # Print out only the good names in the file
-        # name = MyNames()
-        # bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"),
-        #                 name.lookup("Ghastly"), name.lookup("Awful")]
+        name = MyNames()
+        bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"),
+                         name.lookup("Ghastly"), name.lookup("Awful")]
+
+        while True:
+            character_list = get_next_name(file)
+            print(character_list)
+            if character_list[0] == None:
+                print(" \n End of file reached")
+                break
+            
+            good_name = name.lookup(character_list[0])
+
+            print("Good name is", good_name)
+
+            if good_name != None:
+                print(good_name, end=", ")
+            
+            
 
 if __name__ == "__main__":
     main()
