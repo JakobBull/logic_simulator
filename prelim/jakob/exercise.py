@@ -51,10 +51,19 @@ def get_next_number(input_file):
 
 
 def get_next_name(input_file):
-    """Seek the next name string in input_file.
+    while True:
+        character = [input_file.read(1)]
+        if character[0].isalpha():
+            while True:
+                next_character = input_file.read(1)
 
-    Return the name string (or None) and the next non-alphanumeric character.
-    """
+                if next_character.isalnum():
+                    character.append(next_character)
+                else:
+                    return ["".join(character), next_character]
+        if character[0] == "":
+            return [None, ""]
+
 
 
 def main():
@@ -71,7 +80,7 @@ def main():
         print("Path is {}".format(full_path))
         file = open_file(full_path)
                 
-        print("printing everything")        
+        print("\nNow reading file...")       
         while True:
             character = get_next_character(file)
 
@@ -83,7 +92,7 @@ def main():
 
         file.seek(0)
 
-        print("printing non-white-spaces")  
+        print("\nNow skipping spaces...") 
         while True:
             character = get_next_non_whitespace_character(file)
         
@@ -95,7 +104,7 @@ def main():
 
         file.seek(0)
 
-        print("printing numbers")  
+        print("\nNow reading numbers...")  
         while True:
             character_list = get_next_number(file)
             if character_list[0] == None:
@@ -104,18 +113,17 @@ def main():
             
             print(character_list[0], end=", ")
 
+        file.seek(0)
 
-        print("\nNow reading file...")
-        # Print out all the characters in the file, until the end of file
+        print("\nNow reading names...") 
+        while True:
+            character_list = get_next_name(file)
+            if character_list[0] == None:
+                print(" \n End of file reached")
+                break
+            
+            print(character_list[0], end=", ")
 
-        print("\nNow skipping spaces...")
-        # Print out all the characters in the file, without spaces
-
-        print("\nNow reading numbers...")
-        # Print out all the numbers in the file
-
-        print("\nNow reading names...")
-        # Print out all the names in the file
 
         print("\nNow censoring bad names...")
         # Print out only the good names in the file
