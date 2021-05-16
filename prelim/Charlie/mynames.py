@@ -23,7 +23,7 @@ class MyNames:
                  given name ID. Returns None if the ID is not a valid index.
     """
 
-    def __init__(self, names_table):
+    def __init__(self):
         """Initialise the names list."""
         self.names_table = []
 
@@ -32,13 +32,18 @@ class MyNames:
 
         If the name string is not present in the names list, add it.
         """
-        for i in range(len(self.names_table)):
-            if name_string == self.names_table[i]:
-                return i
-        self.names_table.append(name_string)
+        if name_string in self.names_table:
+            return self.names_table.index(name_string)
+        else:    
+            self.names_table.append(name_string)
+            return self.names_table.index(name_string)
 
     def get_string(self, name_id):
         """Return the corresponding name string for the given name_id.
 
         If the name ID is not a valid index into the names list, return None.
         """
+        try:
+            return self.names_table[name_id]
+        except IndexError:
+            return None

@@ -2,7 +2,7 @@
 """Preliminary exercises for Part IIA Project GF2."""
 import sys
 import os
-
+from mynames import MyNames
 
 def open_file(path):
     """Open and return the file specified by path."""
@@ -152,12 +152,28 @@ def main():
                 print(x[0], end=' ')
             else:
                 break
-
+        
+        text.seek(0,0)
         print("\nNow censoring bad names...")
         # Print out only the good names in the file
-        # name = MyNames()
-        # bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"),
-        #                 name.lookup("Ghastly"), name.lookup("Awful")]
+        name = MyNames()
+        bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"), 
+                        name.lookup("Ghastly"), name.lookup("Awful")]
+        print(bad_name_ids)
+        while True:
+            x = get_next_name(text)
+            if name.lookup(x[0]) in bad_name_ids:
+                continue
+            
+            elif x[0] != None:
+                print(x[0], end=" ")
+            else:
+                break
+
+            
+                
+
+
 
 if __name__ == "__main__":
     main()
