@@ -34,6 +34,12 @@ class MyNames:
             return self.names.index(name_string)
 
     def get_string(self, name_id):
+
+        if type(name_id) != int:
+            raise TypeError
+        elif name_id < 0:
+            raise ValueError
+
         try:
             return self.names[name_id]
         except IndexError:

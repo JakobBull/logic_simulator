@@ -4,6 +4,7 @@ import sys
 import os
 from mynames import MyNames
 
+
 def open_file(path):
 
     try:
@@ -17,11 +18,9 @@ def open_file(path):
         sys.exit()
 
 
-
-
 def get_next_character(input_file):
     return input_file.read(1)
-    
+
 
 def get_next_non_whitespace_character(input_file):
     while True:
@@ -30,7 +29,6 @@ def get_next_non_whitespace_character(input_file):
             pass
         else:
             return character
-
 
 
 def get_next_number(input_file):
@@ -47,7 +45,6 @@ def get_next_number(input_file):
                     character.append(next_character)
                 else:
                     return [int("".join(character)), next_character]
-        
 
 
 def get_next_name(input_file):
@@ -65,7 +62,6 @@ def get_next_name(input_file):
             return [None, ""]
 
 
-
 def main():
     """Preliminary exercises for Part IIA Project GF2."""
 
@@ -76,77 +72,78 @@ def main():
         sys.exit()
 
     else:
-        full_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), arguments[0])
+        full_path = os.path.join(os.path.dirname(
+                                    os.path.realpath(__file__)), arguments[0])
         print("Path is {}".format(full_path))
         file = open_file(full_path)
-                
-        print("\nNow reading file...")       
+
+        print("\nNow reading file...")
         while True:
             character = get_next_character(file)
 
             if character == "":
                 print("End of file reached")
                 break
-        
+
             print(character, end="")
 
         file.seek(0)
 
-        print("\nNow skipping spaces...") 
+        print("\nNow skipping spaces...")
+
         while True:
             character = get_next_non_whitespace_character(file)
-        
+
             if character == "":
                 print("\n End of file reached")
                 break
-            
-            print(character, end = "")
+
+            print(character, end="")
 
         file.seek(0)
 
-        print("\nNow reading numbers...")  
+        print("\nNow reading numbers...")
+
         while True:
             character_list = get_next_number(file)
-            if character_list[0] == None:
+            if character_list[0] is None:
                 print(" \n End of file reached")
                 break
-            
+
             print(character_list[0], end=", ")
 
         file.seek(0)
 
-        print("\nNow reading names...") 
+        print("\nNow reading names...")
         while True:
             character_list = get_next_name(file)
-            if character_list[0] == None:
+            if character_list[0] is None:
                 print(" \n End of file reached")
                 break
-            
+
             print(character_list[0], end=", ")
 
         file.seek(0)
 
         print("\nNow censoring bad names...")
+
         # Print out only the good names in the file
         name = MyNames()
+
         bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"),
-                         name.lookup("Ghastly"), name.lookup("Awful")]
+                        name.lookup("Ghastly"), name.lookup("Awful")]
 
         while True:
             character_list = get_next_name(file)
-            print(character_list)
-            if character_list[0] == None:
+            if character_list[0] is None:
                 print(" \n End of file reached")
                 break
-            
-            good_name = name.lookup(character_list[0])
 
-            print("Good name is", good_name)
+            name_id = name.lookup(character_list[0])
 
-            if good_name != None:
-                print(good_name, end=", ")
-            
-            
+            if  name_id not in bad_name_ids: 
+                print(name.get_string(name_id), end=", ")
 
 if __name__ == "__main__":
+
     main()
