@@ -47,3 +47,19 @@ def test_get_string(used_names, new_names, name_id, expected_string):
     assert used_names.get_string(name_id) == expected_string
     # Name is absent
     assert new_names.get_string(name_id) is None
+
+
+#Test for lookup
+
+#test to see if lookup adds new names
+def test_lookup_add_new_names(new_names,used_names,name_string_list):
+    """Return a names instance, after three names have been added."""
+    for name in name_string_list:
+        new_names.lookup(name)
+    assert new_names.names == used_names.names
+
+#test to see if lookup will find names that are already stored
+def test_lookup_finds_stored_names(used_names,name_string_list):
+    """Return a names instance, after three names have been added."""
+    for name in name_string_list:
+        assert used_names.lookup(name) is not None
