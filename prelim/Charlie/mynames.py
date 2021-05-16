@@ -43,6 +43,9 @@ class MyNames:
 
         If the name ID is not a valid index into the names list, return None.
         """
+        if name_id < 0:
+
+            raise ValueError
         try:
             return self.names_table[name_id]
         except IndexError:
