@@ -41,6 +41,7 @@ class Names:
     def __init__(self):
         """Initialise names list."""
         self.error_code_count = 0  # how many error codes have been declared
+		self.names = []
 
     def unique_error_codes(self, num_error_codes):
         """Return a list of unique integer error codes."""
@@ -67,3 +68,10 @@ class Names:
 
         If the name_id is not an index in the names list, return None.
         """
+		#from prelim exercise
+		if not type(name_id) is int:
+            raise TypeError("Only integers are allowed as IDs")
+        if name_id < 0:
+            raise ValueError("only possitive integers allowed as IDs")
+        if name_id <= len(self.names)-1:
+            return self.names[name_id]
