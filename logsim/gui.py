@@ -226,6 +226,7 @@ class Gui(wx.Frame):
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
+        menuBar.Append(fileMenu, "&Save")
         self.SetMenuBar(menuBar)
 
         # Canvas for drawing signals
