@@ -35,10 +35,53 @@ class Parser:
 
     def __init__(self, names, devices, network, monitors, scanner):
         """Initialise constants."""
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
+        self.scanner = scanner
+
+        self.type = None
+        self.id = None
+        self.parse_errors = 0
+
+        self.device_types = [ "NAND","AND", "NOR", "OR", "XOR", "SWITCH", "DTYPE", "CLOCK"]
+        self.headings = ["NETWORK","DEVICES", "CONNECTIONS", "SIGNALS", "SETSIGNAL", "SETCLOCK", "MONITOR" ]
+        self.punctuation = [";", "{", "}", "-", "="]
+
+        self.headings_found = 0
+        self.devices_defined = False
+        self.connections_defined = False
+        self.setsignal_defined = False
+        self.setclock_defined = False
+        self.monitor_defined = False
+
+
+
+        
 
     def parse_network(self):
         """Parse the circuit definition file."""
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
+
+        error_free = True
+
+        while True:
+
+            # Call for the next symbol from scanner
+            self.symbol = self.scanner.get_symbol()
+            
+            if self.symbol in self.headings:
+                if self.headings.index(self.symbol) != self.headings_found: #Check if headings are called in the right order
+                    raise SyntaxError("Headings called in the wrong order")
+                else:
+                    self.headings_found += 1
+
+
+
+
+            
+
         return True
