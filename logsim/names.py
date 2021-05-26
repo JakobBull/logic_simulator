@@ -53,7 +53,7 @@ class Names:
         If the name string is not present in the names list, return None.
         """
         if not isinstance(name_string, str):    #raise TypeError if name_string isn't a string
-            raise TypeError("Only strings are allowed as name_string")
+            raise TypeError("Only strings are allowed as inputs to query")
         for i in range(len(self.names)):        #iterate through all indeces of names list
             if self.names[i] == name_string: return i   #return index whose name == name_stirng
         return None                             #return none if return hasn't been called in for loop
@@ -80,8 +80,8 @@ class Names:
         """
 		#from prelim exercise
         if not type(name_id) is int:
-            raise TypeError("Only integers are allowed as IDs")
+            raise TypeError("Only +ve integers are allowed as inputs to get_name_string")
         if name_id < 0:
-            raise ValueError("only possitive integers allowed as IDs")
+            raise ValueError("only +ve integers allowed as inputs to get_name_string")
         if name_id <= len(self.names)-1:
             return self.names[name_id]
