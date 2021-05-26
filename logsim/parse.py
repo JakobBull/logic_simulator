@@ -48,13 +48,17 @@ class Parser:
         self.device_types = [ "NAND","AND", "NOR", "OR", "XOR", "SWITCH", "DTYPE", "CLOCK"]
         self.headings = ["NETWORK","DEVICES", "CONNECTIONS", "SIGNALS", "SETSIGNAL", "SETCLOCK", "MONITOR" ]
         self.punctuation = [";", "{", "}", "-", "="]
+        self.numbers = range(20)
 
         self.headings_found = 0
-        self.devices_defined = False
-        self.connections_defined = False
-        self.setsignal_defined = False
-        self.setclock_defined = False
-        self.monitor_defined = False
+        self.sections_complete = 0
+        self.devices_parsed = False
+        self.connections_parsed = False
+        self.setsignal_parsed = False
+        self.setclock_parsed = False
+        self.monitor_parsed = False
+
+        
 
 
 
@@ -66,18 +70,79 @@ class Parser:
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
 
-        error_free = True
+        
 
         while True:
 
             # Call for the next symbol from scanner
             self.symbol = self.scanner.get_symbol()
             
-            if self.symbol in self.headings:
+            if self.symbol in self.headings: #Check if symbol is a Heading
                 if self.headings.index(self.symbol) != self.headings_found: #Check if headings are called in the right order
+                    self.parse_errors += 1
                     raise SyntaxError("Headings called in the wrong order")
+                    
+
+                elif self.headings.index(self.symbol) != self.sections_complete:
+                    self.parse_errors += 1
+                    raise SyntaxError("Previous section not complete") #Check if previous section is complete before new section started
+                
+                    
                 else:
                     self.headings_found += 1
+                    # Check that next symbol is {
+                    self.symbol = self.scanner.get_symbol()
+                    if self.symbol != "{":
+                        raise SyntaxError("Always need to follow a heading with {")
+                    else:
+                        continue # New heading found so call for new symbol at start of new section
+
+            if self.sections_parsed == 0 and self.headings_found == 2: # Check if the section is DEVICES and parse devices
+                #Sequence is name = device ;
+                #Get name of device then check there's a = sign then check there's a device
+                
+                
+                if self.symbol == "}": # Check if the Devices section is ending
+                    self.devices_parsed = True
+                    self.sections_complete = 1
+
+                
+                elif self.symbol.isalpha() == False:
+                    self.parse_errors += 1
+                    raise SyntaxError("Name of device must contain a letter")
+                else:
+                    self.symbol = self.scanner.get_symbol() #Get next symbol which should be an =
+                    if self.symbol != "=":
+                        self.parse_errors += 1
+                        raise SyntaxError
+                    else:
+                        self.symbol = self.scanner.get_symbol()
+                        if self.symbol not in self.device_types:
+                            self.parse_errors += 1
+                            raise SyntaxError("Device type not recognised")
+                        else:
+                            self.symbol = self.scanner.get_symbol()
+                            if self.symbol != ";":
+                                self.parse_errors += 1
+                                raise SyntaxError
+                            else:
+                                continue #line passes and is in the right syntax
+            
+        
+
+                            
+
+
+
+                
+
+
+
+                
+
+
+            
+
 
 
 
