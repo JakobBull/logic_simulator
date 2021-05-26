@@ -10,9 +10,7 @@ Names - maps variable names and string names to unique integers.
 
 
 class Names:
-
     """Map variable names and string names to unique integers.
-
     This class deals with storing grammatical keywords and user-defined words,
     and their corresponding name IDs, which are internal indexing integers. It
     provides functions for looking up either the name ID or the name string.
@@ -25,8 +23,7 @@ class Names:
 
     Public methods
     -------------
-    unique_error_codes(self, num_error_codes): Returns a list of unique integer
-                                               error codes.
+    unique_error_codes(self, num_error_codes): Returns a list of unique integer                                           error codes.
 
     query(self, name_string): Returns the corresponding name ID for the
                         name string. Returns None if the string is not present.
@@ -38,10 +35,10 @@ class Names:
                         the name ID. Returns None if the ID is not present.
     """
 
-    def __init__(self):
+    def __init__(self, names=[]):
         """Initialise names list."""
         self.error_code_count = 0  # how many error codes have been declared
-		self.names = []
+        self.names = names
 
     def unique_error_codes(self, num_error_codes):
         """Return a list of unique integer error codes."""
@@ -53,15 +50,30 @@ class Names:
 
     def query(self, name_string):
         """Return the corresponding name ID for name_string.
-
         If the name string is not present in the names list, return None.
         """
+        if not isinstance(name_string, str):
+            raise TypeError("Only strings are allowed as name_string")
+            return None
+        for i in range(len(self.names)):
+            if self.names[i] == name_string: return i
+        return None
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
-
         If the name string is not present in the names list, add it.
         """
+        name_ids = []
+        present = False
+        for n in name_string_list:
+            for i in range(len(self.names)):
+                if self.names[i] == n:
+                    name_ids.append(i)
+                    present = True
+                    break
+            if(present == False): self.names.append(n)
+        return name_ids
+
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
@@ -69,7 +81,7 @@ class Names:
         If the name_id is not an index in the names list, return None.
         """
 		#from prelim exercise
-		if not type(name_id) is int:
+        if not type(name_id) is int:
             raise TypeError("Only integers are allowed as IDs")
         if name_id < 0:
             raise ValueError("only possitive integers allowed as IDs")
