@@ -70,7 +70,9 @@ class Names:
                     name_ids.append(i)
                     present = True
                     break   #if a name in name_string_list is found, change present to true and break loop
-            if(present == False): self.names.append(n)  #if a name in name_string_list isn't found, add to names list of instance
+            if(present is False):
+                self.names.append(n)  #if a name in name_string_list isn't found, add to names list of instance
+                name_ids.append(len(self.names)-1)
         return name_ids
 
 

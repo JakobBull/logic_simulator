@@ -58,7 +58,7 @@ def test_lookup_add_new_names(new_names,used_names,name_string_list):
     #tests to see that lookup returns no name ids when using lookup
     #function on the new_names instance, since the new_names instance
     #has no stored names
-    assert new_names.lookup(name_string_list) == []
+    assert new_names.lookup(name_string_list) == [0,1,2]
     #tests to see that after the first attempt to lookup name_string_list
     #the names of name_string_list are stores in the new_names instance
     assert new_names.lookup(name_string_list) == [0,1,2]
@@ -69,8 +69,8 @@ def test_lookup_finds_stored_names(new_names,used_names,name_string_list):
     assert used_names.lookup(name_string_list) == [0,1,2]
     #tests that no name ids are found when list of names that haven't been used before
     #are used as parameter to lookup function for both new_names and used_names instances
-    assert used_names.lookup(["bob","mike","jill"]) == []
-    assert new_names.lookup(["bob","mike","jill"]) == []
+    assert used_names.lookup(["bob","mike","jill"]) == [3,4,5]
+    assert new_names.lookup(["bob","mike","jill"]) == [0,1,2]
 
 """TESTS FOR GET_NAME_STRING"""
 #GET_NAME_STRING
