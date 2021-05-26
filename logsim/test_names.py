@@ -15,7 +15,9 @@ def name_string_list():
 @pytest.fixture
 def used_names(name_string_list):
     """Return a names instance, after three names have been added."""
-    return Names(name_string_list)
+    name = Names()
+    name.lookup(name_string_list)
+    return name
 #TESTS FOR QUERY
 #QUERY:
     #Return the corresponding name ID for name_string.
@@ -90,4 +92,4 @@ def test_get_name_string_output(used_names, new_names, name_id, expected_string)
     # Name is present
     assert used_names.get_name_string(name_id) == expected_string
     # Name is absent
-    assert new_names.get_name_string(name_id) == expected_string
+    assert new_names.get_name_string(name_id) == None
