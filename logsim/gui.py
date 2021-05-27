@@ -222,40 +222,113 @@ class Gui(wx.Frame):
 
         # Configure the file menu
         fileMenu = wx.Menu()
+        saveMenu = wx.Menu()
         menuBar = wx.MenuBar()
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
-        menuBar.Append(fileMenu, "&Save")
+        menuBar.Append(saveMenu, "&Save")
         self.SetMenuBar(menuBar)
+
+        #panel for better formatting
+        #self.panel = wx.Panel(self, wx.ID_ANY)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self, devices, monitors)
 
         # Configure the widgets
+        
+        #cycle_sizer
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
+
+        #button_sizer
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
+        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
+        """
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER)
+                                    style=wx.TE_PROCESS_ENTER)"""
+        
+        self.switch_box_text = wx.StaticText(self, wx.ID_ANY, "Set Switch")
+        #switch_sizer
+        self.switch_box = wx.ComboBox(self, wx.ID_ANY, "Switch")
+        self.switch_box_inter_text = wx.StaticText(self, wx.ID_ANY, "set to", style= wx.ALIGN_CENTER)
+        self.switch_box_values = wx.ComboBox(self, wx.ID_ANY, "Value")
+
+        
+        self.monitor_text = wx.StaticText(self, wx.ID_ANY, "Set outputs to monitor")
+        #monitor_sizer
+        self.monitor_combobox = wx.ComboBox(self, wx.ID_ANY, "Select")
+        self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
+
+        
+        self.remove_monitor_text = wx.StaticText(self, wx.ID_ANY, "Remove monitor")
+        #remove_monitor_sizer
+        self.remove_monitor_combobox = wx.ComboBox(self, wx.ID_ANY, "Select")
+        self.remove_monitor_button = wx.Button(self, wx.ID_ANY, "Remove")
+        self.remove_all_button = wx.Button(self, wx.ID_ANY, "Remove all")
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
+
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+
+        #self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        self.switch_box.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
+        self.switch_box_values.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         side_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        cycle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        switch_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        remove_monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        remove_monitor_subsizer = wx.BoxSizer(wx.VERTICAL)
+        remove_monitor_bordersizer = wx.BoxSizer(wx.VERTICAL)
 
         main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
         main_sizer.Add(side_sizer, 1, wx.ALL, 5)
 
-        side_sizer.Add(self.text, 1, wx.TOP, 10)
-        side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        side_sizer.SetMinSize(side_sizer.GetMinSize())
+        side_sizer.Add(cycle_sizer, 1, wx.ALL | wx.EXPAND, 0)
+        side_sizer.Add(button_sizer, 1, wx.ALL |wx.EXPAND, 0)
+        side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
+        side_sizer.Add(self.switch_box_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
+        side_sizer.Add(switch_sizer, 1, wx.ALL|wx.EXPAND, 0)
+        side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
+        side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
+        side_sizer.Add(monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
+        side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
+        side_sizer.Add(self.remove_monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
+        side_sizer.Add(remove_monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
+
+        cycle_sizer.Add(self.text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
+        cycle_sizer.Add(self.spin, 2, wx.ALL | wx.ALIGN_RIGHT, 5)
+
+        button_sizer.Add(self.run_button, 1, wx.ALL | wx.EXPAND, 5)
+        button_sizer.Add(self.continue_button, 1, wx.ALL | wx.EXPAND, 5)
+
+        switch_sizer.Add(self.switch_box, 0, wx.ALL, 5)
+        switch_sizer.Add(self.switch_box_inter_text, 0, wx.ALL | wx.CENTRE, 5)
+        switch_sizer.Add(self.switch_box_values, 0, wx.ALL, 5)
+
+        monitor_sizer.Add(self.monitor_combobox, 1, wx.ALL, 5)
+        monitor_sizer.Add(self.add_monitor_button, 1, wx.ALL, 5)
+
+        remove_monitor_sizer.Add(remove_monitor_bordersizer, 1, wx.RIGHT | wx.LEFT | wx.EXPAND, 5)
+        remove_monitor_sizer.Add(remove_monitor_subsizer, 1, wx.ALL, 5)
+
+        remove_monitor_bordersizer.Add(self.remove_monitor_combobox, 0, wx.TOP  | wx.BOTTOM | wx.EXPAND, 10)
+
+        remove_monitor_subsizer.Add(self.remove_monitor_button, 0, wx.ALL |wx.EXPAND, 5)
+        remove_monitor_subsizer.Add(self.remove_all_button, 0, wx.ALL|wx.EXPAND, 5)
+
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
@@ -279,9 +352,18 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
         self.canvas.render(text)
+    
+    def on_continue_button(self, event):
+        """Handle the event triggered by pressing the continue button"""
+        text = "Contine button pressed."
+        self.canvas.render(text)
 
     def on_text_box(self, event):
         """Handle the event when the user enters text."""
         text_box_value = self.text_box.GetValue()
         text = "".join(["New text box value: ", text_box_value])
         self.canvas.render(text)
+
+    def on_combo_select(self, event):
+        """Handle event from selecting an event from the combobox dropdown menu"""
+        self.canvas.render("selected")
