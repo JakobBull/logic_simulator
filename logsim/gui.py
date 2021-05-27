@@ -192,50 +192,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
+class SidePanel(wx.Panel):
 
-class Gui(wx.Frame):
-    """Configure the main window and all the widgets.
-
-    This class provides a graphical user interface for the Logic Simulator and
-    enables the user to change the circuit properties and run simulations.
-
-    Parameters
-    ----------
-    title: title of the window.
-
-    Public methods
-    --------------
-    on_menu(self, event): Event handler for the file menu.
-
-    on_spin(self, event): Event handler for when the user changes the spin
-                           control value.
-
-    on_run_button(self, event): Event handler for when the user clicks the run
-                                button.
-
-    on_text_box(self, event): Event handler for when the user enters text.
-    """
-
-    def __init__(self, title, path, names, devices, network, monitors):
-        """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(800, 600))
-
-        # Configure the file menu
-        fileMenu = wx.Menu()
-        saveMenu = wx.Menu()
-        menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
-        menuBar.Append(fileMenu, "&File")
-        menuBar.Append(saveMenu, "&Save")
-        self.SetMenuBar(menuBar)
-
-        #panel for better formatting
-        #self.panel = wx.Panel(self, wx.ID_ANY)
-
-        # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
-
+    def __init__(self, parent)-> None:
+        super().__init__(parent=parent)
         # Configure the widgets
         
         #cycle_sizer
@@ -279,59 +239,52 @@ class Gui(wx.Frame):
         self.switch_box.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
         self.switch_box_values.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
 
-        # Configure sizers for layout
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.side_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        side_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.cycle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.switch_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.remove_monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.remove_monitor_subsizer = wx.BoxSizer(wx.VERTICAL)
+        self.remove_monitor_bordersizer = wx.BoxSizer(wx.VERTICAL)
 
-        cycle_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        switch_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        remove_monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        remove_monitor_subsizer = wx.BoxSizer(wx.VERTICAL)
-        remove_monitor_bordersizer = wx.BoxSizer(wx.VERTICAL)
+        self.side_sizer.SetMinSize(self.side_sizer.GetMinSize())
+        self.side_sizer.Add(self.cycle_sizer, 1, wx.ALL | wx.EXPAND, 0)
+        self.side_sizer.Add(self.button_sizer, 1, wx.ALL |wx.EXPAND, 0)
+        self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
+        self.side_sizer.Add(self.switch_box_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
+        self.side_sizer.Add(self.switch_sizer, 1, wx.ALL|wx.EXPAND, 0)
+        self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
+        self.side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
+        self.side_sizer.Add(self.monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
+        self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
+        self.side_sizer.Add(self.remove_monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
+        self.side_sizer.Add(self.remove_monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
 
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(side_sizer, 1, wx.ALL, 5)
+        self.cycle_sizer.Add(self.text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
+        self.cycle_sizer.Add(self.spin, 2, wx.ALL | wx.ALIGN_RIGHT, 5)
 
-        side_sizer.SetMinSize(side_sizer.GetMinSize())
-        side_sizer.Add(cycle_sizer, 1, wx.ALL | wx.EXPAND, 0)
-        side_sizer.Add(button_sizer, 1, wx.ALL |wx.EXPAND, 0)
-        side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
-        side_sizer.Add(self.switch_box_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
-        side_sizer.Add(switch_sizer, 1, wx.ALL|wx.EXPAND, 0)
-        side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
-        side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
-        side_sizer.Add(monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
-        side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
-        side_sizer.Add(self.remove_monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
-        side_sizer.Add(remove_monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
+        self.button_sizer.Add(self.run_button, 1, wx.ALL | wx.EXPAND, 5)
+        self.button_sizer.Add(self.continue_button, 1, wx.ALL | wx.EXPAND, 5)
 
-        cycle_sizer.Add(self.text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
-        cycle_sizer.Add(self.spin, 2, wx.ALL | wx.ALIGN_RIGHT, 5)
+        self.switch_sizer.Add(self.switch_box, 0, wx.ALL, 5)
+        self.switch_sizer.Add(self.switch_box_inter_text, 0, wx.ALL | wx.CENTRE, 5)
+        self.switch_sizer.Add(self.switch_box_values, 0, wx.ALL, 5)
 
-        button_sizer.Add(self.run_button, 1, wx.ALL | wx.EXPAND, 5)
-        button_sizer.Add(self.continue_button, 1, wx.ALL | wx.EXPAND, 5)
+        self.monitor_sizer.Add(self.monitor_combobox, 1, wx.ALL, 5)
+        self.monitor_sizer.Add(self.add_monitor_button, 1, wx.ALL, 5)
 
-        switch_sizer.Add(self.switch_box, 0, wx.ALL, 5)
-        switch_sizer.Add(self.switch_box_inter_text, 0, wx.ALL | wx.CENTRE, 5)
-        switch_sizer.Add(self.switch_box_values, 0, wx.ALL, 5)
+        self.remove_monitor_sizer.Add(self.remove_monitor_bordersizer, 1, wx.RIGHT | wx.LEFT | wx.EXPAND, 5)
+        self.remove_monitor_sizer.Add(self.remove_monitor_subsizer, 1, wx.ALL, 5)
 
-        monitor_sizer.Add(self.monitor_combobox, 1, wx.ALL, 5)
-        monitor_sizer.Add(self.add_monitor_button, 1, wx.ALL, 5)
+        self.remove_monitor_bordersizer.Add(self.remove_monitor_combobox, 0, wx.TOP  | wx.BOTTOM | wx.EXPAND, 10)
 
-        remove_monitor_sizer.Add(remove_monitor_bordersizer, 1, wx.RIGHT | wx.LEFT | wx.EXPAND, 5)
-        remove_monitor_sizer.Add(remove_monitor_subsizer, 1, wx.ALL, 5)
+        self.remove_monitor_subsizer.Add(self.remove_monitor_button, 0, wx.ALL |wx.EXPAND, 5)
+        self.remove_monitor_subsizer.Add(self.remove_all_button, 0, wx.ALL|wx.EXPAND, 5)
 
-        remove_monitor_bordersizer.Add(self.remove_monitor_combobox, 0, wx.TOP  | wx.BOTTOM | wx.EXPAND, 10)
+        self.SetSizer(self.side_sizer)
 
-        remove_monitor_subsizer.Add(self.remove_monitor_button, 0, wx.ALL |wx.EXPAND, 5)
-        remove_monitor_subsizer.Add(self.remove_all_button, 0, wx.ALL|wx.EXPAND, 5)
-
-
-        self.SetSizeHints(600, 600)
-        self.SetSizer(main_sizer)
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -367,3 +320,62 @@ class Gui(wx.Frame):
     def on_combo_select(self, event):
         """Handle event from selecting an event from the combobox dropdown menu"""
         self.canvas.render("selected")
+
+class Monitor:
+
+    def __init__(self) -> None:
+        pass
+
+
+class Gui(wx.Frame):
+    """Configure the main window and all the widgets.
+
+    This class provides a graphical user interface for the Logic Simulator and
+    enables the user to change the circuit properties and run simulations.
+
+    Parameters
+    ----------
+    title: title of the window.
+
+    Public methods
+    --------------
+    on_menu(self, event): Event handler for the file menu.
+
+    on_spin(self, event): Event handler for when the user changes the spin
+                           control value.
+
+    on_run_button(self, event): Event handler for when the user clicks the run
+                                button.
+
+    on_text_box(self, event): Event handler for when the user enters text.
+    """
+
+    def __init__(self, title, path, names, devices, network, monitors):
+        """Initialise widgets and layout."""
+        super().__init__(parent=None, title=title, size=(800, 600))
+
+        # Configure the file menu
+        fileMenu = wx.Menu()
+        saveMenu = wx.Menu()
+        menuBar = wx.MenuBar()
+        fileMenu.Append(wx.ID_ABOUT, "&About")
+        fileMenu.Append(wx.ID_EXIT, "&Exit")
+        menuBar.Append(fileMenu, "&File")
+        menuBar.Append(saveMenu, "&Save")
+        self.SetMenuBar(menuBar)
+
+        # Canvas for drawing signals
+        self.canvas = MyGLCanvas(self, devices, monitors)
+        #Control side_panel
+        self.side_panel = SidePanel(self)
+
+
+        # Configure sizers for layout
+        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
+        main_sizer.Add(self.side_panel, 1, wx.ALL, 5)
+
+
+        self.SetSizeHints(600, 600)
+        self.SetSizer(main_sizer)
