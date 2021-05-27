@@ -46,6 +46,7 @@ class Parser:
         self.parse_errors = 0
 
         self.device_types = [ "NAND","AND", "NOR", "OR", "XOR", "SWITCH", "DTYPE", "CLOCK"]
+        self.device_names = []
         self.headings = ["NETWORK","DEVICES", "CONNECTIONS", "SIGNALS", "SETSIGNAL", "SETCLOCK", "MONITOR" ]
         self.punctuation = [";", "{", "}", "-", "="]
         self.numbers = range(20)
@@ -97,7 +98,7 @@ class Parser:
                     else:
                         continue # New heading found so call for new symbol at start of new section
 
-            if self.sections_parsed == 0 and self.headings_found == 2: # Check if the section is DEVICES and parse devices
+            elif self.sections_parsed == 0 and self.headings_found == 2: # Check if the section is DEVICES and parse devices
                 #Sequence is name = device ;
                 #Get name of device then check there's a = sign then check there's a device
                 
@@ -111,6 +112,7 @@ class Parser:
                     self.parse_errors += 1
                     raise SyntaxError("Name of device must contain a letter")
                 else:
+                    self.device_names.append(self.symbol) # add symbol id to a list of device ids
                     self.symbol = self.scanner.get_symbol() #Get next symbol which should be an =
                     if self.symbol != "=":
                         self.parse_errors += 1
@@ -127,6 +129,31 @@ class Parser:
                                 raise SyntaxError
                             else:
                                 continue #line passes and is in the right syntax
+            
+            
+            elif self.setclock_parsed == 1 and self.headings_found == 3: #Check if section is CONNECTIONS and parse connections
+                #Check if symbol is in the list of devices, then check for - then check what it's connected to before checking the ;
+                
+
+                if self.symbol == "}": # Check if the Connections section is ending
+                    self.connection_parsed = True
+                    self.sections_complete = 2
+                
+                if self.symbol not in self.device_names:
+                    self.parse_errors += 1
+                    raise SyntaxError("Device not defined")
+                
+                else:
+                    self.symbol = self.scanner.get_symbol()
+                    if self.symbol != "-":
+                        self.parse_errors += 1
+                        raise SyntaxError("No - found to define connection")
+                    else:
+                        self.symbol = self.scanner.get_symbol()
+                        
+
+
+
             
         
 
