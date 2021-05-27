@@ -102,7 +102,13 @@ class Parser:
                     else:
                         raise SyntaxError("Headings called in wrong order")
 
-                
+                elif self.symbol == "SIGNAL":
+                    if self.sections_complete == 2 and self.headings_found == 3:
+                        self.headings_found += 1
+                        self.signal_list()
+                    else:
+                        raise SyntaxError("Headings called in wrong order")
+
                 else:
                     return True
             else:
@@ -210,12 +216,22 @@ class Parser:
         else:
             self.parse_errors += 1
             raise SyntaxError("SETSIGNAL heading expected")
+        
+        self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETCLOCK
+        if self.symbol == "SETCLOCK":
+            self.headings_found += 1
+            self.setclock_parse
+
     
     def setsignal_list(self):
         """Function which parses the setsignal section"""
 
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol() #Go to first symbol of the line
+        if self.symbol.type == self.scanner.CLOSEDCURLY:
+            self.setsignal_parsed = True
+            self.sections_complete += 1
+            return 
         self.setsignal_parse()
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
@@ -232,6 +248,8 @@ class Parser:
         """Function which parses a single line of the setsignal section"""
         #Expected format : name EQUALS BINARYNUMBER "starttime" NUMBER SEMICOLON
         
+        
+
         if self.symbol not in self.device_names:
             self.parse_errors += 1
             raise SyntaxError("Device not defined")
@@ -266,10 +284,97 @@ class Parser:
             raise SyntaxError("Expected ; to end line")
 
 
+    def setclock_list(self):
+        self.OPENCURLY_search()
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == self.scanner.CLOSEDCURLY:
+            self.setclockparsed = True
+            self.sections_complete += 1
+            return 
+        self.setclock_parse()
+        while self.symbol.type == self.scanner.SEMICOLON:
+            self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
+            if self.symbol.type == self.scanner.CLOSEDCURLY: # Check if } which denotes end of setsignal
+                self.setclock_parsed = True
+                self.sections_complete += 1
+                break 
+            self.setclock_parse()
+
+
+
+    def setclock_parse(self):
+        """"Function which parses a single line of the setclock section"""
+        # Expected format : name EQUALS BINARYNUMBER "starttime" NUMBER "period" NUMBER "first change" NUMBER SEMICOLON
+        
+       
+        if self.symbol not in self.device_names:
+            self.parse_errors += 1
+            raise SyntaxError("Device not defined")
+
+        self.symbol = self.scanner.get_symbol() 
+        
+        if self.symbol.type != self.scanner.EQUALS:
+                self.parse_errors += 1
+                raise SyntaxError("= sign expected")
+        
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.BINARYNUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Signal can only be set to 1 or 0")
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol != "starttime":
+            self.parse_errors += 1
+            raise SyntaxError("word starttime expected")
+        
+        self.symbol = self.scanner.get_symbol()
+        
+        if self.symbol.type != self.scanner.NUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Integer number required")
+
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol != "period":
+            self.parse_errors += 1
+            raise SyntaxError("word period expected")
+        
+        self.symbol = self.scanner.get_symbol()
+        
+        if self.symbol.type != self.scanner.NUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Integer number required")
+
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol != "first":
+            self.parse_errors += 1
+            raise SyntaxError("word first expected")
+
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol != "symbol":
+            self.parse_errors += 1
+            raise SyntaxError("word symbol expected")
+        
+        self.symbol = self.scanner.get_symbol()
+        
+        if self.symbol.type != self.scanner.NUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Integer number required")
+
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol.type != self.scanner.SEMICOLON:
+            self.parse_errors += 1
+            raise SyntaxError("Expected ; to end line")
+
 
         
+
         
-    
+
+
             
                 
         
