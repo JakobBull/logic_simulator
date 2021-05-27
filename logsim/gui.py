@@ -9,6 +9,8 @@ MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
 import wx
+import time
+import wx.lib.scrolledpanel as scrolledpanel
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 
@@ -194,8 +196,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
 class SidePanel(wx.Panel):
 
-    def __init__(self, parent)-> None:
+    def __init__(self, parent, scrolled_panel)-> None:
         super().__init__(parent=parent)
+        
+        self.scrolled_panel = scrolled_panel
         # Configure the widgets
         
         #cycle_sizer
@@ -238,6 +242,8 @@ class SidePanel(wx.Panel):
         #self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
         self.switch_box.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
         self.switch_box_values.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
+
+        self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_monitor)
 
         self.side_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -285,6 +291,9 @@ class SidePanel(wx.Panel):
 
         self.SetSizer(self.side_sizer)
 
+    def on_add_monitor(self, event):
+        """Handle the event when the add monitor button is pressed"""
+        self.scrolled_panel.add_monitor("text 3")
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -321,10 +330,25 @@ class SidePanel(wx.Panel):
         """Handle event from selecting an event from the combobox dropdown menu"""
         self.canvas.render("selected")
 
-class Monitor:
+class Monitor(scrolledpanel.ScrolledPanel):
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, parent) -> None:
+        super().__init__(parent=parent, size=(400, 600))
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.text_1 = wx.StaticText(self, wx.ID_ANY, "Text1")
+        self.text_2 = wx.StaticText(self, wx.ID_ANY, "Text2")
+
+        self.sizer.Add(self.text_1, 1, wx.ALL |wx.EXPAND, 0)
+        self.sizer.Add(self.text_2, 1, wx.ALL |wx.EXPAND, 0)
+
+        self.SetSizer(self.sizer)
+
+    def add_monitor(self, text):
+        self.text_3 = wx.StaticText(self, wx.ID_ANY, text)
+        self.sizer.Add(self.text_3, 1,  wx.ALL |wx.EXPAND, 0)
+        self.SetSizer(self.sizer)
+        self.sizer.Layout()
 
 
 class Gui(wx.Frame):
@@ -365,17 +389,21 @@ class Gui(wx.Frame):
         self.SetMenuBar(menuBar)
 
         # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
+        self.scrolled_panel = Monitor(self)
+        self.scrolled_panel.SetupScrolling()
+        self.scrolled_panel.SetBackgroundColour('#b0bcda')
+        #self.canvas = MyGLCanvas(self, devices, monitors)
         #Control side_panel
-        self.side_panel = SidePanel(self)
+        self.side_panel = SidePanel(self, self.scrolled_panel)
 
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
+        main_sizer.Add(self.scrolled_panel, 5, wx.EXPAND | wx.ALL, 5)
         main_sizer.Add(self.side_panel, 1, wx.ALL, 5)
 
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
+
