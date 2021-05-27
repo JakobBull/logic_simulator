@@ -78,7 +78,7 @@ class Parser:
             # Call for the next symbol from scanner
             self.symbol = self.scanner.get_symbol()
             
-            if self.symbol in self.headings: #Check if symbol is a Heading
+            if self.symbol.type == self.scanner.HEADING: #Check if symbol is a Heading
                 if self.headings.index(self.symbol) != self.headings_found: #Check if headings are called in the right order
                     self.parse_errors += 1
                     raise SyntaxError("Headings called in the wrong order")
@@ -88,68 +88,106 @@ class Parser:
                     self.parse_errors += 1
                     raise SyntaxError("Previous section not complete") #Check if previous section is complete before new section started
                 
-                    
+                elif self.symbol == "DEVICES":
+                    self.device_list()
+
+                elif self.symbol == "CONNECTIONS":
+                    self.connection_list()
                 else:
-                    self.headings_found += 1
-                    # Check that next symbol is {
-                    self.symbol = self.scanner.get_symbol()
-                    if self.symbol != "{":
-                        raise SyntaxError("Always need to follow a heading with {")
-                    else:
-                        continue # New heading found so call for new symbol at start of new section
+                    return True
+            else:
+                return True
 
-            elif self.sections_parsed == 0 and self.headings_found == 2: # Check if the section is DEVICES and parse devices
-                #Sequence is name = device ;
-                #Get name of device then check there's a = sign then check there's a device
-                
-                
-                if self.symbol == "}": # Check if the Devices section is ending
-                    self.devices_parsed = True
-                    self.sections_complete = 1
+              
+    def device_list(self):
+        """ Function which parses the device list"""
 
-                
-                elif self.symbol.isalpha() == False:
+
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.OPENCURLY:
+            raise SyntaxError("Always need to follow a heading with {")
+        
+        self.symbol = self.scanner.get_symbol()
+        self.device_parse()
+        self.symbol = self.scanner.get_symbol()
+        while self.symbol.type == self.scanner.SEMICOLON:
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol.type == self.scanner.CLOSEDCURLY:
+                self.devices_parsed = True
+                self.sections_complete += 1
+                break
+            else:
+                self.device_parse()
+                self.symbol = self.scanner.get_symbol               
+               
+    def device_parse(self):
+
+        if self.symbol.type != self.scanner.NAME:
+            self.parse_errors += 1
+            raise SyntaxError("Name of device must contain a letter") 
+        
+        else:
+            self.device_names.append(self.symbol) # add symbol id to a list of device ids
+            self.symbol = self.scanner.get_symbol() #Get next symbol which should be an = sign   
+            if self.symbol.type != self.scanner.EQUALS:
                     self.parse_errors += 1
-                    raise SyntaxError("Name of device must contain a letter")
-                else:
-                    self.device_names.append(self.symbol) # add symbol id to a list of device ids
-                    self.symbol = self.scanner.get_symbol() #Get next symbol which should be an =
-                    if self.symbol != "=":
-                        self.parse_errors += 1
-                        raise SyntaxError
-                    else:
-                        self.symbol = self.scanner.get_symbol()
-                        if self.symbol not in self.device_types:
-                            self.parse_errors += 1
-                            raise SyntaxError("Device type not recognised")
-                        else:
-                            self.symbol = self.scanner.get_symbol()
-                            if self.symbol != ";":
-                                self.parse_errors += 1
-                                raise SyntaxError
-                            else:
-                                continue #line passes and is in the right syntax
-            
-            
-            elif self.setclock_parsed == 1 and self.headings_found == 3: #Check if section is CONNECTIONS and parse connections
-                #Check if symbol is in the list of devices, then check for - then check what it's connected to before checking the ;
+                    raise SyntaxError
+            else:
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol not in self.device_types:
+                    self.parse_errors += 1
                 
+                    
 
-                if self.symbol == "}": # Check if the Connections section is ending
-                    self.connection_parsed = True
-                    self.sections_complete = 2
+    def connection_list(self):
+
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.OPENCURLY:
+            raise SyntaxError("Always need to follow a heading with {")
+
+        self.symbol = self.scanner.get_symbol()
+        self.connection_parse() 
+        self.symbol = self.scanner.get_symbol()
+        while self.symbol.type == self.scanner.SEMICOLON:
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol.type == self.scanner.CLOSEDCURLY:
+                self.connections_parsed = True
+                self.sections_complete += 1
+                break
+            else:
+                self.connection_parse()
+                self.symbol = self.scanner.get_symbol  
+
                 
-                if self.symbol not in self.device_names:
+    def connection_parse(self):
+
+        if self.symbol not in self.device_names:
+            self.parse_errors += 1
+            raise SyntaxError("Device not defined")
+
+        else:
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol.type != self.type.HYPHEN:
+                self.parse_errors += 1
+                raise SyntaxError("No - found to define connection")
+
+            else:
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol.type != self.type.NAME:
                     self.parse_errors += 1
                     raise SyntaxError("Device not defined")
-                
+
                 else:
                     self.symbol = self.scanner.get_symbol()
-                    if self.symbol != "-":
-                        self.parse_errors += 1
-                        raise SyntaxError("No - found to define connection")
-                    else:
-                        self.symbol = self.scanner.get_symbol()
+                    if self.symbol.type != self.scanner.INPUT:
+                        raise SyntaxError("Input not defined")
+
+
+                
+            
+     
+
+
                         
 
 
@@ -175,5 +213,3 @@ class Parser:
 
 
             
-
-        return True
