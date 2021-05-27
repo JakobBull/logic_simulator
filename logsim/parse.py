@@ -108,11 +108,21 @@ class Parser:
                         self.signal_list()
                     else:
                         raise SyntaxError("Headings called in wrong order")
+                    
 
-                else:
-                    return True
-            else:
+                elif self.symbol == "MONITOR":
+                    if self.sections_complete == 5 and self.headings_found == 6:
+                        self.headings_found += 1
+
+                    else:
+                        raise SyntaxError("Headings called in wrong order")
+
+                
+            elif self.sections_complete == 6 and self.headings_found == 7:
                 return True
+            else:
+                return False
+                
 
 
     def OPENCURLY_search(self):
@@ -202,8 +212,17 @@ class Parser:
 
                 else:
                     self.symbol = self.scanner.get_symbol()
-                    if self.symbol.type != self.scanner.INPUT:
-                        raise SyntaxError("Input not defined")
+                    if self.symbol.type != self.scanner.DOT:
+                        raise SyntaxError("No . found")
+
+                    else: 
+                        self.symbol = self.scanner.get_symbol()
+                        if self.symbol.type != self.scanner.NUMBER:
+                            raise SyntaxError("Input not defined")
+
+
+
+
 
     def signal_list(self):
         "function whcih parses the signal setting"
@@ -220,7 +239,13 @@ class Parser:
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETCLOCK
         if self.symbol == "SETCLOCK":
             self.headings_found += 1
-            self.setclock_parse
+            self.setclock_parse()
+        
+        self.symbol = self.scanner.get_symbol() #Get next symbol, should be }
+        if self.symbol.type == self.scanner.CLOSEDCURLY:
+            self.sections_complete += 1
+        
+
 
     
     def setsignal_list(self):
@@ -370,7 +395,45 @@ class Parser:
             raise SyntaxError("Expected ; to end line")
 
 
+    def monitor_list(self):
+        """Function that parses the monitor section of the code"""
+
+        self.OPENCURLY_search()
+
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol.type == self.scanner.CLOSEDCURLY:
+            self.parse_errors += 1
+            raise SyntaxError("No devices monitored")
         
+        else:
+            while self.symbol.type == self.scanner.SEMICOLON:
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol.type == self.scanner.CLOSEDCURLY:
+                    self.sections_complete += 1
+                    self.monitor_parsed = True
+                    break
+                else:
+                    self.monitor_parse()
+
+
+    
+    def monitor_parse(self):
+        """Function which parses a line in Monitor """
+        #Expected format : name SEMICOLON
+        if self.symbol not in self.device_names:
+            self.parse_errors += 1
+            raise SyntaxError("Device not defined")
+        
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol.type != self.scanner.SEMICOLON:
+            self.parse_errors += 1
+            raise SyntaxError("Expected ; to end line")
+
+
+
+
 
         
 
