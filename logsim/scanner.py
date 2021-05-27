@@ -28,11 +28,12 @@ class Symbol:
     def __init__(self):
         """Initialise symbol properties."""
         self.type = None
-        self.id = None
+        self.id = None      #number if symbol is a number
         # extended to include symbol's line and character number
-        #self.line_number = None
-        #self.char_number = None
-        #self.name_string = None
+        self.line_number = None
+        self.start_char_number = None
+        self.end_char_number = None
+        self.string = None
 
 
 class Scanner:
@@ -72,15 +73,18 @@ class Scanner:
             self.END_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
 
-        #self.current_line_number = 1;
-        #self.current_char_number = 1;
+        self.current_line_number = 1;
+        self.current_char_number = 0;
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
+        symbol.line_number = self.current_line_number
+        symbol.start_char_number = self.current_char_number
         if self.current_character.isalpha():  # name
             name_string = self.get_name()
+            symbol.string = name_string
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
             else:
@@ -102,6 +106,7 @@ class Scanner:
             symbol.type = self.EOF
         else:  # not a valid character
             self.advance()
+        symbol.end_char_number = self.current_char_number
         return symbol
 
     def advance(self):  #Need to advance once to get to fist character of file!
@@ -109,13 +114,11 @@ class Scanner:
         # and places it in current_character
         char = self.file.read(1)
         self.current_character = char
-        """
         if(self.current_character == '\n'):
             self.current_line_number += 1
             self.current_char_number = 1
         else:
             self.current_char_number += 1
-        """
 
     def skip_spaces(self):
         # skip_spaces: calls advance as necessary until current_character
