@@ -30,8 +30,9 @@ class Symbol:
         self.type = None
         self.id = None
         # extended to include symbol's line and character number
-        self.line_number = None
-        self.char_number = None
+        #self.line_number = None
+        #self.char_number = None
+        #self.name_string = None
 
 
 class Scanner:
@@ -71,6 +72,9 @@ class Scanner:
             self.END_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
 
+        #self.current_line_number = 1;
+        #self.current_char_number = 1;
+
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
@@ -100,6 +104,27 @@ class Scanner:
             self.advance()
         return symbol
 
+    def advance(self):  #Need to advance once to get to fist character of file!
+        # advance: reads the next character from the definition file
+        # and places it in current_character
+        char = self.file.read(1)
+        self.current_character = char
+        """
+        if(self.current_character == '\n'):
+            self.current_line_number += 1
+            self.current_char_number = 1
+        else:
+            self.current_char_number += 1
+        """
+
+    def skip_spaces(self):
+        # skip_spaces: calls advance as necessary until current_character
+        # is not whitespace
+        """Skip whitespace until a non-whitespace character is reached."""
+        self.advance()
+        while self.current_character.isspace():
+            self.advance()
+
     def get_name(self):
         """similar to get_next_name in the preliminary exercises,
         except that it now assumes the current character is a letter,
@@ -112,48 +137,24 @@ class Scanner:
         name = ""
         name += self.current_character
         while True:
-            char = self.get_character()
-            if not char.isalnum():
-                self.current_character = char
+            self.advance()
+            if not self.current_character.isalnum():
+                #self.current_character = char
                 break
-            else: name+=char
+            else: name+=self.current_character
         return name
 
     def get_number(self):
         """assumes the current character is a digit,
         returns the integernumber and places the next
         non-digit character in current_character"""
-        #only expecting binary numbers
+        #should number be able to start with a 0?
         integernumber = ""
         integernumber += self.current_character
         while True:
-            self.current_character = self.get_character()
+            self.advance()
             if self.current_character.isdigit():
-                integernumber += char
+                integernumber += self.current_character
             else:
                 break
         return integernumber
-
-    def advance(self):
-        """reads the next character from the definition file and places
-        it in current_character skip_spaces: calls advance as necessary
-        until current_character is not whitespace"""
-        self.get_character()
-        self.current_character = self.read_command()
-
-    def skip_spaces(self):
-        """Skip whitespace until a non-whitespace character is reached."""
-        self.get_character()
-        while self.current_character.isspace():
-            self.get_character()
-
-    def read_command(self):
-        """Return the first non-whitespace character."""
-        self.skip_spaces()
-        return self.character
-
-    def get_character(self):
-        """Read and return the next character in input_file."""
-        char = self.file.read(1)
-        if char is None: return ""
-        else: return char
