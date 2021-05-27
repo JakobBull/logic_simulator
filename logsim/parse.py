@@ -83,29 +83,42 @@ class Parser:
                     self.parse_errors += 1
                     raise SyntaxError("Headings called in the wrong order")
                     
+                elif self.symbol == "NETWORK":
+                    self.headings_found += 1
 
-                elif self.headings.index(self.symbol) != self.sections_complete:
-                    self.parse_errors += 1
-                    raise SyntaxError("Previous section not complete") #Check if previous section is complete before new section started
                 
                 elif self.symbol == "DEVICES":
-                    self.device_list()
+                    if self.sections_complete == 0 and self.headings_found == 1:
+                        self.headings_found += 1
+                        self.device_list()
+                    else:
+                        raise SyntaxError("Headings called in wrong order")
+                    
 
                 elif self.symbol == "CONNECTIONS":
-                    self.connection_list()
+                    if self.sections_complete == 1 and self.headings_found == 2:
+                        self.headings_found += 1
+                        self.connection_list()
+                    else:
+                        raise SyntaxError("Headings called in wrong order")
+
+                
                 else:
                     return True
             else:
                 return True
 
+
+    def OPENCURLY_search(self):
+        """Function which searches for a { after a heading"""
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.OPENCURLY:
+            raise SyntaxError("Always need to follow a heading with {")
               
     def device_list(self):
         """ Function which parses the device list"""
 
-
-        self.symbol = self.scanner.get_symbol()
-        if self.symbol.type != self.scanner.OPENCURLY:
-            raise SyntaxError("Always need to follow a heading with {")
+        self.OPENCURLY_search()
         
         self.symbol = self.scanner.get_symbol()
         self.device_parse()
@@ -121,6 +134,8 @@ class Parser:
                 self.symbol = self.scanner.get_symbol               
                
     def device_parse(self):
+        """Function which parses a single line of a device definition"""
+        # Expected format : name EQUALS device
 
         if self.symbol.type != self.scanner.NAME:
             self.parse_errors += 1
@@ -136,30 +151,32 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol not in self.device_types:
                     self.parse_errors += 1
+                    raise SyntaxError("Device type not found")
                 
                     
 
     def connection_list(self):
+        """Function whhich parses the connection list"""
+        
+        self.OPENCURLY_search()
 
-        self.symbol = self.scanner.get_symbol()
-        if self.symbol.type != self.scanner.OPENCURLY:
-            raise SyntaxError("Always need to follow a heading with {")
-
-        self.symbol = self.scanner.get_symbol()
+        self.symbol = self.scanner.get_symbol() # Go to first symbol of line
         self.connection_parse() 
-        self.symbol = self.scanner.get_symbol()
+        self.symbol = self.scanner.get_symbol() # Go to last symbol of line, should be ;
         while self.symbol.type == self.scanner.SEMICOLON:
-            self.symbol = self.scanner.get_symbol()
-            if self.symbol.type == self.scanner.CLOSEDCURLY:
+            self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
+            if self.symbol.type == self.scanner.CLOSEDCURLY: # Check if } which denotes end of connections
                 self.connections_parsed = True
-                self.sections_complete += 1
+                self.sections_complete += 1 
                 break
             else:
-                self.connection_parse()
-                self.symbol = self.scanner.get_symbol  
+                self.connection_parse() 
+                self.symbol = self.scanner.get_symbol  #Go to last symbol of line, should be ;
 
                 
     def connection_parse(self):
+        """Function which parses a single connection"""
+        # Expected format : name HYPHEN name DOT INPUT
 
         if self.symbol not in self.device_names:
             self.parse_errors += 1
@@ -181,6 +198,89 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
                     if self.symbol.type != self.scanner.INPUT:
                         raise SyntaxError("Input not defined")
+
+    def signal_list(self):
+        "function whcih parses the signal setting"
+
+        self.OPENCURLY_search()
+        self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETSIGNAL
+        if self.symbol == "SETSIGNAL":
+            self.headings_found += 1
+            self.setsignal_list()
+        else:
+            self.parse_errors += 1
+            raise SyntaxError("SETSIGNAL heading expected")
+    
+    def setsignal_list(self):
+        """Function which parses the setsignal section"""
+
+        self.OPENCURLY_search()
+        self.symbol = self.scanner.get_symbol() #Go to first symbol of the line
+        self.setsignal_parse()
+        while self.symbol.type == self.scanner.SEMICOLON:
+            self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
+            if self.symbol.type == self.scanner.CLOSEDCURLY: # Check if } which denotes end of setsignal
+                self.setsignal_parsed = True
+                self.sections_complete += 1
+                break 
+            self.setsignal_parse()
+            
+        
+
+
+    def setsignal_parse(self):
+        """Function which parses a single line of the setsignal section"""
+        #Expected format : name EQUALS BINARYNUMBER "starttime" NUMBER SEMICOLON
+        
+        if self.symbol not in self.device_names:
+            self.parse_errors += 1
+            raise SyntaxError("Device not defined")
+            
+        
+        self.symbol = self.scanner.get_symbol() 
+        
+        if self.symbol.type != self.scanner.EQUALS:
+                self.parse_errors += 1
+                raise SyntaxError("= sign expected")
+
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.BINARYNUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Signal can only be set to 1 or 0")
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol != "starttime":
+            self.parse_errors += 1
+            raise SyntaxError("word starttime expected")
+        
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol.type != self.scanner.NUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Integer number required")
+
+        self.symbol = self.scanner.get_symbol()
+
+        if self.symbol.type != self.scanner.SEMICOLON:
+            self.parse_errors += 1
+            raise SyntaxError("Expected ; to end line")
+
+
+
+        
+        
+    
+            
+                
+        
+        
+
+
+        
+        
+        
+
+
 
 
                 
