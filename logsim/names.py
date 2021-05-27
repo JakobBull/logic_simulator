@@ -23,8 +23,7 @@ class Names:
 
     Public methods
     -------------
-    unique_error_codes(self, num_error_codes): Returns a list of unique integer                                           error codes.
-
+    unique_error_codes(self, num_error_codes): Returns a list of unique integer
     query(self, name_string): Returns the corresponding name ID for the
                         name string. Returns None if the string is not present.
 
@@ -52,38 +51,54 @@ class Names:
         """Return the corresponding name ID for name_string.
         If the name string is not present in the names list, return None.
         """
-        if not isinstance(name_string, str):    #raise TypeError if name_string isn't a string
+        # raise TypeError if name_string isn't a string
+        if not isinstance(name_string, str):
             raise TypeError("Only strings are allowed as inputs to query")
-        for i in range(len(self.names)):        #iterate through all indeces of names list
-            if self.names[i] == name_string: return i   #return index whose name == name_stirng
-        return None                             #return none if return hasn't been called in for loop
+        # iterate through all indeces of names list
+        for i in range(len(self.names)):
+            # return index whose name == name_stirng
+            if self.names[i] == name_string:
+                return i
+        # return none if return hasn't been called in for loop
+        return None
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
         If the name string is not present in the names list, add it.
         """
         name_ids = []
-        present = False     #boolean to determine whether a name in name_string_list is in names of instance
+        # boolean to determine whether a name in name_string_list
+        # is in names of instance
         for n in name_string_list:
+            present = False
             for i in range(len(self.names)):
                 if self.names[i] == n:
                     name_ids.append(i)
                     present = True
-                    break   #if a name in name_string_list is found, change present to true and break loop
+                    # if a name in name_string_list is found,
+                    # change present to true and break loop
+                    break
             if(present is False):
-                self.names.append(n)  #if a name in name_string_list isn't found, add to names list of instance
-                name_ids.append(len(self.names)-1)
+                # if a name in name_string_list isn't found,
+                # add to names list of instance
+                # and add its name_id to the name_ids list
+                # add length of names to name_ids before adding new name,
+                # since length of old names list will be the index of the
+                # new name
+                name_ids.append(len(self.names))
+                self.names.append(n)
         return name_ids
-
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
         If the name_id is not an index in the names list, return None.
         """
-		#from prelim exercise
+        # from prelim exercise
         if not type(name_id) is int:
-            raise TypeError("Only +ve integers are allowed as inputs to get_name_string")
+            raise TypeError(
+                "Only +ve integers are allowed as inputs to get_name_string")
         if name_id < 0:
-            raise ValueError("only +ve integers allowed as inputs to get_name_string")
+            raise ValueError(
+                "only +ve integers allowed as inputs to get_name_string")
         if name_id <= len(self.names)-1:
             return self.names[name_id]
