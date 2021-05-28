@@ -83,11 +83,11 @@ class Parser:
                     self.parse_errors += 1
                     raise SyntaxError("Headings called in the wrong order")
                     
-                elif self.symbol == "NETWORK":
+                elif self.symbol.id == self.scanner.NETWORK_ID:
                     self.headings_found += 1
 
                 
-                elif self.symbol == "DEVICES":
+                elif self.symbol.id == self.scanner.DEVICES_ID:
                     if self.sections_complete == 0 and self.headings_found == 1:
                         self.headings_found += 1
                         self.device_list()
@@ -95,14 +95,14 @@ class Parser:
                         raise SyntaxError("Headings called in wrong order")
                     
 
-                elif self.symbol == "CONNECTIONS":
+                elif self.symbol == self.scanner.CONNECTIONS_ID:
                     if self.sections_complete == 1 and self.headings_found == 2:
                         self.headings_found += 1
                         self.connection_list()
                     else:
                         raise SyntaxError("Headings called in wrong order")
 
-                elif self.symbol == "SIGNAL":
+                elif self.symbol == self.scanner.SIGNALS_ID:
                     if self.sections_complete == 2 and self.headings_found == 3:
                         self.headings_found += 1
                         self.signal_list()
@@ -110,7 +110,7 @@ class Parser:
                         raise SyntaxError("Headings called in wrong order")
                     
 
-                elif self.symbol == "MONITOR":
+                elif self.symbol == self.scanner.MONITOR_ID:
                     if self.sections_complete == 5 and self.headings_found == 6:
                         self.headings_found += 1
 
@@ -128,7 +128,7 @@ class Parser:
     def OPENCURLY_search(self):
         """Function which searches for a { after a heading"""
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type != self.scanner.OPENCURLY:
+        if self.symbol.type != self.scanner.LEFT_BRACKET:
             raise SyntaxError("Always need to follow a heading with {")
               
     def device_list(self):
@@ -141,7 +141,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol()
-            if self.symbol.type == self.scanner.CLOSEDCURLY:
+            if self.symbol.type == self.scanner.RIGHT_BRACKET:
                 self.devices_parsed = True
                 self.sections_complete += 1
                 break
@@ -165,7 +165,7 @@ class Parser:
                     raise SyntaxError
             else:
                 self.symbol = self.scanner.get_symbol()
-                if self.symbol not in self.device_types:
+                if self.symbol.id < 2 and self.symbol.id > 9:
                     self.parse_errors += 1
                     raise SyntaxError("Device type not found")
                 
@@ -181,7 +181,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol() # Go to last symbol of line, should be ;
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
-            if self.symbol.type == self.scanner.CLOSEDCURLY: # Check if } which denotes end of connections
+            if self.symbol.type == self.scanner.LEFT_BRACKET: # Check if } which denotes end of connections
                 self.connections_parsed = True
                 self.sections_complete += 1 
                 break
@@ -200,7 +200,7 @@ class Parser:
 
         else:
             self.symbol = self.scanner.get_symbol()
-            if self.symbol.type != self.type.HYPHEN:
+            if self.symbol.type != self.type.DASH:
                 self.parse_errors += 1
                 raise SyntaxError("No - found to define connection")
 
@@ -212,7 +212,7 @@ class Parser:
 
                 else:
                     self.symbol = self.scanner.get_symbol()
-                    if self.symbol.type != self.scanner.DOT:
+                    if self.symbol.type != self.scanner.PERIOD:
                         raise SyntaxError("No . found")
 
                     else: 
@@ -229,7 +229,7 @@ class Parser:
 
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETSIGNAL
-        if self.symbol == "SETSIGNAL":
+        if self.symbol.id == self.scanner.SETSIGNALS_ID:
             self.headings_found += 1
             self.setsignal_list()
         else:
@@ -237,12 +237,12 @@ class Parser:
             raise SyntaxError("SETSIGNAL heading expected")
         
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETCLOCK
-        if self.symbol == "SETCLOCK":
+        if self.symbol == self.scanner.SETCLOCK_ID:
             self.headings_found += 1
             self.setclock_parse()
         
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be }
-        if self.symbol.type == self.scanner.CLOSEDCURLY:
+        if self.symbol.type == self.scanner.RIGHT_BRACKET:
             self.sections_complete += 1
         
 
@@ -253,14 +253,14 @@ class Parser:
 
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol() #Go to first symbol of the line
-        if self.symbol.type == self.scanner.CLOSEDCURLY:
+        if self.symbol.type == self.scanner.RIGHT_BRACKET:
             self.setsignal_parsed = True
             self.sections_complete += 1
             return 
         self.setsignal_parse()
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
-            if self.symbol.type == self.scanner.CLOSEDCURLY: # Check if } which denotes end of setsignal
+            if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of setsignal
                 self.setsignal_parsed = True
                 self.sections_complete += 1
                 break 
@@ -287,7 +287,10 @@ class Parser:
                 raise SyntaxError("= sign expected")
 
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type != self.scanner.BINARYNUMBER:
+        if self.symbol.id != 0 and self.symbol.id != 1 and self.symbol.type == self.scanner.NUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Signal can only be set to 1 or 0")
+        elif self.symbol.type != self.symbol.NUMBER:
             self.parse_errors += 1
             raise SyntaxError("Signal can only be set to 1 or 0")
         self.symbol = self.scanner.get_symbol()
@@ -312,14 +315,14 @@ class Parser:
     def setclock_list(self):
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == self.scanner.CLOSEDCURLY:
+        if self.symbol.type == self.scanner.RIGHT_BRACKET:
             self.setclockparsed = True
             self.sections_complete += 1
             return 
         self.setclock_parse()
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
-            if self.symbol.type == self.scanner.CLOSEDCURLY: # Check if } which denotes end of setsignal
+            if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of setsignal
                 self.setclock_parsed = True
                 self.sections_complete += 1
                 break 
@@ -343,12 +346,15 @@ class Parser:
                 raise SyntaxError("= sign expected")
         
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type != self.scanner.BINARYNUMBER:
+        if self.symbol.id != 0 and self.symbol.id != 1 and self.symbol.type == self.scanner.NUMBER:
+            self.parse_errors += 1
+            raise SyntaxError("Signal can only be set to 1 or 0")
+        elif self.symbol.type != self.symbol.NUMBER:
             self.parse_errors += 1
             raise SyntaxError("Signal can only be set to 1 or 0")
         self.symbol = self.scanner.get_symbol()
 
-        if self.symbol != "starttime":
+        if self.symbol.id != self.scanner.starttime_ID:
             self.parse_errors += 1
             raise SyntaxError("word starttime expected")
         
@@ -360,7 +366,7 @@ class Parser:
 
         self.symbol = self.scanner.get_symbol()
 
-        if self.symbol != "period":
+        if self.symbol.type != self.scanner.period_ID:
             self.parse_errors += 1
             raise SyntaxError("word period expected")
         
@@ -372,7 +378,7 @@ class Parser:
 
         self.symbol = self.scanner.get_symbol()
 
-        if self.symbol != "first":
+        if self.symbol.id != self.scanner.firstchange_ID:
             self.parse_errors += 1
             raise SyntaxError("word first expected")
 
@@ -402,14 +408,14 @@ class Parser:
 
         self.symbol = self.scanner.get_symbol()
 
-        if self.symbol.type == self.scanner.CLOSEDCURLY:
+        if self.symbol.type == self.scanner.RIGHTBRACKET:
             self.parse_errors += 1
             raise SyntaxError("No devices monitored")
         
         else:
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
-                if self.symbol.type == self.scanner.CLOSEDCURLY:
+                if self.symbol.type == self.scanner.RIGHTBRACKET:
                     self.sections_complete += 1
                     self.monitor_parsed = True
                     break
