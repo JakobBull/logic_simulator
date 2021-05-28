@@ -127,7 +127,9 @@ class Scanner:
         # skip_spaces: calls advance as necessary until current_character
         # is not whitespace
         """Skip whitespace until a non-whitespace character is reached."""
-        #
+        # only skips to next non-whitespace character if current character is
+        # is a space. Then it will skip all whitespace between the current
+        # space until the next non whitespace character
         while self.current_character.isspace():
             self.advance()
 
