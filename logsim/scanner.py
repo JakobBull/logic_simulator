@@ -127,25 +127,31 @@ class Scanner:
                 symbol.type = self.NAME
             [symbol.id] = self.names.lookup([name_string])
         elif self.current_character.isdigit():  # number
-            symbol.id = self.get_number()
+            symbol.string = self.get_number()
             symbol.type = self.NUMBER
         elif self.current_character == "{":  # punctuation
             symbol.type = self.LEFT_BRACKET
+            symbol.string = "{"
             self.advance()
         elif self.current_character == "}":
             symbol.type = self.RIGHT_BRACKET
+            symbol.string = "}"
             self.advance()
         elif self.current_character == "=":
             symbol.type = self.EQUALS
+            symbol.string = "="
             self.advance()
         elif self.current_character == ".":
             symbol.type = self.PERIOD
+            symbol.string = "."
             self.advance()
         elif self.current_character == "-":
             symbol.type = self.DASH
+            symbol.string = "-"
             self.advance()
         elif self.current_character == ";":
             symbol.type = self.SEMICOLON
+            symbol.string = ";"
             self.advance()
         elif self.current_character == "":  # end of file
             symbol.type = self.EOF
