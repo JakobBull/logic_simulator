@@ -5,7 +5,6 @@ import pytest
 
 def test_advance():
     scan = Scanner("scanner_test_files/test_advance.txt", Names())
-    scan.advance()
     assert(scan.current_character == 'a')
     scan.advance()
     assert(scan.current_character == 'b')
@@ -14,10 +13,11 @@ def test_advance():
 
 def test_skip_spaces():
     scan = Scanner("scanner_test_files/test_skip_spaces.txt", Names())
-    scan.skip_spaces()
     assert(scan.current_character == 'a')
+    scan.advance()  #move forward to whitespace
     scan.skip_spaces()
     assert(scan.current_character == 'h')   #just spaces
+    scan.advance()  ##move forward to whitespace
     scan.skip_spaces()
     assert(scan.current_character == 'b')   #tabs aswell
 

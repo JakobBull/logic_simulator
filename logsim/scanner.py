@@ -71,7 +71,10 @@ class Scanner:
         self.keywords_list = ["DEVICES", "CONNECT", "MONITOR", "END"]
         [self.DEVICES_ID, self.CONNECT_ID, self.MONITOR_ID,
             self.END_ID] = self.names.lookup(self.keywords_list)
-        self.current_character = ""
+
+        #initialise current character to be first character
+        char = self.file.read(1)
+        self.current_character = char
 
         self.current_line_number = 1;
         self.current_char_number = 0;
@@ -124,7 +127,7 @@ class Scanner:
         # skip_spaces: calls advance as necessary until current_character
         # is not whitespace
         """Skip whitespace until a non-whitespace character is reached."""
-        self.advance()
+        #
         while self.current_character.isspace():
             self.advance()
 

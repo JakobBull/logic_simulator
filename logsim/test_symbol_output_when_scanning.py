@@ -3,6 +3,8 @@ from scanner import Scanner
 from names import Names
 
 scan = Scanner("scanner_test_files/scanner_test_line.txt", Names())
+print("scanning from: scanner_test_files/scanner_test_line.txt")
+print("")
 print("type\tid\tline#\tstart_char#\tend_char#\tstring")
 for i in range(20):
     symbol = scan.get_symbol()
