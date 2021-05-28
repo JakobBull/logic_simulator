@@ -66,16 +66,40 @@ class Scanner:
                 sys.exit()
         # initialises reserved words and IDs
         self.names = names
-        self.symbol_type_list = [self.COMMA, self.SEMICOLON, self.EQUALS,
-            self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(7)
-        self.keywords_list = ["DEVICES", "CONNECT", "MONITOR", "END"]
-        [self.DEVICES_ID, self.CONNECT_ID, self.MONITOR_ID,
-            self.END_ID] = self.names.lookup(self.keywords_list)
 
-        #initialise current character to be first character
+        # SIMPLE EBNF
+
+        # self.symbol_type_list = [self.COMMA, self.SEMICOLON, self.EQUALS,
+        #     self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(7)
+
+        # self.keywords_list = ["DEVICES", "CONNECT", "MONITOR", "END"]
+
+        # OUR EBNF
+        self.symbol_type_list = [self.LEFT_BRACKET, self.RIGHT_BRACKET,
+        self.EQUALS, self.PERIOD, self.DASH, self.SEMICOLON, self.KEYWORD,
+        self.NUMBER, self.NAME, self.EOF] = range(10)
+
+        self.keywords_list = ["NETWORK", "DEVICES", "CLOCK", "SWITCH", "DTYPE", "AND",
+                    "NAND", "NOR", "OR", "XOR", "CONNECTIONS", "SIGNALS",
+                    "SETSIGNAL", "SETCLOCK", "MONITOR", "starttime", "period",
+                    "firstchange"]
+
+        # SIMPLE EBNF
+        # [self.DEVICES_ID, self.CONNECT_ID, self.MONITOR_ID,
+        #    self.END_ID] = self.names.lookup(self.keywords_list)
+
+        # OUR EBNF
+        [self.NETWORK_ID, self.DEVICES_ID, self.CLOCK_ID, self.SWITCH_ID,
+        self.DTYPE_ID, self.AND_ID, self.NAND_ID, self.NOR_ID, self.OR_ID,
+        self.XOR_ID, self.CONNECTIONS_ID, self.SIGNALS_ID, self.SETSIGNALS_ID,
+        self.SETCLOCK_ID, self.MONITOR_ID, self.starttime_ID, self.period_ID,
+        self.firstchange_ID] = self.names.lookup(self.keywords_list)
+
+        # initialise current character to be first character
         char = self.file.read(1)
         self.current_character = char
 
+        #initialise line number and character number counters
         self.current_line_number = 1;
         self.current_char_number = 0;
 
@@ -96,11 +120,20 @@ class Scanner:
         elif self.current_character.isdigit():  # number
             symbol.id = self.get_number()
             symbol.type = self.NUMBER
-        elif self.current_character == "=":  # punctuation
+        elif self.current_character == "{":  # punctuation
+            symbol.type = self.LEFT_BRACKET
+            self.advance()
+        elif self.current_character == "}":
+            symbol.type = self.RIGHT_BRACKET
+            self.advance()
+        elif self.current_character == "=":
             symbol.type = self.EQUALS
             self.advance()
-        elif self.current_character == ",":
-            symbol.type = self.COMMA
+        elif self.current_character == ".":
+            symbol.type = self.PERIOD
+            self.advance()
+        elif self.current_character == "-":
+            symbol.type = self.DASH
             self.advance()
         elif self.current_character == ";":
             symbol.type = self.SEMICOLON

@@ -1,1 +1,1 @@
-DEVICES 123 hello = wow CONNECT END;
+DEVICES 123 hello = wow bye;

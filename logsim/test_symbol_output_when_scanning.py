@@ -15,3 +15,9 @@ for i in range(20):
     print(symbol.end_char_number, end = "\t\t")
     print(symbol.string)
     if(symbol.type == scan.EOF): break
+
+scan = Scanner("scanner_test_files/example_1.txt", Names())
+while True:
+    symbol = scan.get_symbol()
+    print(symbol.type)
+    if(symbol.type == scan.EOF): break
