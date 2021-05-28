@@ -101,7 +101,7 @@ class Scanner:
 
         #initialise line number and character number counters
         self.current_line_number = 1;
-        self.current_char_number = 0;
+        self.current_char_number = 1;
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
@@ -109,8 +109,10 @@ class Scanner:
         self.skip_spaces()  # current character now not whitespace
         symbol.line_number = self.current_line_number
         symbol.start_char_number = self.current_char_number
+        symbol.end_char_number = self.current_char_number
         if self.current_character.isalpha():  # name
             name_string = self.get_name()
+            symbol.end_char_number += len(name_string)
             symbol.string = name_string
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
@@ -142,7 +144,6 @@ class Scanner:
             symbol.type = self.EOF
         else:  # not a valid character
             self.advance()
-        symbol.end_char_number = self.current_char_number
         return symbol
 
     def advance(self):  #Need to advance once to get to fist character of file!
@@ -152,7 +153,7 @@ class Scanner:
         self.current_character = char
         if(self.current_character == '\n'):
             self.current_line_number += 1
-            self.current_char_number = 1
+            self.current_char_number = 0
         else:
             self.current_char_number += 1
 

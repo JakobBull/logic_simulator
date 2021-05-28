@@ -36,13 +36,44 @@ def test_get_number():
 # tests scanner works on a single line
 def test_scanner():
     scan = Scanner("scanner_test_files/scanner_test_line.txt", Names())
-    assert(scan.get_symbol().type == scan.KEYWORD)
-    assert(scan.get_symbol().type == scan.NUMBER)
-    assert(scan.get_symbol().type == scan.NAME)
-    assert(scan.get_symbol().type == scan.EQUALS)
-    assert(scan.get_symbol().type == scan.NAME)
-    assert(scan.get_symbol().type == scan.NAME)
-    assert(scan.get_symbol().type == scan.SEMICOLON)
+    symbol = scan.get_symbol()
+    assert(symbol.type == scan.KEYWORD)      # DEVICES
+    assert(symbol.line_number == 1)
+    assert(symbol.start_char_number == 1)
+    assert(symbol.end_char_number == 8)
+    assert(scan.get_symbol().type == scan.NUMBER)       # 123
+    assert(scan.get_symbol().type == scan.NAME)         # hello
+    assert(scan.get_symbol().type == scan.EQUALS)       # =
+    assert(scan.get_symbol().type == scan.KEYWORD)         # XOR
+    #"test specific to our ebnf")
+    symbol = scan.get_symbol()
+    assert(symbol.type == scan.NAME)                    # bye
+    assert(symbol.line_number == 1)
+    assert(symbol.start_char_number == 25)
+    assert(symbol.end_char_number == 28)
+    assert(scan.get_symbol().type == scan.SEMICOLON)    # ;
+    symbol = scan.get_symbol()
+    assert(symbol.type == scan.KEYWORD)                 # CONNECTIONS
+    #"test specific to our ebnf")
+    assert(symbol.line_number == 2)
+    assert(symbol.start_char_number == 1)
+    assert(symbol.end_char_number == 12)
+    symbol = scan.get_symbol()
+    assert(symbol.type == scan.KEYWORD)                  # NETWORK
+    #"test specific to our ebnf")
+    assert(symbol.line_number == 2)
+    assert(symbol.start_char_number == 13)
+    assert(symbol.end_char_number == 20)
+    symbol = scan.get_symbol()
+    assert(symbol.type == scan.NAME)                    # hello
+    assert(symbol.line_number == 3)
+    assert(symbol.start_char_number == 1)
+    assert(symbol.end_char_number == 6)
+    symbol = scan.get_symbol()
+    assert(symbol.type == scan.NAME)                    # bye
+    assert(symbol.line_number == 3)
+    assert(symbol.start_char_number == 7)
+    assert(symbol.end_char_number == 10)
     assert(scan.get_symbol().type == scan.EOF)
 
 # test that the scanner works on our example_1

@@ -1,1 +1,3 @@
-DEVICES 123 hello = wow bye;
+DEVICES 123 hello = XOR bye;
+CONNECTIONS NETWORK
+hello bye
