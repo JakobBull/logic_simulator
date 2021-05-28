@@ -5,3 +5,5 @@ from parse import Parser
 
 import pytest
 
+def test_device_parse():
+    
