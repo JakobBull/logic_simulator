@@ -12,6 +12,7 @@ import sys
 import os
 from userint import UserInterface
 
+
 class Symbol:
 
     """Encapsulate a symbol and store its properties.
@@ -28,7 +29,7 @@ class Symbol:
     def __init__(self):
         """Initialise symbol properties."""
         self.type = None
-        self.id = None      #number if symbol is a number
+        self.id = None      # number if symbol is a number
         # extended to include symbol's line and character number
         self.line_number = None
         self.start_char_number = None
@@ -60,10 +61,10 @@ class Scanner:
         # opens specified file
         try:
             """Open and return the file specified by path for reading"""
-            self.file =  open(path, "r", encoding="utf-8")
+            self.file = open(path, "r", encoding="utf-8")
         except IOError:
-                print("error, can't find or open file")
-                sys.exit()
+            print("error, can't find or open file")
+            sys.exit()
         # initialises reserved words and IDs
         self.names = names
 
@@ -75,33 +76,39 @@ class Scanner:
         # self.keywords_list = ["DEVICES", "CONNECT", "MONITOR", "END"]
 
         # OUR EBNF
-        self.symbol_type_list = [self.LEFT_BRACKET, self.RIGHT_BRACKET,
-        self.EQUALS, self.PERIOD, self.DASH, self.SEMICOLON, self.KEYWORD,
-        self.NUMBER, self.NAME, self.EOF] = range(10)
+        self.symbol_type_list = [
+            self.LEFT_BRACKET, self.RIGHT_BRACKET,
+            self.EQUALS, self.PERIOD, self.DASH, self.SEMICOLON, self.KEYWORD,
+            self.NUMBER, self.NAME, self.EOF
+        ] = range(10)
 
-        self.keywords_list = ["NETWORK", "DEVICES", "CLOCK", "SWITCH", "DTYPE", "AND",
-                    "NAND", "NOR", "OR", "XOR", "CONNECTIONS", "SIGNALS",
-                    "SETSIGNAL", "SETCLOCK", "MONITOR", "starttime", "period",
-                    "firstchange"]
+        self.keywords_list = [
+            "NETWORK", "DEVICES", "CLOCK", "SWITCH", "DTYPE", "AND",
+            "NAND", "NOR", "OR", "XOR", "CONNECTIONS", "SIGNALS",
+            "SETSIGNAL", "SETCLOCK", "MONITOR", "starttime", "period",
+            "firstchange"
+        ]
 
         # SIMPLE EBNF
         # [self.DEVICES_ID, self.CONNECT_ID, self.MONITOR_ID,
         #    self.END_ID] = self.names.lookup(self.keywords_list)
 
         # OUR EBNF
-        [self.NETWORK_ID, self.DEVICES_ID, self.CLOCK_ID, self.SWITCH_ID,
-        self.DTYPE_ID, self.AND_ID, self.NAND_ID, self.NOR_ID, self.OR_ID,
-        self.XOR_ID, self.CONNECTIONS_ID, self.SIGNALS_ID, self.SETSIGNALS_ID,
-        self.SETCLOCK_ID, self.MONITOR_ID, self.starttime_ID, self.period_ID,
-        self.firstchange_ID] = self.names.lookup(self.keywords_list)
+        [
+            self.NETWORK_ID, self.DEVICES_ID, self.CLOCK_ID, self.SWITCH_ID,
+            self.DTYPE_ID, self.AND_ID, self.NAND_ID, self.NOR_ID, self.OR_ID,
+            self.XOR_ID, self.CONNECTIONS_ID, self.SIGNALS_ID,
+            self.SETSIGNALS_ID, self.SETCLOCK_ID, self.MONITOR_ID,
+            self.starttime_ID, self.period_ID, self.firstchange_ID
+            ] = self.names.lookup(self.keywords_list)
 
         # initialise current character to be first character
         char = self.file.read(1)
         self.current_character = char
 
-        #initialise line number and character number counters
-        self.current_line_number = 1;
-        self.current_char_number = 1;
+        # initialise line number and character number counters
+        self.current_line_number = 1
+        self.current_char_number = 1
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
@@ -146,7 +153,8 @@ class Scanner:
             self.advance()
         return symbol
 
-    def advance(self):  #Need to advance once to get to fist character of file!
+    def advance(self):
+        # Need to advance once to get to fist character of file!
         # advance: reads the next character from the definition file
         # and places it in current_character
         char = self.file.read(1)
@@ -173,24 +181,27 @@ class Scanner:
         returns only the name string and places the next non-alphanumeric
         character in current_character """
 
-        """get_next_name: Seek the next name string in input_file.
-        Return the name string (or None) and the next non-alphanumeric character.
+        """get_next_name:
+        Seek the next name string in input_file.
+        Return the name string (or None) and the
+        next non-alphanumeric character
         """
         name = ""
         name += self.current_character
         while True:
             self.advance()
             if not self.current_character.isalnum():
-                #self.current_character = char
+                # self.current_character = char
                 break
-            else: name+=self.current_character
+            else:
+                name += self.current_character
         return name
 
     def get_number(self):
         """assumes the current character is a digit,
         returns the integernumber and places the next
         non-digit character in current_character"""
-        #should number be able to start with a 0?
+        # should number be able to start with a 0?
         integernumber = ""
         integernumber += self.current_character
         while True:

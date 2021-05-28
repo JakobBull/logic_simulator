@@ -8,16 +8,18 @@ print("")
 print("type\tid\tline#\tstart_char#\tend_char#\tstring")
 for i in range(20):
     symbol = scan.get_symbol()
-    print(symbol.type, end = "\t")
-    print(symbol.id, end = "\t")
-    print(symbol.line_number, end = "\t")
-    print(symbol.start_char_number, end = "\t\t")
-    print(symbol.end_char_number, end = "\t\t")
+    print(symbol.type, end="\t")
+    print(symbol.id, end="\t")
+    print(symbol.line_number, end="\t")
+    print(symbol.start_char_number, end="\t\t")
+    print(symbol.end_char_number, end="\t\t")
     print(symbol.string)
-    if(symbol.type == scan.EOF): break
+    if(symbol.type == scan.EOF):
+        break
 
 scan = Scanner("scanner_test_files/example_1.txt", Names())
 while True:
     symbol = scan.get_symbol()
     print(symbol.type)
-    if(symbol.type == scan.EOF): break
+    if(symbol.type == scan.EOF):
+        break
