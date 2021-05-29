@@ -249,7 +249,7 @@ class SidePanel(wx.Panel):
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_monitor)
         self.remove_monitor_button.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
         self.remove_all_button.Bind(wx.EVT_BUTTON, self.on_remove_all_monitors)
-        #self.remove_monitor_combobox.Bind(wx.EVT_COMBOBOX, choices = self.scrolled_panel.item_list)
+        #self.remove_monitor_combobox.Bind(wx.EVT_COMBOBOX, self.on_remove_monitor_combobox)
 
         #self.remove_monitor_combobox.Add
 
@@ -306,7 +306,8 @@ class SidePanel(wx.Panel):
 
     def on_remove_monitor(self, event):
         """Handle the event when the remove monitor button is pressed"""
-        self.scrolled_panel.remove_monitor("testing")
+        self.remove_monitor_combobox.Remove(self.remove_monitor_combobox.Value)
+        self.scrolled_panel.remove_monitor(self.remove_monitor_combobox.Value)
 
     def on_remove_all_monitors(self, event):
         """Handle the event when removign all monitors."""
@@ -384,8 +385,9 @@ class Monitor(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def remove_monitor(self, text):
+        self.item_list = [item for item in self.item_list if item.name != text]
         for item in self.sizer.GetChildren():
-            if (widget :=item.GetWindow()).name is text:
+            if (widget := item.GetWindow()).name == text:
                 self.sizer.Hide(widget)
                 widget.Destroy()
         self.SetSizer(self.sizer)
