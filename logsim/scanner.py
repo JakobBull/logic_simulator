@@ -155,6 +155,7 @@ class Scanner:
             self.advance()
         elif self.current_character == "":  # end of file
             symbol.type = self.EOF
+            symbol.string = "EOF"
         else:  # not a valid character
             self.advance()
         return symbol
