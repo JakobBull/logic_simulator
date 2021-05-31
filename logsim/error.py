@@ -1,5 +1,4 @@
 from scanner import Symbol
-from scanner import Scanner
 import sys
 import os
 import math
@@ -18,7 +17,7 @@ class Error:
         Error.types.append(type)        # error type, number from list of error document
         Error.symbols.append(symbol)    # symbol that causes the error
         Error.num_errors += 1           # everytime an error called, number of errors increased
-    def print_error(scan,path):
+    def print_error(path):
         lines = Error.get_lines(path)
         for i in range(Error.num_errors):
             line = lines[Error.symbols[i].line_number-1]

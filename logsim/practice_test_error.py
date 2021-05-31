@@ -51,9 +51,8 @@ def main():
             Error(i%3,symbol)
 
         print("printing error message\n\n\n")
-        scan = Scanner(path, Names())
         #printing error
-        Error.print_error(scan,path)
+        Error.print_error(path)
 
 if __name__ == "__main__":
     main()
