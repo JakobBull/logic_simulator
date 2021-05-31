@@ -62,7 +62,9 @@ class Error:
                 print(' ', end = '')
             print("^")
             print(Error.error_message[Error.types[i]])
-            for n in range(len(Error.error_message[Error.types[i]])):
+            #for n in range(len(Error.error_message[Error.types[i]])):
+            #    print('-', end = '')
+            for n in range(8):
                 print('-', end = '')
             print("")
     def get_lines(path):
