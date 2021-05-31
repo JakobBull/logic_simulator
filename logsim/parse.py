@@ -33,12 +33,12 @@ class Parser:
     parse_network(self): Parses the circuit definition file.
     """
 
-    def __init__(self, names, scanner):
+    def __init__(self, names, devices, network, monitors, scanner):
         """Initialise constants."""
         self.names = names
-        #self.devices = devices
-        #self.network = network
-        #self.monitors = monitors
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
         self.scanner = scanner
 
         self.type = None
@@ -49,6 +49,9 @@ class Parser:
         self.device_names = []
         self.headings = ["NETWORK","DEVICES", "CONNECTIONS", "SIGNALS", "SETSIGNAL", "SETCLOCK", "MONITOR" ]
         self.punctuation = [";", "{", "}", "-", "="]
+        self.gate_var_inputs_IDs = [5, 6, 7, 8]
+        self.new_device_id = None
+        self.new_device_type = None
         self.numbers = range(20)
 
         self.headings_found = 0
@@ -117,13 +120,13 @@ class Parser:
                     if self.sections_complete == 2 and self.headings_found == 3:
                         self.headings_found += 1
                         #print("signals")
-                        self.signal_list()
+                        self.setsignal_list()
                     else:
                         raise SyntaxError("Headings called in wrong order")
                     
 
                 elif self.symbol.id == self.scanner.MONITOR_ID:
-                    if self.sections_complete == 5 and self.headings_found == 6:
+                    if self.sections_complete == 3 and self.headings_found == 4:
                         self.headings_found += 1
                         self.monitor_list()
 
@@ -131,7 +134,7 @@ class Parser:
                         raise SyntaxError("Headings called in wrong order")
 
                 
-            elif self.sections_complete == 6 and self.headings_found == 7:
+            elif self.sections_complete == 4 and self.headings_found == 5:
                 #print(self.symbol.string)
                 #print("complete")
                 return True
@@ -175,12 +178,15 @@ class Parser:
             self.parse_errors += 1
             raise SyntaxError("Device: Name of device must contain a letter") 
         
+        
+
         else:
             if self.symbol.id in self.device_names:
                 self.parse_errors += 1
                 raise SyntaxError("Device: Name for device already used")
 
             self.device_names.append(self.symbol.id) # add symbol id to a list of device ids
+            self.new_device_id = self.symbol.id
             #print(self.symbol.string)
             self.symbol = self.scanner.get_symbol() #Get next symbol which should be an = sign   
             if self.symbol.type != self.scanner.EQUALS:
@@ -191,8 +197,58 @@ class Parser:
                 #print(self.symbol.string)
                 
                 if self.symbol.id < 2 or self.symbol.id > 9:
+                    self.new_device_id = self.symbol.id
                     self.parse_errors += 1
                     raise SyntaxError("Device: Device type not found")
+  
+                else:
+                    self.new_device_type = self.symbol.id 
+
+                    if self.symbol.id == self.scanner.XOR_ID or self.symbol.id == self.scanner.DTYPE_ID:
+                        self.devices.make_device(self.new_device_id, self.new_device_type, None)
+
+                    elif self.symbol.id == self.scanner.SWITCH_ID:
+                        self.symbol = self.scanner.get_symbol()
+                        self.devices.make_switch(self.new_device_id, 0)
+
+                    elif self.symbol.id in self.gate_var_inputs_IDs:
+                        self.symbol = self.scanner.get_symbol()
+                        if self.symbol.string != "inputs":
+                            self.parse_errors += 1
+                            raise SyntaxError("Word inputs required")
+                        else:
+                            self.symbol = self.scanner.get_symbol()
+                            if self.symbol.type != self.scanner.NUMBER:
+                                self.parse_errors += 1
+                                raise SyntaxError("Invalid number of inputs")
+                            if self.symbol.id < 1 or self.symbol.id > 16:
+                                self.parse_errors += 1
+                                raise SyntaxError("Invalid number of inputs")
+                            else:
+                                self.devices.make_gate(self.new_device_id, self.new_device_type, self.symbol.id)
+                            
+                    elif self.symbol.id == self.scanner.CLOCK_ID:
+                        self.symbol = self.scanner.get_symbol()
+                        if self.symbol.string != "halfperiod":
+                            self.parse_errors += 1
+                            raise SyntaxError("Word halfperiod required")
+                        else:
+                            self.symbol = self.scanner.get_symbol()
+                            if self.symbol.type != self.scanner.NUMBER:
+                                self.parse_errors += 1
+                                raise SyntaxError("Invalid halfperiod")
+                            else:
+                                self.devices.make_clock(self.new_device_id, self.symbol.id)
+
+                                
+
+
+
+                    
+
+
+
+                
                 
                     
 
@@ -225,7 +281,9 @@ class Parser:
             self.parse_errors += 1
             raise SyntaxError("CONNECTION: Device not defined")
 
-        else:
+        else: 
+            [in_device_id, in_port_id] = self.signame_in()
+
             self.symbol = self.scanner.get_symbol()
     
             if self.symbol.type != self.scanner.DASH:
@@ -239,12 +297,15 @@ class Parser:
                     raise SyntaxError("CONNECTION: Device not defined")
 
                 else:
+                    out_device = self.symbol.devices.get_device(self.symbol.id)
+                    out_device_id = out_device.device_id
                     self.symbol = self.scanner.get_symbol()
                     if self.symbol.type != self.scanner.PERIOD:
                         raise SyntaxError("CONNECTION: No . found")
 
                     else: 
                         self.symbol = self.scanner.get_symbol()
+                        out_port_id = self.symbol.id
                         self.input_list = list(self.symbol.string)
                         if self.input_list[0] != "I":
                             self.parse_errors += 1 
@@ -255,38 +316,34 @@ class Parser:
                         if self.input_number.isdigit() == False:
                             
                             raise SyntaxError("CONNECTION: Input not defined")
+                        
+                        error_type = self.network.make_connection(
+                            in_device_id, in_port_id, out_device_id, self.symbol.id)
+                        if error_type != self.network.NO_ERROR:
+                            raise SyntaxError("Error creating connection")
+                        
 
 
 
-
-
-    def signal_list(self):
-        "function whcih parses the signal setting"
-
-        self.OPENCURLY_search()
-        self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETSIGNAL
-        if self.symbol.id == self.scanner.SETSIGNALS_ID:
-            #print("Keyword")
-            #print("SETSIGNAL")
-            self.headings_found += 1
-            self.setsignal_list()
+    def signame_in(self):
+        in_device = self.devices.get_device(self.symbol.id)
+        if in_device.device_kind == self.devices.D_TYPE:
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol.type != self.scanner.PERIOD:
+                self.parse_errors += 1
+                raise SyntaxError("D type output denoted by a .")
+            else:
+                self.symbol = self.scanner.get_symbol
+                if self.symbol.id not in self.devices.dtype_output_ids:
+                    self.parse_errors += 1
+                    raise SyntaxError("Not a valid D type output")
+                
+                else:
+                    return [in_device.device_id, self.symbol.id]
+            
         else:
-            self.parse_errors += 1
-            raise SyntaxError("SETSIGNAL heading expected")
-        
-        self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETCLOCK
-        
-        if self.symbol.id == self.scanner.SETCLOCK_ID:
-            #print("Keyword")
-            #print("SETCLOCK")
-            self.headings_found += 1
-            self.setclock_list()
-        
-        self.symbol = self.scanner.get_symbol() #Get next symbol, should be }
-        if self.symbol.type == self.scanner.RIGHT_BRACKET:
-            self.sections_complete += 1
-            #print(self.symbol.string)
-        
+            return [in_device.device_id, None]
+
 
 
     
@@ -321,130 +378,28 @@ class Parser:
 
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
-            raise SyntaxError("SETSIGNAL: Device not defined")
+            raise SyntaxError("SIGNALS: Device not defined")
             
         
         self.symbol = self.scanner.get_symbol() 
         
         if self.symbol.type != self.scanner.EQUALS:
                 self.parse_errors += 1
-                raise SyntaxError("SETSIGNAL: = sign expected")
+                raise SyntaxError("SIGNALS: = sign expected")
 
         self.symbol = self.scanner.get_symbol()
         if self.symbol.string != "0" and self.symbol.string != "1":
             self.parse_errors += 1
             
-            raise SyntaxError("SETSIGNAL: Signal can only be set to 1 or 0")
+            raise SyntaxError("SIGNALS: Signal can only be set to 1 or 0")
         elif self.symbol.type != self.scanner.NUMBER:
             self.parse_errors += 1
-            raise SyntaxError("SETSIGNAL: Signal can only be set to 1 or 0")
-        self.symbol = self.scanner.get_symbol()
-
-        if self.symbol.id != self.scanner.starttime_ID:
-            self.parse_errors += 1
-            raise SyntaxError("SETSIGNAL: word starttime expected")
-        
-        self.symbol = self.scanner.get_symbol()
-
-        if self.symbol.type != self.scanner.NUMBER:
-            self.parse_errors += 1
-            raise SyntaxError("SETSIGNAL: Integer number required")
-
+            raise SyntaxError("SIGNALS: Signal can only be set to 1 or 0")
         self.symbol = self.scanner.get_symbol()
 
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
-            raise SyntaxError("SETSIGNAL: Expected ; to end line")
-
-
-    def setclock_list(self):
-        
-        self.OPENCURLY_search()
-        
-        self.symbol = self.scanner.get_symbol()
-        
-        if self.symbol.type == self.scanner.RIGHT_BRACKET:
-            #print(self.symbol.string)
-            self.setclockparsed = True
-            self.sections_complete += 1
-            return 
-        self.setclock_parse()
-        while self.symbol.type == self.scanner.SEMICOLON:
-            self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
-            if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of setsignal
-                #print(self.symbol.string)
-                self.setclock_parsed = True
-                self.sections_complete += 1
-                break 
-            self.setclock_parse()
-
-
-
-    def setclock_parse(self):
-        """"Function which parses a single line of the setclock section"""
-        # Expected format : name EQUALS BINARYNUMBER "starttime" NUMBER "period" NUMBER "first change" NUMBER SEMICOLON
-        
-       
-        if self.symbol.id not in self.device_names:
-            #print("Device not defined: ", self.symbol.string)
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Device not defined")
-
-        self.symbol = self.scanner.get_symbol() 
-        
-        if self.symbol.type != self.scanner.EQUALS:
-                self.parse_errors += 1
-                raise SyntaxError("SETCLOCK: = sign expected")
-        
-        self.symbol = self.scanner.get_symbol()
-        if self.symbol.id != 0 and self.symbol.id != 1 and self.symbol.type == self.scanner.NUMBER:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Signal can only be set to 1 or 0")
-        elif self.symbol.type != self.symbol.NUMBER:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Signal can only be set to 1 or 0")
-        self.symbol = self.scanner.get_symbol()
-
-        if self.symbol.id != self.scanner.starttime_ID:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: word starttime expected")
-        
-        self.symbol = self.scanner.get_symbol()
-        
-        if self.symbol.type != self.scanner.NUMBER:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Integer number required")
-
-        self.symbol = self.scanner.get_symbol()
-
-        if self.symbol.type != self.scanner.period_ID:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: word period expected")
-        
-        self.symbol = self.scanner.get_symbol()
-        
-        if self.symbol.type != self.scanner.NUMBER:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Integer number required to set period")
-
-        self.symbol = self.scanner.get_symbol()
-
-        if self.symbol.id != self.scanner.firstchange_ID:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: word firstchange expected")
-
-        
-        self.symbol = self.scanner.get_symbol()
-        
-        if self.symbol.type != self.scanner.NUMBER:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Integer number required to set first change")
-
-        self.symbol = self.scanner.get_symbol()
-
-        if self.symbol.type != self.scanner.SEMICOLON:
-            self.parse_errors += 1
-            raise SyntaxError("SETCLOCK: Expected ; to end line")
+            raise SyntaxError("SIGNALS: Expected ; to end line")
 
 
     def monitor_list(self):
