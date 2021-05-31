@@ -11,5 +11,6 @@ import os
 def test_headings_order():
     scan = Scanner("parse_test_files/test_headings.txt", Names())
     parse = Parser(Names(), scan)
-    parse.parse_network()
-    assert SyntaxError("Headings called in wrong order")
+    with pytest.raises(SyntaxError, match= "Headings called in wrong order"):
+        parse.parse_network()
+ 
