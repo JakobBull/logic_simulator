@@ -118,6 +118,7 @@ class Scanner:
         """
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
+        self.skip_comments()
         symbol.line_number = self.current_line_number
         symbol.start_char_number = self.current_char_number
         symbol.end_char_number = self.current_char_number
@@ -192,6 +193,22 @@ class Scanner:
         """
         while self.current_character.isspace():
             self.advance()
+
+    def skip_comments(self):
+        if self.current_character == "/":      #comment
+            self.advance()
+            if self.current_character == "/":   #single line comment
+                while True:
+                    self.advance()
+                    if self.current_character == "\n":
+                        break
+            elif self.current_character == "*":
+                while True:
+                    self.advance()
+                    if self.current_character == "*":
+                        self.advance()
+                        if self.current_character == "/":
+                            break
 
     def get_name(self):
         """
