@@ -98,7 +98,7 @@ class Parser:
 
                     if self.sections_complete == 0 and self.headings_found == 1:
                         self.headings_found += 1
-                        print("devices")
+                        #print("devices")
                         self.device_list()
                     else:
                         raise SyntaxError("Headings called in wrong order")
@@ -108,7 +108,7 @@ class Parser:
                 
                     if self.sections_complete == 1 and self.headings_found == 2:
                         self.headings_found += 1
-                        print("connections")
+                        #print("connections")
                         self.connection_list()
                     else:
                         raise SyntaxError("Headings called in wrong order")
@@ -116,7 +116,7 @@ class Parser:
                 elif self.symbol.id == self.scanner.SIGNALS_ID:
                     if self.sections_complete == 2 and self.headings_found == 3:
                         self.headings_found += 1
-                        print("signals")
+                        #print("signals")
                         self.signal_list()
                     else:
                         raise SyntaxError("Headings called in wrong order")
@@ -132,8 +132,8 @@ class Parser:
 
                 
             elif self.sections_complete == 6 and self.headings_found == 7:
-                print(self.symbol.string)
-                print("complete")
+                #print(self.symbol.string)
+                #print("complete")
                 return True
             else:
                 return False
@@ -159,7 +159,7 @@ class Parser:
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                print(self.symbol.string)
+                #print(self.symbol.string)
                 self.devices_parsed = True
                 self.sections_complete += 1
                 break
@@ -181,14 +181,14 @@ class Parser:
                 raise SyntaxError("Device: Name for device already used")
 
             self.device_names.append(self.symbol.id) # add symbol id to a list of device ids
-            print(self.symbol.string)
+            #print(self.symbol.string)
             self.symbol = self.scanner.get_symbol() #Get next symbol which should be an = sign   
             if self.symbol.type != self.scanner.EQUALS:
                     self.parse_errors += 1
                     raise SyntaxError("Device: Expected symbol is an =")
             else:
                 self.symbol = self.scanner.get_symbol()
-                print(self.symbol.string)
+                #print(self.symbol.string)
                 
                 if self.symbol.id < 2 or self.symbol.id > 9:
                     self.parse_errors += 1
@@ -207,7 +207,7 @@ class Parser:
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
             if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of connections
-                print(self.symbol.string)
+                #print(self.symbol.string)
                 self.connections_parsed = True
                 self.sections_complete += 1 
                 break
@@ -221,7 +221,7 @@ class Parser:
         # Expected format : name DASH name PERIOD Inumber
         
         if self.symbol.id not in self.device_names:
-            print("Not defined:", self.symbol.string)
+            #print("Not defined:", self.symbol.string)
             self.parse_errors += 1
             raise SyntaxError("CONNECTION: Device not defined")
 
@@ -266,8 +266,8 @@ class Parser:
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETSIGNAL
         if self.symbol.id == self.scanner.SETSIGNALS_ID:
-            print("Keyword")
-            print("SETSIGNAL")
+            #print("Keyword")
+            #print("SETSIGNAL")
             self.headings_found += 1
             self.setsignal_list()
         else:
@@ -277,15 +277,15 @@ class Parser:
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be SETCLOCK
         
         if self.symbol.id == self.scanner.SETCLOCK_ID:
-            print("Keyword")
-            print("SETCLOCK")
+            #print("Keyword")
+            #print("SETCLOCK")
             self.headings_found += 1
             self.setclock_list()
         
         self.symbol = self.scanner.get_symbol() #Get next symbol, should be }
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
             self.sections_complete += 1
-            print(self.symbol.string)
+            #print(self.symbol.string)
         
 
 
@@ -296,7 +296,7 @@ class Parser:
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol() #Go to first symbol of the line
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
-            print(self.symbol.string)
+            #print(self.symbol.string)
             self.setsignal_parsed = True
             self.sections_complete += 1
             return 
@@ -304,7 +304,7 @@ class Parser:
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
             if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of setsignal
-                print(self.symbol.string)
+                #print(self.symbol.string)
                 self.setsignal_parsed = True
                 self.sections_complete += 1
                 break 
@@ -364,7 +364,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
-            print(self.symbol.string)
+            #print(self.symbol.string)
             self.setclockparsed = True
             self.sections_complete += 1
             return 
@@ -372,7 +372,7 @@ class Parser:
         while self.symbol.type == self.scanner.SEMICOLON:
             self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
             if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of setsignal
-                print(self.symbol.string)
+                #print(self.symbol.string)
                 self.setclock_parsed = True
                 self.sections_complete += 1
                 break 
@@ -386,7 +386,7 @@ class Parser:
         
        
         if self.symbol.id not in self.device_names:
-            print("Device not defined: ", self.symbol.string)
+            #print("Device not defined: ", self.symbol.string)
             self.parse_errors += 1
             raise SyntaxError("SETCLOCK: Device not defined")
 
@@ -464,7 +464,7 @@ class Parser:
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                    print(self.symbol.string)
+                    #print(self.symbol.string)
                     self.sections_complete += 1
                     self.monitor_parsed = True
                     break
