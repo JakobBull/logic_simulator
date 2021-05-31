@@ -10,7 +10,6 @@ Symbol - encapsulates a symbol and stores its properties.
 """
 import sys
 import os
-from userint import UserInterface
 
 
 class Symbol:
@@ -109,6 +108,7 @@ class Scanner:
         # initialise line number and character number counters
         self.current_line_number = 1
         self.current_char_number = 1
+        if char == '\n':  self.current_line_number += 1
 
     def get_symbol(self):
         """
