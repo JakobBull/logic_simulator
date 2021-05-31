@@ -48,7 +48,7 @@ def main():
                 break
             i += 1
             #calling an error for each symbol
-            Error(i%3,symbol)
+            Error(i%20,symbol)
 
         print("printing error message\n\n\n")
         #printing error
