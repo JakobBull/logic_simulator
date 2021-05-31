@@ -215,15 +215,15 @@ class Parser:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "inputs":
                             self.parse_errors += 1
-                            raise SyntaxError("Word inputs required")
+                            raise SyntaxError("DEVICE: Word inputs required")
                         else:
                             self.symbol = self.scanner.get_symbol()
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
-                                raise SyntaxError("Invalid number of inputs")
+                                raise SyntaxError("DEVICE: Invalid number of inputs")
                             if self.symbol.id < 1 or self.symbol.id > 16:
                                 self.parse_errors += 1
-                                raise SyntaxError("Invalid number of inputs")
+                                raise SyntaxError("DEVICE: Invalid number of inputs")
                             else:
                                 self.devices.make_gate(self.new_device_id, self.new_device_type, self.symbol.id)
                             
@@ -231,12 +231,12 @@ class Parser:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "halfperiod":
                             self.parse_errors += 1
-                            raise SyntaxError("Word halfperiod required")
+                            raise SyntaxError("DEVICE: Word halfperiod required")
                         else:
                             self.symbol = self.scanner.get_symbol()
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
-                                raise SyntaxError("Invalid halfperiod")
+                                raise SyntaxError("DEVICE: Invalid halfperiod")
                             else:
                                 self.devices.make_clock(self.new_device_id, self.symbol.id)
 
@@ -442,7 +442,15 @@ class Parser:
 
         [device_id, output_id] = self.signame_in()
 
-        self.monitors.make_monitor(device_id, output_id)
+        error_type = self.monitors.make_monitor(device_id, output_id)
+
+        if error_type == self.monitors.NOT_OUTPUT:
+            self.parse_errors += 1
+            raise SyntaxError("MONITOR: Output not properly defined")
+
+        elif error_type == self.monitors.MONITOR_PRESENT:
+            self.parse_errors += 1
+            raise SyntaxError("MONITOR: Device already monitored")
         
         self.symbol = self.scanner.get_symbol()
 
