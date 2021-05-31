@@ -82,8 +82,8 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             
             if self.symbol.type == self.scanner.KEYWORD: #Check if symbol is a Heading
-                print('Keyword')
-                print(self.symbol.string)
+                #print('Keyword')
+                #print(self.symbol.string)
                 '''
                 if self.headings.index(self.symbol) != self.headings_found: #Check if headings are called in the right order
                     self.parse_errors += 1
@@ -145,7 +145,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.LEFT_BRACKET:
             raise SyntaxError("Always need to follow a heading with {")
-        print('{')
+        #print('{')
               
     def device_list(self):
         """ Function which parses the device list"""
