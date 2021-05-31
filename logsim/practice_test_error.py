@@ -34,7 +34,9 @@ def main():
         print("scanning from: " + path)
         print("")
         print("type\tid\tline#\tstart_char#\tend_char#\tstring")
-        for i in range(2):
+        i = 0
+        while True:
+            #initial symbol listing
             symbol = scan.get_symbol()
             print(symbol.type, end="\t")
             print(symbol.id, end="\t")
@@ -42,12 +44,16 @@ def main():
             print(symbol.start_char_number, end="\t\t")
             print(symbol.end_char_number, end="\t\t")
             print(symbol.string)
-            Error(i, symbol)
             if(symbol.type == scan.EOF):
                 break
+            i += 1
+            #calling an error for each symbol
+            Error(i%3,symbol)
+
         print("printing error message\n\n\n")
         scan = Scanner(path, Names())
-        Error.print_error(scan)
+        #printing error
+        Error.print_error(scan,path)
 
 if __name__ == "__main__":
     main()
