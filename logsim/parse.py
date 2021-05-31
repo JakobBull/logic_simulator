@@ -380,7 +380,8 @@ class Parser:
             self.parse_errors += 1
             raise SyntaxError("SIGNALS: Device not defined")
             
-        
+        switch_set_ID = self.devices.get_device(self.symbol.id)
+
         self.symbol = self.scanner.get_symbol() 
         
         if self.symbol.type != self.scanner.EQUALS:
@@ -395,6 +396,10 @@ class Parser:
         elif self.symbol.type != self.scanner.NUMBER:
             self.parse_errors += 1
             raise SyntaxError("SIGNALS: Signal can only be set to 1 or 0")
+
+        elif self.symbol.string == "1":
+            self.devices.set_switch(switch_set_ID, 1)
+        
         self.symbol = self.scanner.get_symbol()
 
         if self.symbol.type != self.scanner.SEMICOLON:
@@ -434,6 +439,10 @@ class Parser:
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
             raise SyntaxError("MONITOR: Device not defined")
+
+        [device_id, output_id] = self.signame_in()
+
+        self.monitors.make_monitor(device_id, output_id)
         
         self.symbol = self.scanner.get_symbol()
 
