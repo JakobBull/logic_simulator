@@ -200,8 +200,7 @@ class SidePanel(wx.Panel):
         super().__init__(parent=parent)
         
         self.scrolled_panel = scrolled_panel
-        for item in self.scrolled_panel.item_list:
-            print(item.name)
+
         # Configure the widgets
         
         #cycle_sizer
@@ -219,7 +218,10 @@ class SidePanel(wx.Panel):
         #switch_sizer
         self.switch_box = wx.ComboBox(self, wx.ID_ANY, "Switch")
         self.switch_box_inter_text = wx.StaticText(self, wx.ID_ANY, "set to", style= wx.ALIGN_CENTER)
-        self.switch_box_values = wx.ComboBox(self, wx.ID_ANY, "Value", choices = ["0", "1"])
+        #self.switch_box_values = wx.ComboBox(self, wx.ID_ANY, "Value", choices = ["0", "1"])
+        self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
+        self.one_button = wx.RadioButton(self, -1, "1")
+        self.add_switch_button = wx.Button(self, -1, "Add")
 
         
         self.monitor_text = wx.StaticText(self, wx.ID_ANY, "Set outputs to monitor")
@@ -244,7 +246,7 @@ class SidePanel(wx.Panel):
 
         #self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
         self.switch_box.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
-        self.switch_box_values.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
+        #self.switch_box_values.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
 
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_monitor)
         self.remove_monitor_button.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
@@ -262,13 +264,14 @@ class SidePanel(wx.Panel):
         self.remove_monitor_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.remove_monitor_subsizer = wx.BoxSizer(wx.VERTICAL)
         self.remove_monitor_bordersizer = wx.BoxSizer(wx.VERTICAL)
+        self.binary_choice_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.side_sizer.SetMinSize(self.side_sizer.GetMinSize())
         self.side_sizer.Add(self.cycle_sizer, 1, wx.ALL | wx.EXPAND, 0)
         self.side_sizer.Add(self.button_sizer, 1, wx.ALL |wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
-        self.side_sizer.Add(self.switch_box_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
-        self.side_sizer.Add(self.switch_sizer, 1, wx.ALL|wx.EXPAND, 0)
+        self.side_sizer.Add(self.switch_box_text, 1, wx.ALIGN_CENTER, 0)
+        self.side_sizer.Add(self.switch_sizer, 1, wx.ALIGN_CENTER |wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
         self.side_sizer.Add(self.monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
@@ -284,7 +287,12 @@ class SidePanel(wx.Panel):
 
         self.switch_sizer.Add(self.switch_box, 0, wx.ALL, 5)
         self.switch_sizer.Add(self.switch_box_inter_text, 0, wx.ALL | wx.CENTRE, 5)
-        self.switch_sizer.Add(self.switch_box_values, 0, wx.EXPAND | wx.ALL, 5)
+        #self.switch_sizer.Add(self.switch_box_values, 0, wx.ALL, 5)
+        self.switch_sizer.Add(self.binary_choice_sizer, -1, wx.ALL, 5)
+        self.switch_sizer.Add(self.add_switch_button, -1, wx.ALL, 5)
+
+        self.binary_choice_sizer.Add(self.zero_button, 0, wx.ALL, 0)
+        self.binary_choice_sizer.Add(self.one_button, 0, wx.ALL, 0)
 
         self.monitor_sizer.Add(self.monitor_combobox, 1, wx.ALL, 5)
         self.monitor_sizer.Add(self.add_monitor_button, 1, wx.ALL, 5)
@@ -306,8 +314,10 @@ class SidePanel(wx.Panel):
 
     def on_remove_monitor(self, event):
         """Handle the event when the remove monitor button is pressed"""
-        self.remove_monitor_combobox.Remove(self.remove_monitor_combobox.Value)
+        self.remove_monitor_combobox.Clear()
         self.scrolled_panel.remove_monitor(self.remove_monitor_combobox.Value)
+        for item in self.scrolled_panel.item_list:
+            self.remove_monitor_combobox.Append(item.name)
 
     def on_remove_all_monitors(self, event):
         """Handle the event when removign all monitors."""
@@ -355,23 +365,17 @@ class Monitor(scrolled.ScrolledPanel):
         scrolled.ScrolledPanel.__init__(self, parent, -1)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        #self.text_1 = wx.StaticText(self, wx.ID_ANY, "Text1", size = (-1, 50))
-        #self.text_2 = wx.StaticText(self, wx.ID_ANY, "Text2", size = (-1, 50))
-        #self.text_1.SetBackgroundColour('#b0bcda')
-        #self.text_2.SetBackgroundColour('#b0bcda')
-
-        #self.sizer.Add(self.text_1, 0, wx.EXPAND | wx.ALL, 5)
-        #self.sizer.Add(self.text_2, 0, wx.EXPAND |wx.ALL, 5)
 
         self.item_list = []
 
         self.item_list.append(MonitorItem(self, "text 1"))
+        self.sizer.Add(self.item_list[0], 0, wx.EXPAND | wx.ALL, 5)
+
         self.item_list.append(MonitorItem(self, "Text 2"))
+        self.sizer.Add(self.item_list[1], 0, wx.EXPAND |wx.ALL, 5)
+
         self.item_list[0].SetBackgroundColour('#b0bcda')
         self.item_list[1].SetBackgroundColour('#b0bcda')
-
-        self.sizer.Add(self.item_list[0], 0, wx.EXPAND | wx.ALL, 5)
-        self.sizer.Add(self.item_list[1], 0, wx.EXPAND |wx.ALL, 5)
 
         self.SetSizer(self.sizer)
         self.SetupScrolling()
@@ -394,6 +398,16 @@ class Monitor(scrolled.ScrolledPanel):
         self.sizer.Layout()
         self.SetupScrolling()
 
+    def remove_child(self, child):
+        for element in self.sizer.GetChildren():
+            if element.GetWindow() == child:
+                self.sizer.Hide(child)
+                child.Destroy()
+                self.SetSizer(self.sizer)
+                self.sizer.Layout()
+                self.SetupScrolling()
+
+
     def remove_all_monitors(self):
         for item in self.sizer.GetChildren():
             self.sizer.Hide(item.GetWindow())
@@ -406,18 +420,25 @@ class MonitorItem(wx.Panel):
 
     def __init__(self, parent, name) -> None:
         super().__init__(parent=parent)
+        self.parent = parent
         self.name = name
-        self.name_text = wx.StaticText(self, wx.ID_ANY, label= self.name)
+        self.name_text = wx.StaticText(self, wx.ID_ANY, label= self.name, size=(100,-1))
         self.signal_trace = wx.StaticText(self, wx.ID_ANY, "We will add the signal trace here")
-        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove")
+        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(100,-1))
+
+        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        self.sizer.Add(self.name_text, 0 , wx.EXPAND | wx.ALL, 0)
-        self.sizer.Add(self.signal_trace, 0 , wx.EXPAND | wx.ALL, 0)
-        self.sizer.Add(self.remove_item, 0 , wx.EXPAND | wx.ALL, 0)
-
+        self.sizer.Add(self.name_text, 0,wx.ALIGN_CENTER, 0)
+        self.sizer.Add(self.signal_trace, -1 , wx.ALIGN_CENTER, 0)
+        self.sizer.Add(self.remove_item, 0, wx.ALIGN_CENTER , 0)
         self.SetSizer(self.sizer)
+
+    def on_remove_item(self, event):
+        self.parent.remove_child(self)
+
+
 
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
