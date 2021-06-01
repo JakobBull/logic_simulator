@@ -199,6 +199,7 @@ class SidePanel(wx.Panel):
     def __init__(self, parent, scrolled_panel)-> None:
         super().__init__(parent=parent)
         
+        self.parent = parent
         self.scrolled_panel = scrolled_panel
 
         # Configure the widgets
@@ -216,7 +217,7 @@ class SidePanel(wx.Panel):
         zero_button and one_button allow toggling between 0 and 1
         add_switch_executes the add button"""
         self.switch_box_text = wx.StaticText(self, wx.ID_ANY, "Set Switch")
-        self.switch_box = wx.ComboBox(self, wx.ID_ANY, "Switch")
+        self.switch_box = wx.ComboBox(self, wx.ID_ANY, "Switch", choices = [self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)])
         self.switch_box_inter_text = wx.StaticText(self, wx.ID_ANY, "set to", style= wx.ALIGN_CENTER)
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
@@ -225,7 +226,7 @@ class SidePanel(wx.Panel):
         
         self.monitor_text = wx.StaticText(self, wx.ID_ANY, "Set outputs to monitor")
         #monitor_sizer
-        self.monitor_combobox = wx.ComboBox(self, wx.ID_ANY, "Select")
+        self.monitor_combobox = wx.ComboBox(self, wx.ID_ANY, "Select", choices = [self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(None)])
         self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
 
         
@@ -245,7 +246,6 @@ class SidePanel(wx.Panel):
 
         self.add_switch_button.Bind(wx.EVT_BUTTON, self.on_update_signal)
 
-        #self.monitor_combobox.Bind(wx.EVT_COMBOBOX, self.on_monitor_combobox)
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_monitor)
 
         self.remove_monitor_button.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
@@ -306,17 +306,69 @@ class SidePanel(wx.Panel):
 
         self.SetSizer(self.side_sizer)
 
-    def on_update_signal(self, event):
-        """Handle the event when selecting a switch to set"""
-        if self.one_button.GetValue():
-            self.parent.network.update_signal(self.switch_box.GetValue(), 1)
-        else:
-            self.parent.network.update_signal(self.switch_box.GetValue(), 1)
+    def read_name(self, name_string):
+        """Return the name ID of the current string if valid.
 
+        Return None if the current string is not a valid name string.
+        """
+        if name_string is None:
+            return None
+        else:
+            name_id = self.parent.names.query(name_string)
+        if name_id is None:
+            print("Error! Unknown name.")
+        return name_id
+
+    def read_signal_name(self):
+        """Return the device and port IDs of the current signal name.
+
+        Return None if either is invalid.
+        """
+        device_id = self.read_name()
+        if device_id is None:
+            return None
+        elif self.character == ".":
+            port_id = self.read_name()
+            if port_id is None:
+                return None
+        else:
+            port_id = None
+        return [device_id, port_id]
+
+    
     def on_add_monitor(self, event):
         """Handle the event when the add monitor button is pressed"""
-        self.remove_monitor_combobox.Append("testing")
-        self.scrolled_panel.add_monitor("testing")
+        monitor = self.monitor_combobox.GetValue()
+        self.remove_monitor_combobox.Append(monitor)
+        self.scrolled_panel.add_monitor(monitor)
+
+    def run_network(self, cycles):
+        """Run the network for the specified number of simulation cycles.
+
+        Return True if successful.
+        """
+        for _ in range(cycles):
+            if self.parent.network.execute_network():
+                self.parent.monitors.record_signals()
+            else:
+                print("Error! Network oscillating.")
+                return False
+        self.parent.monitors.display_signals()
+        return True
+
+    def on_update_signal(self, event):
+        """Set the specified switch to the specified signal level."""
+        name_string = self.switch_box.GetValue()
+        switch_id = self.read_name(name_string)
+        if switch_id is not None:
+            if self.one_button.GetValue():
+                switch_state = 1
+            else:
+                switch_state = 0
+            if self.parent.devices.set_switch(switch_id, switch_state):
+                print("Successfully set switch.")
+            else:
+                print("Error! Invalid switch.")
 
     def on_remove_monitor(self, event):
         """Handle the event when the remove monitor button is pressed"""
@@ -341,16 +393,39 @@ class SidePanel(wx.Panel):
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
         spin_value = self.spin.GetValue()
-        text = "".join(["New spin control value: ", str(spin_value)])
-        self.canvas.render(text)
+        #text = "".join(["New spin control value: ", str(spin_value)])
+        #self.canvas.render(text)
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
-        self.canvas.render(text)
+        self.cycles_completed = 0
+        cycles = self.spin.GetValue()
+        self.parent.monitors.reset_monitors()
+        print("".join(["Running for ", str(cycles), " cycles"]))
+        self.parent.devices.cold_startup()
+        if self.run_network(cycles):
+            self.cycles_completed += cycles
+
+        #text = "Run button pressed."
+        #self.canvas.render(text)
+
+    def run_command(self):
+        """Run the simulation from scratch."""
+        self.cycles_completed = 0
+        cycles = self.read_number(0, None)
+
+        if cycles is not None:  # if the number of cycles provided is valid
+            self.monitors.reset_monitors()
+            print("".join(["Running for ", str(cycles), " cycles"]))
+            self.devices.cold_startup()
+            if self.run_network(cycles):
+                self.cycles_completed += cycles
     
     def on_continue_button(self, event):
         """Handle the event triggered by pressing the continue button"""
+        cycles = self.spin.GetValue()
+        for _ in cycles:
+            self.parent.network.execute_network()
         text = "Contine button pressed."
         self.canvas.render(text)
 
@@ -366,18 +441,21 @@ class SidePanel(wx.Panel):
 
 class Monitor(scrolled.ScrolledPanel):
 
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, monitors, devices, names) -> None:
 
         scrolled.ScrolledPanel.__init__(self, parent, -1)
+        self.monitors = monitors
+        self.devices = devices
+        self.names = names
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.item_list = []
 
-        self.item_list.append(MonitorItem(self, "text 1"))
+        self.item_list.append(MonitorItem(self, "text 1", self.monitors, self.devices, self.names))
         self.sizer.Add(self.item_list[0], 0, wx.EXPAND | wx.ALL, 5)
 
-        self.item_list.append(MonitorItem(self, "Text 2"))
+        self.item_list.append(MonitorItem(self, "Text 2", self.monitors, self.devices, self.names))
         self.sizer.Add(self.item_list[1], 0, wx.EXPAND |wx.ALL, 5)
 
         self.item_list[0].SetBackgroundColour('#b0bcda')
@@ -387,7 +465,7 @@ class Monitor(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def add_monitor(self, text):
-        self.item_list.append(MonitorItem(self, text))
+        self.item_list.append(MonitorItem(self, text, self.monitors, self.devices, self.names))
         self.item_list[-1].SetBackgroundColour('#b0bcda')
         self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
         self.SetSizer(self.sizer)
@@ -424,10 +502,16 @@ class Monitor(scrolled.ScrolledPanel):
 
 class MonitorItem(wx.Panel):
 
-    def __init__(self, parent, name) -> None:
+    def __init__(self, parent, name, monitors, devices, names) -> None:
         super().__init__(parent=parent)
         self.parent = parent
         self.name = name
+        self.names = names
+        self.monitors = monitors
+        self.devices = devices
+        [self.device_id, self.output_id] = self.devices.get_signal_ids(self.name)
+        self.value = self.monitors.get_monitor_signal(self.device_id, self.output_id)
+
         self.name_text = wx.StaticText(self, wx.ID_ANY, label= self.name, size=(100,-1))
         self.signal_trace = wx.StaticText(self, wx.ID_ANY, "We will add the signal trace here")
         self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(100,-1))
@@ -478,6 +562,13 @@ class Gui(wx.Frame):
         self.devices = devices
         self.network = network
         self.monitors = monitors
+
+        self.cycles_completed = 0  # number of simulation cycles completed
+
+        self.character = ""  # current character
+        self.line = ""  # current string entered by the user
+        self.cursor = 0  # cursor position
+
         # Configure the file menu
         fileMenu = wx.Menu()
         saveMenu = wx.Menu()
@@ -489,7 +580,7 @@ class Gui(wx.Frame):
         self.SetMenuBar(menuBar)
 
         # Canvas for drawing signals
-        self.scrolled_panel = Monitor(self)
+        self.scrolled_panel = Monitor(self, self.monitors, self.devices, self.names)
         self.scrolled_panel.SetupScrolling()
         #self.canvas = MyGLCanvas(self, devices, monitors)
         #Control side_panel
