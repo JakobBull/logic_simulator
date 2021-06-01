@@ -203,22 +203,21 @@ class SidePanel(wx.Panel):
 
         # Configure the widgets
         
-        #cycle_sizer
+        #control setting number of cycles
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
 
-        #button_sizer
+        #run and continue buttons
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
         self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
-        """
-        self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER)"""
         
+        """Setting the value of a signal/ switch
+        switch_box takes the value
+        zero_button and one_button allow toggling between 0 and 1
+        add_switch_executes the add button"""
         self.switch_box_text = wx.StaticText(self, wx.ID_ANY, "Set Switch")
-        #switch_sizer
         self.switch_box = wx.ComboBox(self, wx.ID_ANY, "Switch")
         self.switch_box_inter_text = wx.StaticText(self, wx.ID_ANY, "set to", style= wx.ALIGN_CENTER)
-        #self.switch_box_values = wx.ComboBox(self, wx.ID_ANY, "Value", choices = ["0", "1"])
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
         self.add_switch_button = wx.Button(self, -1, "Add")
@@ -244,11 +243,11 @@ class SidePanel(wx.Panel):
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
 
-        #self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
-        self.switch_box.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
-        #self.switch_box_values.Bind(wx.EVT_COMBOBOX, self.on_combo_select)
+        self.add_switch_button.Bind(wx.EVT_BUTTON, self.on_update_signal)
 
+        #self.monitor_combobox.Bind(wx.EVT_COMBOBOX, self.on_monitor_combobox)
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_monitor)
+
         self.remove_monitor_button.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
         self.remove_all_button.Bind(wx.EVT_BUTTON, self.on_remove_all_monitors)
         #self.remove_monitor_combobox.Bind(wx.EVT_COMBOBOX, self.on_remove_monitor_combobox)
@@ -306,6 +305,13 @@ class SidePanel(wx.Panel):
         self.remove_monitor_subsizer.Add(self.remove_all_button, 0, wx.ALL|wx.EXPAND, 5)
 
         self.SetSizer(self.side_sizer)
+
+    def on_update_signal(self, event):
+        """Handle the event when selecting a switch to set"""
+        if self.one_button.GetValue():
+            self.parent.network.update_signal(self.switch_box.GetValue(), 1)
+        else:
+            self.parent.network.update_signal(self.switch_box.GetValue(), 1)
 
     def on_add_monitor(self, event):
         """Handle the event when the add monitor button is pressed"""
@@ -466,7 +472,12 @@ class Gui(wx.Frame):
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
-
+        
+        self.path = path
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
         # Configure the file menu
         fileMenu = wx.Menu()
         saveMenu = wx.Menu()
