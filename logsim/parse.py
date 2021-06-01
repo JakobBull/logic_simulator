@@ -107,7 +107,7 @@ class Parser:
                         self.device_list()
                     else:
                         self.parse_errors += 1
-                        self.Error(0, self.symbol)
+                        Error(0, self.symbol)
                     
 
                 elif self.symbol.id == self.scanner.CONNECTIONS_ID:
@@ -118,7 +118,7 @@ class Parser:
                         self.connection_list()
                     else:
                         self.parse_errors += 1
-                        self.Error(0, self.symbol)
+                        Error(0, self.symbol)
 
                 elif self.symbol.id == self.scanner.SIGNALS_ID:
                     if self.sections_complete == 2 and self.headings_found == 3:
@@ -127,7 +127,7 @@ class Parser:
                         self.setsignal_list()
                     else:
                         self.parse_errors += 1
-                        self.Error(0, self.symbol)
+                        Error(0, self.symbol)
                     
 
                 elif self.symbol.id == self.scanner.MONITOR_ID:
@@ -137,7 +137,7 @@ class Parser:
 
                     else:
                         self.parse_errors += 1
-                        self.Error(0, self.symbol)
+                        Error(0, self.symbol)
 
                 
             elif self.sections_complete == 4 and self.headings_found == 5:
@@ -154,7 +154,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.LEFT_BRACKET:
             self.parse_errors += 1
-            self.Error(1, self.symbol)
+            Error(1, self.symbol)
         #print('{')
               
     def device_list(self):
@@ -183,14 +183,14 @@ class Parser:
 
         if self.symbol.type != self.scanner.NAME:
             self.parse_errors += 1
-            self.Error(3, self.symbol) 
+            Error(3, self.symbol) 
         
         
 
         else:
             if self.symbol.id in self.device_names:
                 self.parse_errors += 1
-                self.Error(4, self.symbol)
+                Error(4, self.symbol)
 
             self.device_names.append(self.symbol.id) # add symbol id to a list of device ids
             self.new_device_id = self.symbol.id
@@ -198,7 +198,7 @@ class Parser:
             self.symbol = self.scanner.get_symbol() #Get next symbol which should be an = sign   
             if self.symbol.type != self.scanner.EQUALS:
                     self.parse_errors += 1
-                    self.Error(4, self.symbol)
+                    Error(4, self.symbol)
             else:
                 self.symbol = self.scanner.get_symbol()
                 #print(self.symbol.string)
@@ -206,7 +206,7 @@ class Parser:
                 if self.symbol.id < 2 or self.symbol.id > 9:
                     self.new_device_id = self.symbol.id
                     self.parse_errors += 1
-                    self.Error(5, self.symbol)
+                    Error(5, self.symbol)
                     
   
                 else:
@@ -223,17 +223,17 @@ class Parser:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "inputs":
                             self.parse_errors += 1
-                            self.Error(6, self.symbol)
+                            Error(6, self.symbol)
                             
                         else:
                             self.symbol = self.scanner.get_symbol()
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
-                                self.Error(7, self.symbol)
+                                Error(7, self.symbol)
                                 
                             if self.symbol.id < 1 or self.symbol.id > 16:
                                 self.parse_errors += 1
-                                self.Error(7, self.symbol)
+                                Error(7, self.symbol)
                                 
                             else:
                                 self.devices.make_gate(self.new_device_id, self.new_device_type, self.symbol.id)
@@ -242,13 +242,13 @@ class Parser:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "halfperiod":
                             self.parse_errors += 1
-                            self.Error(8, self.symbol)
+                            Error(8, self.symbol)
                             
                         else:
                             self.symbol = self.scanner.get_symbol()
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
-                                self.Error(9, self.symbol)
+                                Error(9, self.symbol)
                             else:
                                 self.devices.make_clock(self.new_device_id, self.symbol.id)
 
@@ -291,7 +291,7 @@ class Parser:
         if self.symbol.id not in self.device_names:
             #print("Not defined:", self.symbol.string)
             self.parse_errors += 1
-            self.Error(10, self.symbol)
+            Error(10, self.symbol)
             
 
         else: 
@@ -301,14 +301,14 @@ class Parser:
     
             if self.symbol.type != self.scanner.DASH:
                 self.parse_errors += 1
-                self.Error(11, self.symbol)
+                Error(11, self.symbol)
                 
 
             else:
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol.type != self.scanner.NAME:
                     self.parse_errors += 1
-                    self.Error(10, self.symbol)
+                    Error(10, self.symbol)
                     
 
                 else:
@@ -317,7 +317,7 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
                     if self.symbol.type != self.scanner.PERIOD:
                         self.parse_errors += 1
-                        self.Error(12, self.symbol)
+                        Error(12, self.symbol)
                         
 
                     else: 
@@ -326,18 +326,18 @@ class Parser:
                         self.input_list = list(self.symbol.string)
                         if self.input_list[0] != "I":
                             self.parse_errors += 1 
-                            self.Error(13, self.symbol)
+                            Error(13, self.symbol)
                         self.input_number = "".join(self.input_list[1:])
                         
 
                         if self.input_number.isdigit() == False:
                             self.parse_errors += 1
-                            self.Error(13, self.symbol)
+                            Error(13, self.symbol)
                         
                         error_type = self.network.make_connection(
                             in_device_id, in_port_id, out_device_id, self.symbol.id)
                         if error_type != self.network.NO_ERROR:
-                            self.Error(15, self.symbol)
+                            Error(15, self.symbol)
                             
                         
 
@@ -349,13 +349,13 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type != self.scanner.PERIOD:
                 self.parse_errors += 1
-                self.Error(16, self.symbol)
+                Error(16, self.symbol)
                 
             else:
                 self.symbol = self.scanner.get_symbol
                 if self.symbol.id not in self.devices.dtype_output_ids:
                     self.parse_errors += 1
-                    self.Error(17, self.symbol)
+                    Error(17, self.symbol)
                     
                 
                 else:
@@ -398,7 +398,7 @@ class Parser:
 
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
-            self.Error(18, self.symbol)
+            Error(18, self.symbol)
             
             
         switch_set_ID = self.devices.get_device(self.symbol.id)
@@ -407,18 +407,18 @@ class Parser:
         
         if self.symbol.type != self.scanner.EQUALS:
                 self.parse_errors += 1
-                self.Error(19, self.symbol)
+                Error(19, self.symbol)
                 
 
         self.symbol = self.scanner.get_symbol()
         if self.symbol.string != "0" and self.symbol.string != "1":
             self.parse_errors += 1
-            self.Error(20, self.symbol)
+            Error(20, self.symbol)
             
         
         elif self.symbol.type != self.scanner.NUMBER:
             self.parse_errors += 1
-            self.Error(20, self.symbol)
+            Error(20, self.symbol)
             
 
         elif self.symbol.string == "1":
@@ -428,7 +428,7 @@ class Parser:
 
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
-            self.Error(22, self.symbol)
+            Error(22, self.symbol)
             
 
 
@@ -441,7 +441,7 @@ class Parser:
 
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
             self.parse_errors += 1
-            self.Error(23, self.symbol)
+            Error(23, self.symbol)
             
         
         
@@ -464,7 +464,7 @@ class Parser:
         #Expected format : name SEMICOLON
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
-            self.Error(24, self.symbol)
+            Error(24, self.symbol)
             
 
         [device_id, output_id] = self.signame_in()
@@ -473,68 +473,17 @@ class Parser:
 
         if error_type == self.monitors.NOT_OUTPUT:
             self.parse_errors += 1
-            self.Error(25, self.symbol)
+            Error(25, self.symbol)
             
 
         elif error_type == self.monitors.MONITOR_PRESENT:
             self.parse_errors += 1
-            self.Error(26, self.symbol)
+            Error(26, self.symbol)
             
         
         self.symbol = self.scanner.get_symbol()
 
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
-            self.Error(27, self.symbol)
-            
-
-
-
-
-
-        
-
-
-            
-                
-        
-        
-
-
-        
-        
-        
-
-
-
-
-                
-            
-     
-
-
-                        
-
-
-
-            
-        
-
-                            
-
-
-
-                
-
-
-
-                
-
-
-            
-
-
-
-
-
-            
+            Error(27, self.symbol)
+                    
