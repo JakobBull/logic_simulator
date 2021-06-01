@@ -52,7 +52,7 @@ def main():
 
         print("printing error message\n\n\n")
         #printing error
-        Error.print_error(path)
+        Error.print_error(scan)
 
 if __name__ == "__main__":
     main()

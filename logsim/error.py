@@ -43,8 +43,8 @@ class Error:
         Error.symbols.append(symbol)    # symbol that causes the error
         Error.num_errors += 1           # everytime an error called, number of errors increased
 
-    def print_error(path):
-        lines = Error.get_lines(path)
+    def print_error(scanner):
+        lines = Error.get_lines(scanner)
         print(str(Error.num_errors) + " ERRORS!:\n")
         for i in range(Error.num_errors):
             print("Error " + str(i) + ":")
@@ -67,10 +67,10 @@ class Error:
             for n in range(8):
                 print('-', end = '')
             print("")
-    def get_lines(path):
+    def get_lines(scanner):
         try:
             """Open and return the file specified by path for reading"""
-            file = open(path, "r", encoding="utf-8")
+            file = open(scanner.path, "r", encoding="utf-8")
             lines = file.readlines()
             return lines
         except IOError:
