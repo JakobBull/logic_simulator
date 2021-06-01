@@ -71,7 +71,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Bind events to the canvas
         self.Bind(wx.EVT_PAINT, self.on_paint)
-        self.Bind(wx.EVT_SIZE, self.on_size)
+        #self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
     def init_gl(self):
@@ -89,6 +89,30 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
+    def render_value(self, value):
+        """Draw a trace"""
+        self.SetCurrent(self.context)
+        if not self.init:
+            # Configure the viewport, modelview and projection matrices
+            self.init_gl()
+            self.init = True
+
+        # Clear everything
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+
+        # Draw a sample signal trace
+        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
+        GL.glBegin(GL.GL_LINE_STRIP)
+        x = (i * 20) + 10
+        x_next = (i * 20) + 30
+        if value == 1:
+            y = 25
+        else:
+            y = 0
+        GL.glVertex2f(x, y)
+        GL.glVertex2f(x_next, y)
+        GL.glEnd()
+
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
@@ -101,7 +125,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
         # Draw specified text at position (10, 10)
-        self.render_text(text, 10, 10)
+        #self.render_text(text, 10, 10)
 
         # Draw a sample signal trace
         GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
@@ -110,9 +134,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x = (i * 20) + 10
             x_next = (i * 20) + 30
             if i % 2 == 0:
-                y = 75
+                y = 0
             else:
-                y = 100
+                y = 25
             GL.glVertex2f(x, y)
             GL.glVertex2f(x_next, y)
         GL.glEnd()
@@ -350,6 +374,7 @@ class SidePanel(wx.Panel):
         for _ in range(cycles):
             if self.parent.network.execute_network():
                 self.parent.monitors.record_signals()
+                self.parent.scrolled_panel
             else:
                 print("Error! Network oscillating.")
                 return False
@@ -464,6 +489,10 @@ class Monitor(scrolled.ScrolledPanel):
         self.SetSizer(self.sizer)
         self.SetupScrolling()
 
+    def render_children(self):
+        for child in self.item_list:
+            child.render()
+
     def add_monitor(self, text):
         self.item_list.append(MonitorItem(self, text, self.monitors, self.devices, self.names))
         self.item_list[-1].SetBackgroundColour('#b0bcda')
@@ -491,7 +520,6 @@ class Monitor(scrolled.ScrolledPanel):
                 self.sizer.Layout()
                 self.SetupScrolling()
 
-
     def remove_all_monitors(self):
         for item in self.sizer.GetChildren():
             self.sizer.Hide(item.GetWindow())
@@ -509,11 +537,12 @@ class MonitorItem(wx.Panel):
         self.names = names
         self.monitors = monitors
         self.devices = devices
+        self.canvas = MyGLCanvas(self, self.devices, self.monitors)
+
         [self.device_id, self.output_id] = self.devices.get_signal_ids(self.name)
-        self.value = self.monitors.get_monitor_signal(self.device_id, self.output_id)
 
         self.name_text = wx.StaticText(self, wx.ID_ANY, label= self.name, size=(100,-1))
-        self.signal_trace = wx.StaticText(self, wx.ID_ANY, "We will add the signal trace here")
+        #self.signal_trace = wx.StaticText(self, wx.ID_ANY, "We will add the signal trace here")
         self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(100,-1))
 
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
@@ -521,12 +550,18 @@ class MonitorItem(wx.Panel):
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
         
         self.sizer.Add(self.name_text, 0,wx.ALIGN_CENTER, 0)
-        self.sizer.Add(self.signal_trace, -1 , wx.ALIGN_CENTER, 0)
+        self.sizer.Add(self.canvas, -1 , wx.EXPAND | wx.ALIGN_CENTER, 0)
         self.sizer.Add(self.remove_item, 0, wx.ALIGN_CENTER , 0)
         self.SetSizer(self.sizer)
 
     def on_remove_item(self, event):
+        self.parent.item_list = [item for item in self.item_list if item.name != self.name]
         self.parent.remove_child(self)
+
+    def render(self):
+        self.value = self.monitors.get_monitor_signal(self.device_id, self.output_id)
+        self.canvas.render_value(self.value)
+
 
 
 
