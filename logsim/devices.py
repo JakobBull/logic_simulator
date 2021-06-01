@@ -152,6 +152,7 @@ class Devices:
         new_device = Device(device_id)
         new_device.device_kind = device_kind
         self.devices_list.append(new_device)
+        
 
     def add_input(self, device_id, input_id):
         """Add the specified input to the specified device.
