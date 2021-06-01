@@ -30,6 +30,7 @@ class Symbol:
         self.type = None
         self.id = None      # number if symbol is a number
         # extended to include symbol's line and character number
+        self.number = None
         self.line_number = None
         self.start_char_number = None
         self.end_char_number = None
@@ -57,6 +58,7 @@ class Scanner:
     """
     def __init__(self, path, names):
         """"Open specified file and initialise reserved words and IDs."""
+        self.path = path
         # opens specified file
         try:
             """Open and return the file specified by path for reading"""
@@ -133,7 +135,9 @@ class Scanner:
                 symbol.type = self.NAME
             [symbol.id] = self.names.lookup([name_string])
         elif self.current_character.isdigit():  # number
-            symbol.string = self.get_number()
+            number = self.get_number()
+            symbol.string = number
+            symbol.number = int(number)
             symbol.type = self.NUMBER
         elif self.current_character == "{":  # punctuation
             symbol.type = self.LEFT_BRACKET

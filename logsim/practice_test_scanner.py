@@ -32,7 +32,7 @@ def main():
         scan = Scanner(path, Names())
         print("scanning from: " + path)
         print("")
-        print("type\tid\tline#\tstart_char#\tend_char#\tstring")
+        print("type\tid\tline#\tstart_char#\tend_char#\tstring\t\t\tnumber")
         while True:
             symbol = scan.get_symbol()
             print(symbol.type, end="\t")
@@ -40,7 +40,8 @@ def main():
             print(symbol.line_number, end="\t")
             print(symbol.start_char_number, end="\t\t")
             print(symbol.end_char_number, end="\t\t")
-            print(symbol.string)
+            print(symbol.string, end="\t\t\t")
+            print(symbol.number)
             if(symbol.type == scan.EOF):
                 break
 
