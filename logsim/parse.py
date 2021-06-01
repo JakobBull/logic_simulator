@@ -235,12 +235,12 @@ class Parser:
                                 self.parse_errors += 1
                                 Error(7, self.symbol)
                                 
-                            if self.symbol.id < 1 or self.symbol.id > 16:
+                            if self.symbol.number < 1 or self.symbol.number > 16:
                                 self.parse_errors += 1
                                 Error(7, self.symbol)
                                 
                             else:
-                                self.devices.make_gate(self.new_device_id, self.new_device_type, self.symbol.id)
+                                self.devices.make_gate(self.new_device_id, self.new_device_type, self.symbol.number)
                             
                     elif self.symbol.id == self.scanner.CLOCK_ID:
                         self.symbol = self.scanner.get_symbol()
