@@ -68,7 +68,7 @@ class Error:
                 print('-', end = '')
             print("")
 
-    def gui_error(path):
+    def gui_report_error(path):
         error_string = ""
         lines = Error.get_lines(path)
         error_string.append(str(Error.num_errors) + " ERRORS!:\n")
