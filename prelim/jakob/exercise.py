@@ -141,7 +141,7 @@ def main():
 
             name_id = name.lookup(character_list[0])
 
-            if  name_id not in bad_name_ids: 
+            if  name_id not in bad_name_ids:
                 print(name.get_string(name_id), end=", ")
 
 if __name__ == "__main__":

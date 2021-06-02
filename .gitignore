@@ -3,5 +3,6 @@
 .vscode
 .DS_Store
 .git
+__pycache__
 *.pyc
 *.pyo
