@@ -11,6 +11,7 @@ Command line user interface: logsim.py -c <file path>
 Graphical user interface: logsim.py <file path>
 """
 import getopt
+import gui
 import sys
 
 import wx
@@ -65,7 +66,7 @@ def main(arg_list):
                 userint.command_interface()
 
     if not options:  # no option given, use the graphical user interface
-
+        
         if len(arguments) != 1:  # wrong number of arguments
             print("Error: one file path required\n")
             print(usage_message)
@@ -76,11 +77,8 @@ def main(arg_list):
         parser = Parser(names, devices, network, monitors, scanner)
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
-            app = wx.App()
-            gui = Gui("Logic Simulator", path, names, devices, network,
+            gui.FrameManager("Logic Simulator", names, devices, network,
                       monitors)
-            gui.Show(True)
-            app.MainLoop()
 
 
 if __name__ == "__main__":

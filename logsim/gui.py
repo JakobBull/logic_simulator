@@ -10,6 +10,9 @@ Gui - configures the main window and all the widgets.
 """
 import wx
 import time
+import sys
+import os
+from wx.core import HORIZONTAL
 import wx.lib.scrolledpanel as scrolled
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
@@ -587,7 +590,83 @@ class MonitorItem(wx.Panel):
         self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.output_id]
         self.canvas.render_value(self.values)
 
+class MenuFrame(wx.Frame):
+    def __init__(self, parent) -> None:
+        super().__init__(parent=None)
+        self.parent = parent
 
+        self.Bind(wx.EVT_CLOSE, self.closeWindow)
+        self.file_panel = FilePanel(self)
+        self.text_editor = TextEditor(self)
+
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        main_sizer.Add(self.file_panel, 1, wx.EXPAND, 0)
+        main_sizer.Add(self.text_editor, 5, wx.EXPAND, 0)
+
+        self.SetSizeHints(600, 600)
+        self.SetSizer(main_sizer)
+
+    def closeWindow(self, event):
+        sys.exit()
+
+class FilePanel(wx.Panel):
+    def __init__(self, parent) -> None:
+        super().__init__(parent=parent)
+        self.parent = parent
+        self.path = None
+
+        search_file_button = wx.Button(self, wx.ID_ANY, "Search file")
+        gui_button = wx.Button(self, wx.ID_ANY, "Continue to GUI")
+
+        search_file_button.Bind(wx.EVT_BUTTON, self.on_open_file)
+        gui_button.Bind(wx.EVT_BUTTON, self.on_gui_button)
+
+        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        main_sizer.Add(search_file_button, -1, 0, 0)
+        main_sizer.Add(gui_button, -1, 0, 0)
+        self.SetSizer(main_sizer)
+
+    def on_open_file(self, event):
+        self.currentDirectory = os.getcwd()
+        dlg = wx.FileDialog(
+            self, message="Choose a file",
+            defaultDir=self.currentDirectory, 
+            defaultFile="",
+            style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
+            )
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            print("You chose the following file:")
+        dlg.Destroy()
+        if path != None:
+            self.parent.text_editor.set_text(path)
+            self.path = path
+
+    def on_gui_button(self, event):
+        self.parent.parent.show_gui(self.path)
+
+class TextEditor(wx.Panel):
+    def __init__(self, parent) -> None:
+        super().__init__(parent=parent)
+        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.text = wx.TextCtrl(self, 1, style=wx.TE_MULTILINE)
+        main_sizer.Add(self.text, -1, wx.EXPAND, 0)
+        self.SetSizer(main_sizer)
+
+    def set_text(self, path):
+        with open(path) as f:
+            content = f.readlines()
+        self.text.SetValue("".join(content))
+
+class ErrorPanel(wx.Panel):
+    def __init__(self, parent) -> None:
+        super().__init__(parent=parent)
+        self.text = wx.StaticText(self, wx.ID_ANY, style=wx.TE_MULTILINE)
+
+    def set_text(self, text):
+        self.text.SetValue(text)
 
 
 class Gui(wx.Frame):
@@ -613,11 +692,13 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, title, path, names, devices, network, monitors):
+    def __init__(self, parent, title, names, devices, network, monitors):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
         
-        self.path = path
+        self.parent = parent
+        self.Bind(wx.EVT_CLOSE, self.closeWindow)
+        #self.path = path
         self.names = names
         self.devices = devices
         self.network = network
@@ -642,6 +723,7 @@ class Gui(wx.Frame):
 
         # Canvas for drawing signals
         self.scrolled_panel = Monitor(self, self.monitors, self.devices, self.names)
+        self.error_box = ErrorPanel(self)
         self.scrolled_panel.SetupScrolling()
         #self.canvas = MyGLCanvas(self, devices, monitors)
         #Control side_panel
@@ -650,11 +732,38 @@ class Gui(wx.Frame):
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        side_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        main_sizer.Add(self.scrolled_panel, 5, wx.EXPAND | wx.ALL, 5)
+        main_sizer.Add(side_sizer, 5, wx.EXPAND | wx.ALL, 5)
         main_sizer.Add(self.side_panel, 1, wx.ALL, 5)
 
+        side_sizer.Add(self.scrolled_panel, 5, wx.EXPAND, 0)
+        side_sizer.Add(self.error_box, 1, wx.EXPAND, 0)
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
 
+    def closeWindow(self, event):
+        sys.exit()
+
+class FrameManager:
+    def __init__(self, title, names, devices, network, monitors):
+        self.app = wx.App()
+        self.gui = Gui(self, title, names, devices, network,
+                      monitors)
+        self.menu = MenuFrame(self)
+        self.menu.Show()
+        self.gui.Hide()
+        self.app.MainLoop()
+    
+    def show_gui(self, path):
+        if path != None:
+            self.menu.Hide()
+            self.gui.Show()
+            self.gui.path = path
+        else:
+            print("Please choose a file first!")
+
+    def show_menu(self):
+        self.menu.Show()
+        self.gui.Hide()
