@@ -47,11 +47,13 @@ class Parser:
         self.id = None
         self.parse_errors = 0
 
-        self.device_types = [ "NAND","AND", "NOR", "OR", "XOR", "SWITCH", "DTYPE", "CLOCK"]
+        #self.device_types = [ "NAND","AND", "NOR", "OR", "XOR", "SWITCH", "DTYPE", "CLOCK"]
         self.device_names = []
-        self.headings = ["NETWORK","DEVICES", "CONNECTIONS", "SIGNALS", "SETSIGNAL", "SETCLOCK", "MONITOR" ]
-        self.punctuation = [";", "{", "}", "-", "="]
-        self.gate_var_inputs_IDs = [5, 6, 7, 8]
+        #self.headings = ["NETWORK","DEVICES", "CONNECTIONS", "SIGNALS", "SETSIGNAL", "SETCLOCK", "MONITOR" ]
+        #self.punctuation = [";", "{", "}", "-", "="]
+        self.gate_var_inputs_IDs = [self.scanner.AND_ID, self.scanner.NAND_ID, self.scanner.OR_ID, self.scanner.NOR_ID]
+        self.device_IDs = [self.scanner.AND_ID, self.scanner.NAND_ID, self.scanner.OR_ID, self.scanner.NOR_ID,
+                            self.scanner.XOR_ID, self.scanner.XOR_ID, self.scanner.DTYPE_ID, self.scanner.SWITCH_ID, self.scanner.CLOCK_ID]
         self.new_device_id = None
         self.new_device_type = None
         self.numbers = range(20)
@@ -79,7 +81,8 @@ class Parser:
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
 
-        
+        print(self.gate_var_inputs_IDs) 
+        print("Netowrk_ID: ", self.scanner.NETWORK_ID)       
 
         while True:
 
@@ -140,11 +143,12 @@ class Parser:
                         Error(0, self.symbol)
 
                 
-            elif self.sections_complete == 4 and self.headings_found == 5:
+            elif self.sections_complete == 4 and self.headings_found == 5 and self.parse_errors == 0:
                 print(self.symbol.string)
                 print("complete")
                 return True
             else:
+                Error.print_error(self.scanner)
                 return False
                 
 
@@ -154,6 +158,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.LEFT_BRACKET:
             self.parse_errors += 1
+
             Error(1, self.symbol)
         print('{')
               
@@ -204,7 +209,7 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
                 print(self.symbol.string)
                 
-                if self.symbol.id < 2 or self.symbol.id > 9:
+                if self.symbol.id not in self.device_IDs:
                     self.new_device_id = self.symbol.id
                     self.parse_errors += 1
                     Error(5, self.symbol)
@@ -221,8 +226,12 @@ class Parser:
                         #self.symbol = self.scanner.get_symbol()
                         self.devices.make_switch(self.new_device_id, 0)
 
-                    elif self.symbol.type in self.gate_var_inputs_IDs:
+                    elif self.symbol.id in self.gate_var_inputs_IDs:
                         print("gate found")
+                        
+                        print("symbol string", self.symbol.string)
+                        print("symbol id: ", self.symbol.id)
+                        print("symbol type:", self.symbol.type)
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "inputs":
                             self.parse_errors += 1
@@ -254,7 +263,7 @@ class Parser:
                                 self.parse_errors += 1
                                 Error(9, self.symbol)
                             else:
-                                self.devices.make_clock(self.new_device_id, self.symbol.id)
+                                self.devices.make_clock(self.new_device_id, self.symbol.number)
                     
 
     def connection_list(self):
