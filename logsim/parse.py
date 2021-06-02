@@ -145,11 +145,11 @@ class Parser:
                         Error(0, self.symbol)
 
                 
-            elif self.sections_complete == 4 and self.headings_found == 5 and self.parse_errors == 0:
+            elif self.sections_complete == 4 and self.headings_found == 5 and self.parse_errors == 0 and self.symbol.type == self.scanner.EOF:
                 print(self.symbol.string)
                 print("complete")
                 return True
-            else:
+            elif self.symbol.type == self.scanner.EOF:
                 Error.print_error(self.scanner)
                 return False
                 
