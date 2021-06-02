@@ -1,0 +1,68 @@
+
+NETWORK{
+	DEVICES{
+		WS = SWITCH;
+		CLK = CLOCK  halfperiod 2;
+		G1 = NAND inputs 1;
+		G2 = NAND inputs 2;
+		G3 = NAND inputs 2;
+	G4 = NAND inputs 2;
+	G5 = NAND inputs 2;
+	G6 = NAND inputs 2;
+	G7 = NAND inputs 2;
+	G8 = NAND inputs 2;
+	G9 = NAND inputs 2;
+	G10 = NAND inputs 2;
+	DT1 = DTYPE;
+DT2 = DTYPE;
+DT3 = DTYPE;
+DT4 = DTYPE;
+DataSwitch = SWITCH;
+G2Switch = SWITCH;
+G5Switch = SWITCH;
+G8Switch = SWITCH;
+	}
+	CONNECTIONS{
+		//write/shift connections
+WS - G1.I1;	//should test to make sure order doesn’t matter
+WS - G3.I1; 	//could also change for G3.I1 - G1.I1;
+WS - G6.I1;
+WS - G9.I1;
+//G1 output connections
+G1 - G2.I2;
+G1 - G5.I2;
+G1 - G8.I2;
+//connections between NANDS in the blocks of NANDs
+G2 - G4.I1;
+G3 - G4.I2;
+G5 - G7.I1;
+G6 - G7.I2;
+G8 - G10.I1;
+G9 - G10.I2;
+//NAND to DTYPE connections
+DT1.Q - G3.I2;
+DT2.Q - G6.I2;
+DT3.Q - G9.I2;
+G10 - DT4.DATA;
+//CLOCK to DTYPE
+CLK - DT1.CLK;
+CLK - DT2.CLK;
+CLK - DT3.CLK;
+CLK - DT4.CLK;
+DataSwitch - DT1.DATA;
+G5Switch - G5.I1;
+G2Switch - G2.I1;
+G8Switch - G8.I1;
+}
+	
+SIGNALS{
+DataSwitch = 1 ;	//D1
+G2Switch = 0 ;		//D2
+G5Switch = 1 ;		//D3
+G8Switch = 0 ;		//D4
+	}
+	MONITOR{
+		DT4.Q;
+	}
+	
+}
