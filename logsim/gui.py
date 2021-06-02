@@ -72,7 +72,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Bind events to the canvas
         self.Bind(wx.EVT_PAINT, self.on_paint)
         #self.Bind(wx.EVT_SIZE, self.on_size)
-        self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        #self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -89,7 +89,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
-    def render_value(self, value):
+    def render_value(self, values):
         """Draw a trace"""
         self.SetCurrent(self.context)
         if not self.init:
@@ -103,15 +103,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw a sample signal trace
         GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
         GL.glBegin(GL.GL_LINE_STRIP)
-        x = (i * 20) + 10
-        x_next = (i * 20) + 30
-        if value == 1:
-            y = 25
-        else:
-            y = 0
-        GL.glVertex2f(x, y)
-        GL.glVertex2f(x_next, y)
+        print(len(values))
+        for i in range(len(values)):
+            x = (i * 20) + 10
+            x_next = (i * 20) + 30
+            if values[i] == 1:
+                y = 25
+            else:
+                y = 0
+            GL.glVertex2f(x, y)
+            GL.glVertex2f(x_next, y)
         GL.glEnd()
+        # We have been drawing to the back buffer, flush the graphics pipeline
+        # and swap the back buffer to the front
+        GL.glFlush()
+        self.SwapBuffers()
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -146,6 +152,24 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glFlush()
         self.SwapBuffers()
 
+    def render_empty(self):
+        self.SetCurrent(self.context)
+        if not self.init:
+            # Configure the viewport, modelview and projection matrices
+            self.init_gl()
+            self.init = True
+
+        # Clear everything
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+
+        # Draw specified text at position (10, 10)
+        #self.render_text(text, 10, 10)
+
+        # We have been drawing to the back buffer, flush the graphics pipeline
+        # and swap the back buffer to the front
+        GL.glFlush()
+        self.SwapBuffers()
+
     def on_paint(self, event):
         """Handle the paint event."""
         self.SetCurrent(self.context)
@@ -157,7 +181,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         size = self.GetClientSize()
         text = "".join(["Canvas redrawn on paint event, size is ",
                         str(size.width), ", ", str(size.height)])
-        self.render(text)
+        #self.render(text)
+        self.render_empty()
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -374,11 +399,11 @@ class SidePanel(wx.Panel):
         for _ in range(cycles):
             if self.parent.network.execute_network():
                 self.parent.monitors.record_signals()
-                self.parent.scrolled_panel
             else:
                 print("Error! Network oscillating.")
                 return False
         self.parent.monitors.display_signals()
+        self.parent.scrolled_panel.render_children()
         return True
 
     def on_update_signal(self, event):
@@ -476,7 +501,7 @@ class Monitor(scrolled.ScrolledPanel):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.item_list = []
-
+        """
         self.item_list.append(MonitorItem(self, "text 1", self.monitors, self.devices, self.names))
         self.sizer.Add(self.item_list[0], 0, wx.EXPAND | wx.ALL, 5)
 
@@ -485,7 +510,7 @@ class Monitor(scrolled.ScrolledPanel):
 
         self.item_list[0].SetBackgroundColour('#b0bcda')
         self.item_list[1].SetBackgroundColour('#b0bcda')
-
+        """
         self.SetSizer(self.sizer)
         self.SetupScrolling()
 
@@ -559,8 +584,8 @@ class MonitorItem(wx.Panel):
         self.parent.remove_child(self)
 
     def render(self):
-        self.value = self.monitors.get_monitor_signal(self.device_id, self.output_id)
-        self.canvas.render_value(self.value)
+        self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.output_id]
+        self.canvas.render_value(self.values)
 
 
 
@@ -597,6 +622,7 @@ class Gui(wx.Frame):
         self.devices = devices
         self.network = network
         self.monitors = monitors
+
 
         self.cycles_completed = 0  # number of simulation cycles completed
 
