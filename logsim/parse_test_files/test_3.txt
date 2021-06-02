@@ -1,0 +1,19 @@
+NETWORK{
+  DEVICES{}
+    SW1 = SWITCH;
+    SW2 = SWITCH;
+    G1 = DTYPE;
+    CLK1 = CLOCK 2;
+    CLK2 = CLOCK halfperiod 0;
+  }
+  CONNECTIONS{
+    SW1 - G1Q;
+    SW2 - G1.I2;
+  }
+  SIGNALS{
+    SW1 = 0;
+    SW2 = 0;
+  }
+  MONITOR{
+  }
+}

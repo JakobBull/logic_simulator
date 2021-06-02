@@ -191,7 +191,8 @@ class Parser:
 
         if self.symbol.type != self.scanner.NAME:
             self.parse_errors += 1
-            Error(3, self.symbol) 
+            Error(3, self.symbol)
+            self.advance_line_error() 
         
         
 
@@ -199,6 +200,7 @@ class Parser:
             if self.symbol.id in self.device_names:
                 self.parse_errors += 1
                 Error(4, self.symbol)
+                self.advance_line_error()
 
             self.device_names.append(self.symbol.id) # add symbol id to a list of device ids
             self.new_device_id = self.symbol.id
@@ -207,6 +209,7 @@ class Parser:
             if self.symbol.type != self.scanner.EQUALS:
                     self.parse_errors += 1
                     Error(4, self.symbol)
+                    self.advance_line_error()
             else:
                 self.symbol = self.scanner.get_symbol()
                 print(self.symbol.string)
@@ -215,6 +218,7 @@ class Parser:
                     self.new_device_id = self.symbol.id
                     self.parse_errors += 1
                     Error(5, self.symbol)
+                    self.advance_line_error()
                     
   
                 else:
@@ -238,6 +242,7 @@ class Parser:
                         if self.symbol.string != "inputs":
                             self.parse_errors += 1
                             Error(6, self.symbol)
+                            self.advance_line_error()
                             
                         else:
                             self.symbol = self.scanner.get_symbol()
@@ -245,10 +250,12 @@ class Parser:
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
                                 Error(7, self.symbol)
+                                self.advance_line_error()
                                 
                             if self.symbol.number < 1 or self.symbol.number > 16:
                                 self.parse_errors += 1
                                 Error(7, self.symbol)
+                                self.advance_line_error()
                                 
                             else:
                                 self.devices.make_gate(self.new_device_id, self.new_device_type, self.symbol.number)
@@ -258,12 +265,14 @@ class Parser:
                         if self.symbol.string != "halfperiod":
                             self.parse_errors += 1
                             Error(8, self.symbol)
+                            self.advance_line_error()
                             
                         else:
                             self.symbol = self.scanner.get_symbol()
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
                                 Error(9, self.symbol)
+                                self.advance_line_error()
                             else:
                                 self.devices.make_clock(self.new_device_id, self.symbol.number)
                     
@@ -296,6 +305,7 @@ class Parser:
             #print("Not defined:", self.symbol.string)
             self.parse_errors += 1
             Error(10, self.symbol)
+            self.advance_line_error()
             
 
         else: 
@@ -306,6 +316,7 @@ class Parser:
             if self.symbol.type != self.scanner.DASH:
                 self.parse_errors += 1
                 Error(11, self.symbol)
+                self.advance_line_error()
                 
 
             else:
@@ -314,6 +325,7 @@ class Parser:
                 if self.symbol.type != self.scanner.NAME:
                     self.parse_errors += 1
                     Error(10, self.symbol)
+                    self.advance_line_error()
 
                 elif self.devices.get_device(self.symbol.id).device_kind == self.devices.D_TYPE :
                     out_device_id = self.symbol.id
@@ -321,18 +333,21 @@ class Parser:
                     if self.symbol.type != self.scanner.PERIOD:
                         self.parse_errors += 1
                         Error(12, self.symbol)
+                        self.advance_line_error()
                     
                     else:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.id not in self.devices.dtype_input_ids:
                             self.parse_errors += 1 
                             Error(13, self.symbol)
+                            self.advance_line_error()
                         else:
                             error_type = self.network.make_connection(
                             in_device_id, in_port_id, out_device_id, self.symbol.id)
                             if error_type != self.network.NO_ERROR:
                                 self.parse_errors += 1
                                 Error(15, self.symbol)
+                                self.advance_line_error()
 
 
                 else:
@@ -344,6 +359,7 @@ class Parser:
                     if self.symbol.type != self.scanner.PERIOD:
                         self.parse_errors += 1
                         Error(12, self.symbol)
+                        self.advance_line_error()
                         
 
                     else: 
@@ -359,12 +375,14 @@ class Parser:
                         if self.input_number.isdigit() == False:
                             self.parse_errors += 1
                             Error(13, self.symbol)
+                            self.advance_line_error()
                         
                         error_type = self.network.make_connection(
                             in_device_id, in_port_id, out_device_id, self.symbol.id)
                         if error_type != self.network.NO_ERROR:
                             self.parse_errors += 1
                             Error(15, self.symbol)
+                            self.advance_line_error()
                             
                         
 
@@ -377,6 +395,7 @@ class Parser:
             if self.symbol.type != self.scanner.PERIOD:
                 self.parse_errors += 1
                 Error(16, self.symbol)
+                
                 
             else:
                 self.symbol = self.scanner.get_symbol()
@@ -426,6 +445,7 @@ class Parser:
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
             Error(18, self.symbol)
+            self.advance_line_error()
             
             
         switch_set_ID = self.devices.get_device(self.symbol.id)
@@ -435,17 +455,20 @@ class Parser:
         if self.symbol.type != self.scanner.EQUALS:
                 self.parse_errors += 1
                 Error(19, self.symbol)
+                self.advance_line_error()
                 
 
         self.symbol = self.scanner.get_symbol()
         if self.symbol.string != "0" and self.symbol.string != "1":
             self.parse_errors += 1
             Error(20, self.symbol)
+            self.advance_line_error()
             
         
         elif self.symbol.type != self.scanner.NUMBER:
             self.parse_errors += 1
             Error(20, self.symbol)
+            self.advance_line_error()
             
 
         elif self.symbol.string == "1":
@@ -456,6 +479,7 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
             Error(22, self.symbol)
+            self.advance_line_error()
             
 
 
@@ -492,7 +516,7 @@ class Parser:
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
             Error(24, self.symbol)
-            
+            self.advance_line_error()
 
         [device_id, output_id] = self.signame_in()
 
@@ -501,11 +525,13 @@ class Parser:
         if error_type == self.monitors.NOT_OUTPUT:
             self.parse_errors += 1
             Error(25, self.symbol)
+            self.advance_line_error()
             
 
         elif error_type == self.monitors.MONITOR_PRESENT:
             self.parse_errors += 1
             Error(26, self.symbol)
+            self.advance_line_error()
             
         
         self.symbol = self.scanner.get_symbol()
@@ -513,12 +539,10 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
             Error(27, self.symbol)
+            self.advance_line_error()
 
-    def error_advance(self):
+    def advance_line_error(self):
         """Advances to the next ; or heading after an error to continue parsing"""
-        while self.symbol.type != self.scanner.SEMICOLON:
+        while self.symbol.type != self.scanner.SEMICOLON and self.symbol.type!= self.scanner.RIGHT_BRACKET:
             self.symbol = self.scanner.get_symbol()
             #if self.symbol.id in self.heading_IDs:
-
-
-                    
