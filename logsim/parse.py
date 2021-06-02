@@ -54,6 +54,8 @@ class Parser:
         self.gate_var_inputs_IDs = [self.scanner.AND_ID, self.scanner.NAND_ID, self.scanner.OR_ID, self.scanner.NOR_ID]
         self.device_IDs = [self.scanner.AND_ID, self.scanner.NAND_ID, self.scanner.OR_ID, self.scanner.NOR_ID,
                             self.scanner.XOR_ID, self.scanner.XOR_ID, self.scanner.DTYPE_ID, self.scanner.SWITCH_ID, self.scanner.CLOCK_ID]
+        self.heading_IDs = [self.scanner.NETWORK_ID, self.scanner.DEVICES_ID, self.scanner.CONNECTIONS_ID,
+                             self.scanner.SIGNALS_ID, self.scanner.MONITOR_ID]
         self.new_device_id = None
         self.new_device_type = None
         self.numbers = range(20)
@@ -312,7 +314,26 @@ class Parser:
                 if self.symbol.type != self.scanner.NAME:
                     self.parse_errors += 1
                     Error(10, self.symbol)
+
+                elif self.devices.get_device(self.symbol.id).device_kind == self.devices.D_TYPE :
+                    out_device_id = self.symbol.id
+                    self.symbol = self.scanner.get_symbol()
+                    if self.symbol.type != self.scanner.PERIOD:
+                        self.parse_errors += 1
+                        Error(12, self.symbol)
                     
+                    else:
+                        self.symbol = self.scanner.get_symbol()
+                        if self.symbol.id not in self.devices.dtype_input_ids:
+                            self.parse_errors += 1 
+                            Error(13, self.symbol)
+                        else:
+                            error_type = self.network.make_connection(
+                            in_device_id, in_port_id, out_device_id, self.symbol.id)
+                            if error_type != self.network.NO_ERROR:
+                                self.parse_errors += 1
+                                Error(15, self.symbol)
+
 
                 else:
                     
@@ -342,6 +363,7 @@ class Parser:
                         error_type = self.network.make_connection(
                             in_device_id, in_port_id, out_device_id, self.symbol.id)
                         if error_type != self.network.NO_ERROR:
+                            self.parse_errors += 1
                             Error(15, self.symbol)
                             
                         
@@ -357,7 +379,7 @@ class Parser:
                 Error(16, self.symbol)
                 
             else:
-                self.symbol = self.scanner.get_symbol
+                self.symbol = self.scanner.get_symbol()
                 if self.symbol.id not in self.devices.dtype_output_ids:
                     self.parse_errors += 1
                     Error(17, self.symbol)
@@ -491,4 +513,12 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
             Error(27, self.symbol)
+
+    def error_advance(self):
+        """Advances to the next ; or heading after an error to continue parsing"""
+        while self.symbol.type != self.scanner.SEMICOLON:
+            self.symbol = self.scanner.get_symbol()
+            #if self.symbol.id in self.heading_IDs:
+
+
                     
