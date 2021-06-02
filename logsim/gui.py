@@ -801,20 +801,23 @@ class FrameManager:
     
     def show_gui(self, path):
         if self.menu.text_editor.text != None:
-            names = Names()
-            devices = Devices(names)
-            network = Network(names, devices)
-            monitors = Monitors(names, devices, network)
-            scanner = Scanner(path, names)
-            parser = Parser(names, devices, network, monitors, scanner)
-            if parser.parse_network():
-                self.gui = Gui(self, self.title, names, devices, network,
-                      monitors)
-                self.menu.Hide()
-                self.gui.Show()
-                self.gui.path = path
-            else:
-                print("Sorry, can't parse network.")
+            try:
+                names = Names()
+                devices = Devices(names)
+                network = Network(names, devices)
+                monitors = Monitors(names, devices, network)
+                scanner = Scanner(path, names)
+                parser = Parser(names, devices, network, monitors, scanner)
+                if parser.parse_network():
+                    self.gui = Gui(self, self.title, names, devices, network,
+                        monitors)
+                    self.menu.Hide()
+                    self.gui.Show()
+                    self.gui.path = path
+                else:
+                    print("Sorry, can't parse network.")
+            except TypeError:
+                pass
         else:
             print("Please choose a file first!")
 
