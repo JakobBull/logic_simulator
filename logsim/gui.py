@@ -322,7 +322,7 @@ class SidePanel(wx.Panel):
         self.side_sizer.Add(self.button_sizer, 1, wx.ALL |wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.switch_box_text, 1, wx.ALIGN_CENTER, 0)
-        self.side_sizer.Add(self.switch_sizer, 1, wx.ALIGN_CENTER |wx.EXPAND, 0)
+        self.side_sizer.Add(self.switch_sizer, 1, wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
         self.side_sizer.Add(self.monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
@@ -578,7 +578,7 @@ class MonitorItem(wx.Panel):
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
         
         self.sizer.Add(self.name_text, 0,wx.ALIGN_CENTER, 0)
-        self.sizer.Add(self.canvas, -1 , wx.EXPAND | wx.ALIGN_CENTER, 0)
+        self.sizer.Add(self.canvas, -1 , wx.EXPAND, 0)
         self.sizer.Add(self.remove_item, 0, wx.ALIGN_CENTER , 0)
         self.SetSizer(self.sizer)
 
