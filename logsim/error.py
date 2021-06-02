@@ -67,6 +67,34 @@ class Error:
             for n in range(8):
                 print('-', end = '')
             print("")
+
+    def gui_error(path):
+        error_string = ""
+        lines = Error.get_lines(path)
+        error_string.append(str(Error.num_errors) + " ERRORS!:\n")
+        for i in range(Error.num_errors):
+            error_string.append("Error " + str(i) + ":")
+            line = lines[Error.symbols[i].line_number-1]
+            start_spaces = 0
+            for c in line:
+                if c.isspace():
+                    start_spaces+=1
+                else: break
+            start = Error.symbols[i].start_char_number
+            end = Error.symbols[i].end_char_number
+            error_string.append("\"" + line.strip() + "\"")
+            cursor = Error.symbols[i].start_char_number-start_spaces
+            for n in range(cursor):
+                error_string.append(' ', end = '')
+            error_string.append("^")
+            error_string.append(Error.error_message[Error.types[i]])
+            #for n in range(len(Error.error_message[Error.types[i]])):
+            #    print('-', end = '')
+            for n in range(8):
+                error_string.append('-', end = '')
+            error_string.append("")
+            return error_string
+
     def get_lines(path):
         try:
             """Open and return the file specified by path for reading"""

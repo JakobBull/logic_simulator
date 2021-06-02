@@ -278,7 +278,11 @@ class SidePanel(wx.Panel):
         
         self.monitor_text = wx.StaticText(self, wx.ID_ANY, "Set outputs to monitor")
         #monitor_sizer
-        self.monitor_combobox = wx.ComboBox(self, wx.ID_ANY, "Select", choices = [self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(None)])
+        all =[self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(None)]
+        switches =[self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)]
+        clocks = [self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(self.parent.devices.CLOCK)]
+        choices = [i for i in all if i not in switches and i not in clocks]
+        self.monitor_combobox = wx.ComboBox(self, wx.ID_ANY, "Select", choices = choices)
         self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
 
         
@@ -322,7 +326,7 @@ class SidePanel(wx.Panel):
         self.side_sizer.Add(self.button_sizer, 1, wx.ALL |wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.switch_box_text, 1, wx.ALIGN_CENTER, 0)
-        self.side_sizer.Add(self.switch_sizer, 1, wx.ALIGN_CENTER |wx.EXPAND, 0)
+        self.side_sizer.Add(self.switch_sizer, 1, wx.ALIGN_CENTER, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
         self.side_sizer.Add(self.monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
@@ -336,11 +340,11 @@ class SidePanel(wx.Panel):
         self.button_sizer.Add(self.run_button, 1, wx.ALL | wx.EXPAND, 5)
         self.button_sizer.Add(self.continue_button, 1, wx.ALL | wx.EXPAND, 5)
 
-        self.switch_sizer.Add(self.switch_box, 0, wx.ALL, 5)
-        self.switch_sizer.Add(self.switch_box_inter_text, 0, wx.ALL | wx.CENTRE, 5)
+        self.switch_sizer.Add(self.switch_box, 1, wx.ALL , 5)
+        self.switch_sizer.Add(self.switch_box_inter_text, 1, wx.ALL | wx.CENTRE, 5)
         #self.switch_sizer.Add(self.switch_box_values, 0, wx.ALL, 5)
-        self.switch_sizer.Add(self.binary_choice_sizer, -1, wx.ALL, 5)
-        self.switch_sizer.Add(self.add_switch_button, -1, wx.ALL, 5)
+        self.switch_sizer.Add(self.binary_choice_sizer, 1, wx.ALL, 5)
+        self.switch_sizer.Add(self.add_switch_button, 1, wx.ALL, 5)
 
         self.binary_choice_sizer.Add(self.zero_button, 0, wx.ALL, 0)
         self.binary_choice_sizer.Add(self.one_button, 0, wx.ALL, 0)
@@ -391,8 +395,12 @@ class SidePanel(wx.Panel):
     def on_add_monitor(self, event):
         """Handle the event when the add monitor button is pressed"""
         monitor = self.monitor_combobox.GetValue()
-        self.remove_monitor_combobox.Append(monitor)
-        self.scrolled_panel.add_monitor(monitor)
+        """
+        for child in self.scrolled_panel.GetChildren():
+            if child.name != monitor:"""
+        if monitor != "Select":
+            self.remove_monitor_combobox.Append(monitor)
+            self.scrolled_panel.add_monitor(monitor)
 
     def run_network(self, cycles):
         """Run the network for the specified number of simulation cycles.
@@ -459,8 +467,15 @@ class SidePanel(wx.Panel):
         if self.run_network(cycles):
             self.cycles_completed += cycles
 
-        #text = "Run button pressed."
-        #self.canvas.render(text)
+    def on_continue_button(self, event):
+        """Continue a previously run simulation."""
+        cycles = self.spin.GetValue()
+        if cycles is not None:  # if the number of cycles provided is valid
+            if self.cycles_completed == 0:
+                print("Error! Nothing to continue. Run first.")
+            elif self.run_network(cycles):
+                self.cycles_completed += cycles
+                
 
     def run_command(self):
         """Run the simulation from scratch."""
@@ -473,14 +488,6 @@ class SidePanel(wx.Panel):
             self.devices.cold_startup()
             if self.run_network(cycles):
                 self.cycles_completed += cycles
-    
-    def on_continue_button(self, event):
-        """Handle the event triggered by pressing the continue button"""
-        cycles = self.spin.GetValue()
-        for _ in cycles:
-            self.parent.network.execute_network()
-        text = "Contine button pressed."
-        self.canvas.render(text)
 
     def on_text_box(self, event):
         """Handle the event when the user enters text."""
@@ -583,7 +590,7 @@ class MonitorItem(wx.Panel):
         self.SetSizer(self.sizer)
 
     def on_remove_item(self, event):
-        self.parent.item_list = [item for item in self.item_list if item.name != self.name]
+        self.parent.item_list = [item for item in self.parent.item_list if item.name != self.name]
         self.parent.remove_child(self)
 
     def render(self):
@@ -617,14 +624,17 @@ class FilePanel(wx.Panel):
         self.path = None
 
         search_file_button = wx.Button(self, wx.ID_ANY, "Search file")
+        save_as_button = wx.Button(self, wx.ID_ANY, "Save as")
         gui_button = wx.Button(self, wx.ID_ANY, "Continue to GUI")
 
         search_file_button.Bind(wx.EVT_BUTTON, self.on_open_file)
+        save_as_button.Bind(wx.EVT_BUTTON, self.on_save_file)
         gui_button.Bind(wx.EVT_BUTTON, self.on_gui_button)
 
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         main_sizer.Add(search_file_button, -1, 0, 0)
+        main_sizer.Add(save_as_button, -1, 0, 0)
         main_sizer.Add(gui_button, -1, 0, 0)
         self.SetSizer(main_sizer)
 
@@ -640,25 +650,38 @@ class FilePanel(wx.Panel):
             path = dlg.GetPath()
             print("You chose the following file:")
         dlg.Destroy()
+        print("Filepath is", path)
         if path != None:
+            print("setting text")
             self.parent.text_editor.set_text(path)
+            print(self.parent.text_editor.text.GetValue())
             self.path = path
 
     def on_gui_button(self, event):
         self.parent.parent.show_gui(self.path)
 
+    def on_save_file(self,event):
+        self.parent.parent.save_file(self)
+
 class TextEditor(wx.Panel):
     def __init__(self, parent) -> None:
         super().__init__(parent=parent)
+        self.file = None
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.text = wx.TextCtrl(self, 1, style=wx.TE_MULTILINE)
         main_sizer.Add(self.text, -1, wx.EXPAND, 0)
         self.SetSizer(main_sizer)
 
     def set_text(self, path):
-        with open(path) as f:
-            content = f.readlines()
-        self.text.SetValue("".join(content))
+        try:
+            """Open and return the file specified by path for reading"""
+            with open(path) as f:
+                content = f.readlines()
+            self.text.SetValue("".join(content))
+        except IOError:
+            print("error, can't find or open file")
+            sys.exit()
+        
 
 class ErrorPanel(wx.Panel):
     def __init__(self, parent) -> None:
@@ -668,6 +691,33 @@ class ErrorPanel(wx.Panel):
     def set_text(self, text):
         self.text.SetValue(text)
 
+class GuiControlPanel(wx.Panel):
+    def __init__(self, parent, size) -> None:
+        super().__init__(parent= parent, size=size)
+
+        self.parent = parent
+        self.path = None
+
+        self.return_button = wx.Button(self, wx.ID_ANY, "Back to text editor")
+        self.save_as_button = wx.Button(self, wx.ID_ANY, "Save as")
+        self.help_button = wx.Button(self, wx.ID_ANY, "Help")
+
+        self.return_button.Bind(wx.EVT_BUTTON, self.on_return_button)
+        self.save_as_button.Bind(wx.EVT_BUTTON, self.on_save_file)
+
+        self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.main_sizer.Add(self.return_button, 1, wx.ALL, 5)
+        self.main_sizer.Add(self.save_as_button, 1, wx.ALL, 5)
+        self.main_sizer.Add(self.help_button, 1, wx.ALL, 5)
+
+        self.SetSizer(self.main_sizer)
+
+    def on_return_button(self, event):
+        self.parent.parent.show_menu()
+
+    def on_save_file(self,event):
+        self.parent.parent.save_file(self)
 
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
@@ -711,16 +761,6 @@ class Gui(wx.Frame):
         self.line = ""  # current string entered by the user
         self.cursor = 0  # cursor position
 
-        # Configure the file menu
-        fileMenu = wx.Menu()
-        saveMenu = wx.Menu()
-        menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
-        menuBar.Append(fileMenu, "&File")
-        menuBar.Append(saveMenu, "&Save")
-        self.SetMenuBar(menuBar)
-
         # Canvas for drawing signals
         self.scrolled_panel = Monitor(self, self.monitors, self.devices, self.names)
         self.error_box = ErrorPanel(self)
@@ -728,42 +768,69 @@ class Gui(wx.Frame):
         #self.canvas = MyGLCanvas(self, devices, monitors)
         #Control side_panel
         self.side_panel = SidePanel(self, self.scrolled_panel)
+        self.gui_control = GuiControlPanel(self, size=(-1, 75))
 
 
         # Configure sizers for layout
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.top_level_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         side_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        main_sizer.Add(side_sizer, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(self.side_panel, 1, wx.ALL, 5)
+        self.top_level_sizer.Add(self.gui_control, 1, wx.EXPAND, 0)
+        self.top_level_sizer.Add(self.main_sizer, 10, wx.EXPAND, 0)
+
+        self.main_sizer.Add(side_sizer, 8, wx.EXPAND | wx.ALL, 5)
+        self.main_sizer.Add(self.side_panel, 1, wx.ALL, 5)
 
         side_sizer.Add(self.scrolled_panel, 5, wx.EXPAND, 0)
         side_sizer.Add(self.error_box, 1, wx.EXPAND, 0)
 
         self.SetSizeHints(600, 600)
-        self.SetSizer(main_sizer)
+        self.SetSizer(self.top_level_sizer)
 
     def closeWindow(self, event):
         sys.exit()
 
 class FrameManager:
-    def __init__(self, title, names, devices, network, monitors):
+    def __init__(self, title):
+        self.title = title
         self.app = wx.App()
-        self.gui = Gui(self, title, names, devices, network,
-                      monitors)
         self.menu = MenuFrame(self)
         self.menu.Show()
-        self.gui.Hide()
         self.app.MainLoop()
     
     def show_gui(self, path):
-        if path != None:
-            self.menu.Hide()
-            self.gui.Show()
-            self.gui.path = path
+        if self.menu.text_editor.text != None:
+            names = Names()
+            devices = Devices(names)
+            network = Network(names, devices)
+            monitors = Monitors(names, devices, network)
+            scanner = Scanner(path, names)
+            parser = Parser(names, devices, network, monitors, scanner)
+            if parser.parse_network():
+                self.gui = Gui(self, self.title, names, devices, network,
+                      monitors)
+                self.menu.Hide()
+                self.gui.Show()
+                self.gui.path = path
+            else:
+                print("Sorry, can't parse network.")
         else:
             print("Please choose a file first!")
 
     def show_menu(self):
         self.menu.Show()
         self.gui.Hide()
+
+    def save_file(self, button):
+        self.currentDirectory = os.getcwd()
+        dlg = wx.FileDialog(
+            button, message="Save file as ...", 
+            defaultDir=self.currentDirectory, 
+            defaultFile="", style=wx.FD_SAVE
+            )
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            print(f"You chose the following filename: {path}")
+        dlg.Destroy()
+        

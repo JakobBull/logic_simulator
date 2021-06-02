@@ -58,6 +58,7 @@ class Scanner:
     """
     def __init__(self, path, names):
         """"Open specified file and initialise reserved words and IDs."""
+        # opens specified file
         self.path = path
         # opens specified file
         try:
