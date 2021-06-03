@@ -12,6 +12,7 @@ import wx
 import time
 import sys
 import os
+import io
 from wx.core import HORIZONTAL
 import wx.lib.scrolledpanel as scrolled
 import wx.glcanvas as wxcanvas
@@ -664,7 +665,14 @@ class FilePanel(wx.Panel):
             print("setting text")
             self.parent.text_editor.set_text(path)
             self.parent.error_panel.SetValue("")
-            print(self.parent.text_editor.text.GetValue())
+            try:
+                """Open and return the file specified by path for reading"""
+                with open(path, "r") as f:
+                    self.parent.parent.content = f.read()
+                    self.parent.parent.file = io.StringIO(self.parent.parent.content)
+            except IOError:
+                print("error, can't find or open file")
+                sys.exit()
             self.path = path
 
     def on_gui_button(self, event):
@@ -810,29 +818,36 @@ class FrameManager:
         self.app.MainLoop()
     
     def show_gui(self, path):
+        self.path = path
         if self.menu.text_editor.text != None:
-            names = Names()
-            devices = Devices(names)
-            network = Network(names, devices)
-            monitors = Monitors(names, devices, network)
-            scanner = Scanner(path, names)
-            parser = Parser(names, devices, network, monitors, scanner)
-
-            if parser.parse_network():
-                print("parsing")
-                self.gui = Gui(self, self.title, names, devices, network,
-                    monitors)
-                self.menu.Hide()
-                self.gui.Show()
-                self.gui.path = path
-            else:
-                error = Error.gui_report_error(scanner)
-                Error.print_error(scanner)
-                print("Sorry, can't parse network.")
-                self.menu.error_panel.SetValue(error)
+            self.names = Names()
+            self.devices = Devices(self.names)
+            self.network = Network(self.names, self.devices)
+            self.monitors = Monitors(self.names, self.devices, self.network)
+            
+            self.process_content()
 
         else:
             print("Please choose a file first!")
+
+    def process_content(self):
+        self.content = self.menu.text_editor.text.GetValue()
+        self.file = io.StringIO(self.content)
+        self.scanner = Scanner(self.path, self.file, self.names)
+        self.parser = Parser(self.names, self.devices, self.network, self.monitors, self.scanner)
+
+        if self.parser.parse_network():
+            print("parsing")
+            self.gui = Gui(self, self.title, self.names, self.devices, self.network,
+                self.monitors)
+            self.menu.Hide()
+            self.gui.Show()
+            self.gui.path = self.path
+        else:
+            error = Error.gui_report_error(self.scanner)
+            Error.print_error(self.scanner)
+            print("Sorry, can't parse network.")
+            self.menu.error_panel.SetValue(error)
 
     def show_menu(self):
         self.menu.Show()
