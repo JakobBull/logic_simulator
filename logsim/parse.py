@@ -543,6 +543,6 @@ class Parser:
 
     def advance_line_error(self):
         """Advances to the next ; or heading after an error to continue parsing"""
-        while self.symbol.type != self.scanner.SEMICOLON and self.symbol.type!= self.scanner.RIGHT_BRACKET:
+        while self.symbol.type != self.scanner.SEMICOLON or self.symbol.type!= self.scanner.RIGHT_BRACKET:
             self.symbol = self.scanner.get_symbol()
             #if self.symbol.id in self.heading_IDs:
