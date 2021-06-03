@@ -688,6 +688,8 @@ class MonitorItem(wx.Panel):
 
     def render(self):
         """Renders signal trace on Canvaspanel object attached to MonitorItem."""
+        [self.device_id, self.output_id] = self.devices.get_signal_ids(
+            self.name)
         if self.devices.get_device(self.device_id).device_kind == self.devices.D_TYPE:
             self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.devices.dtype_output_ids[0]]
             self.canvas_panel.canvas.render_value(self.values)
@@ -853,15 +855,12 @@ class GuiControlPanel(wx.Panel):
     Parameters:
 
     parent: passes an instance of the GUI class
-
     size: passes size 
     
     Public Methods:
 
     on_return_button(self, event): event handler for the return_button, shows menu, hides gui
-
     on_save_file(self, event): event handler for the save_as button, opens save menu
-
     """
     def __init__(self, parent, size) -> None:
         """Initialises widgets and layout"""
