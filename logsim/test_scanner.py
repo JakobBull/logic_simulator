@@ -38,8 +38,8 @@ def test_get_number():
     assert(scan2.get_name() == "0900")
 
 
-# tests scanner works on a single line
 def test_scanner():
+    """tests scanner works on a single line"""
     scan = Scanner("scanner_test_files/scanner_test_line.txt", Names())
     symbol = scan.get_symbol()
     assert(symbol.type == scan.KEYWORD)      # DEVICES
@@ -100,6 +100,7 @@ def test_scanner():
 # NAME      8
 # EOF       9
 
+
 correct_type_list = [
     6, 0,                   # :NETWORK{
     6, 0,                   # :  DEVICES{
@@ -129,8 +130,9 @@ correct_type_list = [
     9                       # :EOF
 ]
 
-# test that the scanner works on our example_1
+
 def test_scanner_example_file():
+    """test that the scanner works on our example_1"""
     scan = Scanner("scanner_test_files/example_1.txt", Names())
     i = 0
     while True:
@@ -145,8 +147,10 @@ def test_scanner_example_file():
         i += 1
         if(symbol.type == scan.EOF):
             break
-# test that the scanner works on our example_1
+
+
 def test_scanner_example_file_with_comments():
+    """test that the scanner works on our example_1_with_comments"""
     scan = Scanner("scanner_test_files/example_1_with_comments.txt", Names())
     i = 0
     while True:

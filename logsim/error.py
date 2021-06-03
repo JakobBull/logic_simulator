@@ -1,3 +1,12 @@
+"""Deals with language errors.
+
+Used in logsim to to call errors and print the line that causes the error
+and a ^ to indicate where on the line the error occurs
+
+Classes
+-------
+Error - creates errors and can print them.
+"""
 from scanner import Symbol
 import sys
 import os
@@ -5,6 +14,38 @@ import math
 
 
 class Error:
+    """Creates errors and prints them.
+
+    This class contains the definition of an error, along with functions
+    to print out the error output.
+
+    many functions required for connecting devices together
+    in the network, getting information about connections, and executing all
+    the devices in the network.
+
+    Parameters
+    ----------
+    error_message - list of all error types we test where index is error type.
+
+    further inforamation here:
+    https://docs.google.com/document/d/15lmjiRRd2pbk0f8T2uEusgCI
+    7VyCCcWidIlgw62IdSo/edit?usp=sharing
+
+    num_errors - count of total number of errors
+
+    type[] - list of all error types that have occured
+
+    symbols[] - list of symbols that have thrown errors
+
+    Public methods
+    --------------
+    def print_error(cls, scanner): prints the error output for called errors
+
+    def gui_report_error(cls, path): prints errors for GUI
+
+    def get_lines(cls, scanner): Open and returns the file from scanner
+    """
+
     num_errors = 0
     types = []
     symbols = []
@@ -42,13 +83,17 @@ class Error:
 
     @classmethod
     def __init__(cls, type, symbol):
+        """Create error. adds type and symbol string, increases num_errors."""
         # error type, number from list of error document
         cls.types.append(type)
-        cls.symbols.append(symbol)    # symbol that causes the error
-        cls.num_errors += 1           # everytime an error called, number of errors increased
+        cls.symbols.append(symbol)
+        cls.num_errors += 1
+        # symbol that causes the error everytime an error called,
+        # number of errors increased
 
     @classmethod
     def print_error(cls, scanner):
+        """Print errors for terminal output."""
         lines = cls.get_lines(scanner)
         print(str(cls.num_errors) + " ERRORS!:\n")
         for i in range(cls.num_errors):
@@ -69,14 +114,15 @@ class Error:
             print("^")
             print(cls.error_message[cls.types[i]])
             # for n in range(len(Error.error_message[Error.types[i]])):
-            #    print('-', end = '')
+            # print('-', end = '')
             for n in range(8):
                 print('-', end='')
             print("")
 
     @classmethod
     def gui_report_error(cls, path):
-        print("GUI reporting errros")
+        """Return error output as a string for gui."""
+        print("GUI reporting errrors")
         error_string = ""
         lines = cls.get_lines(path)
         error_string += str(str(cls.num_errors) + " ERRORS!:\n")
@@ -113,8 +159,8 @@ class Error:
 
     @classmethod
     def get_lines(cls, scanner):
+        """Open and return the file specified by path for reading."""
         try:
-            """Open and return the file specified by path for reading"""
             file = open(scanner.path, "r", encoding="utf-8")
             lines = file.readlines()
             return lines
