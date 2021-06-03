@@ -21,4 +21,8 @@ NETWORK{
 	G1;
 	G2;
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> Charlie_debug_p
