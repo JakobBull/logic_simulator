@@ -668,14 +668,15 @@ class MenuFrame(wx.Frame):
     Parameters:
 
     parent: FrameManager object.
+    title: title.
     
     Public Methods:
 
     closeWindow(self, event): Closes all frames, calls sys.exit.
     """
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, title) -> None:
         """Sets up frame. Instantiates all objects."""
-        super().__init__(parent=None)
+        super().__init__(parent=None, title= title)
         self.parent = parent
 
         self.Bind(wx.EVT_CLOSE, self.closeWindow)
@@ -939,7 +940,7 @@ class FrameManager:
         """Launches app, creates MenuFrame"""
         self.title = title
         self.app = wx.App()
-        self.menu = MenuFrame(self)
+        self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
 
