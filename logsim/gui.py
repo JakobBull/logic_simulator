@@ -663,6 +663,7 @@ class FilePanel(wx.Panel):
         if path != None:
             print("setting text")
             self.parent.text_editor.set_text(path)
+            self.parent.error_panel.SetValue("")
             print(self.parent.text_editor.text.GetValue())
             self.path = path
 
