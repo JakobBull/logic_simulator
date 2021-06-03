@@ -499,9 +499,27 @@ class SidePanel(wx.Panel):
 
 
 class Monitor(scrolled.ScrolledPanel):
+    """
+    Scrolled Panel that contains all the monitor traces
+
+    Paramaters:
+
+    parent: Gui passes an instance of itself.
+    monitors: Instance of the Monitor class.
+    devices: Instance of the Devices class.
+    names: Instance of the Names class.
+
+    Public Methods:
+    render_children(self): Calls all MonitorItems render method.
+    add_monitor(self, text): Add a MonitorItem with name text
+    remove_monitor(self, text): Removes the MonitorItem with name text.
+    remove_child(self, child): Removes a specific MonitorItem.
+    remove_all_monitors(self): Removes all MonitorItems.
+    """
 
     def __init__(self, parent, monitors, devices, names) -> None:
-
+        """Set up the scrolled panel and 
+        initialise MonitorItems from definition file."""
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
         self.monitors = monitors
@@ -528,10 +546,12 @@ class Monitor(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def render_children(self):
+        """Renders all MonitorItems."""
         for child in self.item_list:
             child.render()
 
     def add_monitor(self, text):
+        """Adds a MonitorItem with name text."""
         self.item_list.append(
             MonitorItem(
                 self,
@@ -546,6 +566,7 @@ class Monitor(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def remove_monitor(self, text):
+        """Removes a MonitorItems with name text."""
         self.item_list = [item for item in self.item_list if item.name != text]
         for item in self.sizer.GetChildren():
             widget = item.GetWindow()
@@ -557,6 +578,7 @@ class Monitor(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def remove_child(self, child):
+        """Removes the MonitorItem child."""
         for element in self.sizer.GetChildren():
             if element.GetWindow() == child:
                 self.sizer.Hide(child)
@@ -566,6 +588,7 @@ class Monitor(scrolled.ScrolledPanel):
                 self.SetupScrolling()
 
     def remove_all_monitors(self):
+        """Remove all MonitorItems."""
         for item in self.sizer.GetChildren():
             self.sizer.Hide(item.GetWindow())
             item.GetWindow().Destroy()
@@ -575,6 +598,11 @@ class Monitor(scrolled.ScrolledPanel):
 
 
 class Canvaspanel(scrolled.ScrolledPanel):
+    """
+    Creates a MyGLCanvas object for each MonitorItem to draw signal trace on.
+
+    Paramaters
+    """
     def __init__(self, parent, monitors, devices) -> None:
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
@@ -626,8 +654,12 @@ class MonitorItem(wx.Panel):
         self.parent.remove_child(self)
 
     def render(self):
-        self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.output_id]
-        self.canvas_panel.canvas.render_value(self.values)
+        if self.devices.get_device(self.device_id).device_kind == self.devices.D_TYPE:
+            self.values = self.parent.monitors.monitors_dictionary[self.device_id, None]
+            self.canvas_panel.canvas.render_value(self.values)
+        else:
+            self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.output_id]
+            self.canvas_panel.canvas.render_value(self.values)
 
 
 class MenuFrame(wx.Frame):
