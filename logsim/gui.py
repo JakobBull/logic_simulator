@@ -3,6 +3,10 @@
 Used in the Logic Simulator project to enable the user to run the simulation
 or adjust the network properties.
 
+**PEP 8 has been followed except for the linelength, which has been limited such that it is
+easily visible on a full screen rather than following the 79 character limit.
+This is, because in general it makes code more readable.**
+
 Classes:
 --------
 MyGLCanvas - handles all canvas drawing operations.
@@ -34,6 +38,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     also contains handlers for events relating to the canvas.
 
     Parameters
+
     ----------
     parent: parent window.
     devices: instance of the devices.Devices() class.
@@ -51,10 +56,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
+
     """
 
     def __init__(self, parent, devices, monitors, size):
-        """Initialise canvas properties and useful variables."""
+        """Initialise.
+
+        Initialise canvas properties and useful variables.
+        """
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
@@ -77,7 +86,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
 
     def init_gl(self):
-        """Configure and initialise the OpenGL context."""
+        """Configure and initialise the OpenGL context.
+
+        Set up all the drawing tools needed for openGL.
+        """
         size = self.GetClientSize()
         self.SetCurrent(self.context)
         GL.glDrawBuffer(GL.GL_BACK)
@@ -92,7 +104,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def render_value(self, values):
-        """Draw a trace"""
+        """Draw a trace.
+
+        Draw the trace of a signal value.
+        """
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the viewport, modelview and projection matrices
@@ -122,7 +137,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.SwapBuffers()
 
     def render_empty(self):
-        """Render empty canvas."""
+        """Render empty canvas.
+
+        Initialise an empty canvas.
+        """
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the viewport, modelview and projection matrices
@@ -138,7 +156,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.SwapBuffers()
 
     def on_paint(self, event):
-        """Handle the paint event."""
+        """Handle the paint event.
+
+        Define that on_paint self.render is called.
+        """
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the viewport, modelview and projection matrices
@@ -152,7 +173,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.render_empty()
 
     def render_text(self, text, x_pos, y_pos):
-        """Handle text drawing operations."""
+        """Handle text drawing operations.
+
+        Writes text on canvas.
+        """
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
         font = GLUT.GLUT_BITMAP_HELVETICA_12
@@ -166,16 +190,15 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
 
 class SidePanel(wx.Panel):
-    """
-    SidePanel object is responsible for all runtime control in the GUI object.
+    """SidePanel object is responsible for all runtime control in the GUI object.
 
     Parameters:
-
+    ------
     parent: GUI object.
     scrolled_pabel: MonitorPanel object.
-
+    ------
     Public Methods:
-
+    ------
     read_name(self, name_string): Return the name ID of the current string if valid,
                                 Return None if the current string is not a valid name string.
 
@@ -193,8 +216,6 @@ class SidePanel(wx.Panel):
 
     on_remove_all_monitors(self, event): Event handler, removes all monitors.
 
-    on_menu(self, event): Event handler for the file menu.
-
     on_run_button(self, event): Event handler for when the user clicks the run
                                 button.
 
@@ -203,12 +224,15 @@ class SidePanel(wx.Panel):
     run_command(self): Run the simulation from scratch.
 
     on_text_box(self, event): Event handler for when the user enters text.
-    
     on_combo_select(self, event): Handle event from selecting an event from the combobox dropdown menu
+
     """
 
     def __init__(self, parent, scrolled_panel) -> None:
-        """Initialise SidePanel object, set up widgets."""
+        """Initialise SidePanel object, set up widgets.
+
+        Create all the widgets, assign to sizers and initialise.
+        """
         super().__init__(parent=parent)
 
         self.parent = parent
@@ -262,7 +286,6 @@ class SidePanel(wx.Panel):
         self.remove_all_button.SetForegroundColour('#ff1a1a')
 
         # Bind events to widgets
-        self.Bind(wx.EVT_MENU, self.on_menu)
 
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
@@ -364,7 +387,10 @@ class SidePanel(wx.Panel):
         return [device_id, port_id]
 
     def on_add_monitor(self, event):
-        """Handle the event when the add monitor button is pressed, adds a MonitorItem"""
+        """Handle the event when the add monitor button is pressed, adds a MonitorItem.
+
+        If no monitor is selected, do nothing.
+        """
         monitor = self.monitor_combobox.GetValue()
 
         if monitor != "Select":
@@ -387,7 +413,10 @@ class SidePanel(wx.Panel):
         return True
 
     def on_update_signal(self, event):
-        """Set the specified switch to the specified signal level."""
+        """Set the specified switch to the specified signal level.
+
+        Get Value from switch box and set switch to this.
+        """
         name_string = self.switch_box.GetValue()
         switch_id = self.read_name(name_string)
         if switch_id is not None:
@@ -401,27 +430,27 @@ class SidePanel(wx.Panel):
                 print("Error! Invalid switch.")
 
     def on_remove_monitor(self, event):
-        """Handle the event when the remove monitor button is pressed"""
+        """Handle the event when the remove monitor button is pressed.
+
+        Remove the monitor.
+        """
         self.remove_monitor_combobox.Clear()
         self.scrolled_panel.remove_monitor(self.remove_monitor_combobox.Value)
         for item in self.scrolled_panel.item_list:
             self.remove_monitor_combobox.Append(item.name)
 
     def on_remove_all_monitors(self, event):
-        """Handle the event when removign all monitors."""
+        """Handle the event when removing all monitors.
+
+        Remove all monitors.
+        """
         self.scrolled_panel.remove_all_monitors()
 
-    def on_menu(self, event):
-        """Handle the event when the user selects a menu item."""
-        Id = event.GetId()
-        if Id == wx.ID_EXIT:
-            self.Close(True)
-        if Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017",
-                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
-
     def on_run_button(self, event):
-        """Handle the event when the user clicks the run button."""
+        """Handle the event when the user clicks the run button.
+
+        Call cold_startuo and then run_network.
+        """
         self.cycles_completed = 0
         cycles = self.spin.GetValue()
         self.parent.monitors.reset_monitors()
@@ -431,7 +460,10 @@ class SidePanel(wx.Panel):
             self.cycles_completed += cycles
 
     def on_continue_button(self, event):
-        """Continue a previously run simulation."""
+        """Continue a previously run simulation.
+
+        Run_network.
+        """
         cycles = self.spin.GetValue()
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
@@ -440,7 +472,10 @@ class SidePanel(wx.Panel):
                 self.cycles_completed += cycles
 
     def run_command(self):
-        """Run the simulation from scratch."""
+        """Run the simulation from scratch.
+
+        Do cold_startup and run_network.
+        """
         self.cycles_completed = 0
         cycles = self.read_number(0, None)
 
@@ -452,19 +487,24 @@ class SidePanel(wx.Panel):
                 self.cycles_completed += cycles
 
     def on_text_box(self, event):
-        """Handle the event when the user enters text."""
+        """Handle the event when the user enters text.
+
+        Text response.
+        """
         text_box_value = self.text_box.GetValue()
         text = "".join(["New text box value: ", text_box_value])
         self.canvas.render(text)
 
     def on_combo_select(self, event):
-        """Handle event from selecting an event from the combobox dropdown menu"""
+        """Handle event from selecting an event from the combobox dropdown menu.
+
+        Render selected.
+        """
         self.canvas.render("selected")
 
 
 class MonitorPanel(scrolled.ScrolledPanel):
-    """
-    Scrolled Panel that contains all the monitor traces
+    """Scrolled Panel that contains all the monitor traces.
 
     Paramaters:
 
@@ -479,11 +519,14 @@ class MonitorPanel(scrolled.ScrolledPanel):
     remove_monitor(self, text): Removes the MonitorItem with name text.
     remove_child(self, child): Removes a specific MonitorItem.
     remove_all_monitors(self): Removes all MonitorItems.
+
     """
 
     def __init__(self, parent, monitors, devices, names) -> None:
-        """Set up the scrolled panel and 
-        initialise MonitorItems from definition file."""
+        """Set up the scrolled panel.
+
+        Initialise MonitorItems from definition file.
+        """
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
         self.monitors = monitors
@@ -510,12 +553,18 @@ class MonitorPanel(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def render_children(self):
-        """Renders all MonitorItems."""
+        """Render sall MonitorItems.
+
+        Remove children.
+        """
         for child in self.item_list:
             child.render()
 
     def add_monitor(self, text):
-        """Adds a MonitorItem with name text."""
+        """Add a MonitorItem with name text.
+
+        Call make_monitor.
+        """
         [child_device_id, child_output_id] = self.devices.get_signal_ids(text)
         self.monitors.make_monitor(child_device_id, child_output_id)
         self.item_list.append(
@@ -532,7 +581,10 @@ class MonitorPanel(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def remove_monitor(self, text):
-        """Removes a MonitorItems with name text."""
+        """Remove a MonitorItem with name text.
+
+        Call remove_monitor.
+        """
         [child_device_id, child_output_id] = self.devices.get_signal_ids(text)
         self.monitors.remove_monitor(child_device_id, child_output_id)
         self.item_list = [item for item in self.item_list if item.name != text]
@@ -546,7 +598,10 @@ class MonitorPanel(scrolled.ScrolledPanel):
         self.SetupScrolling()
 
     def remove_child(self, child):
-        """Removes the MonitorItem child."""
+        """Remove the MonitorItem child.
+
+        Destroy self.
+        """
         for element in self.sizer.GetChildren():
             if element.GetWindow() == child:
                 self.sizer.Hide(child)
@@ -556,7 +611,10 @@ class MonitorPanel(scrolled.ScrolledPanel):
                 self.SetupScrolling()
 
     def remove_all_monitors(self):
-        """Remove all MonitorItems."""
+        """Remove all MonitorItems.
+
+        Destroy all.
+        """
         for item in self.sizer.GetChildren():
             self.sizer.Hide(item.GetWindow())
             item.GetWindow().Destroy()
@@ -566,8 +624,7 @@ class MonitorPanel(scrolled.ScrolledPanel):
 
 
 class Canvaspanel(scrolled.ScrolledPanel):
-    """
-    Creates a MyGLCanvas object for each MonitorItem to draw signal trace on.
+    """Creates a MyGLCanvas object for each MonitorItem to draw signal trace on.
 
     Paramaters:
 
@@ -578,9 +635,14 @@ class Canvaspanel(scrolled.ScrolledPanel):
     Public Methods:
 
     None
+
     """
+
     def __init__(self, parent, monitors, devices) -> None:
-        """Set up panel."""
+        """Set up panel.
+
+        Create all widgets.
+        """
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
         self.monitors = monitors
@@ -596,7 +658,7 @@ class Canvaspanel(scrolled.ScrolledPanel):
 
 class MonitorItem(wx.Panel):
     """A single Panel that displays a monitor trace. Child of MonitorPanel.
-    
+
     Paramaters:
 
     parent: MonitorPanel object.
@@ -611,10 +673,14 @@ class MonitorItem(wx.Panel):
                                 destroys self.
     render(self): Calls the render_value method of the Canvaspanel object,
                     added to this widget, draws signal trace.
+
     """
 
     def __init__(self, parent, name, monitors, devices, names) -> None:
-        """Initialises widget. Creates a canvas object and all buttons."""
+        """Initialise widget.
+
+        Create a canvas object and all buttons.
+        """
         super().__init__(parent=parent)
         self.parent = parent
         self.name = name
@@ -640,7 +706,10 @@ class MonitorItem(wx.Panel):
         self.SetSizer(self.sizer)
 
     def on_remove_item(self, event):
-        """Event handler, destroys self widget."""
+        """Event handler.
+
+        Destroy self widget.
+        """
         self.parent.item_list = [
             item for item in self.parent.item_list if item.name != self.name]
         self.parent.parent.side_panel.remove_monitor_combobox.Clear()
@@ -650,7 +719,10 @@ class MonitorItem(wx.Panel):
         self.parent.remove_child(self)
 
     def render(self):
-        """Renders signal trace on Canvaspanel object attached to MonitorItem."""
+        """Render signal trace on Canvaspanel object attached to MonitorItem.
+
+        If DTYPE find outputID.
+        """
         [self.device_id, self.output_id] = self.devices.get_signal_ids(
             self.name)
         if self.devices.get_device(self.device_id).device_kind == self.devices.D_TYPE:
@@ -662,21 +734,28 @@ class MonitorItem(wx.Panel):
 
 
 class MenuFrame(wx.Frame):
-    """Main frame that opens when application is started. Allows loading and saving of files, 
-    allows editing of text and debugging features. Has a button to enter GUI.
-    
-    Parameters:
+    """Main frame that opens when application is started.
 
+    Allows loading and saving of files,
+    allows editing of text and debugging features. Has a button to enter GUI.
+
+    Parameters:
+    ------
     parent: FrameManager object.
     title: title.
-    
+    ------
     Public Methods:
-
+    ------
     closeWindow(self, event): Closes all frames, calls sys.exit.
+
     """
+
     def __init__(self, parent, title) -> None:
-        """Sets up frame. Instantiates all objects."""
-        super().__init__(parent=None, title= title)
+        """Set up frame.
+
+        Instantiate all objects.
+        """
+        super().__init__(parent=None, title=title)
         self.parent = parent
 
         self.Bind(wx.EVT_CLOSE, self.closeWindow)
@@ -698,29 +777,36 @@ class MenuFrame(wx.Frame):
         self.SetSizer(main_sizer)
 
     def closeWindow(self, event):
-        """Closes all frames."""
+        """Close all frames.
+
+        Shutdown everything.
+        """
         sys.exit()
 
 
 class FilePanel(wx.Panel):
     """Control Panel that has control buttons in the MenuFrame.
-    
+
     Parameters:
-
+    ------
     parent: Instance of the MenuFrame frame.
-    
+    ------
     Public Methods:
-
-    on_open_file(self, event): Handles the event when the open file button is pressed, 
+    ------
+    on_open_file(self, event): Handles the event when the open file button is pressed,
                                 opens FileDialog.
     on_gui_button(self, event): Handles the event when the enter GUI button is pressed,
                                 calls FrameManagers show_gui method.
-    on_save_file(self, event): Handles the event when the save file button is pressed, 
-                                calls FrameManagers save_file method.
+    on_save_file(self, event): Handles the event when the save file button is pressed,
+                                calls FrameManagers save_file methods.
 
     """
+
     def __init__(self, parent) -> None:
-        """Initialises FilePanel and widgets."""
+        """Initialise FilePanel and widgets.
+
+        Create all widgets and sizers.
+        """
         super().__init__(parent=parent)
         self.parent = parent
         self.path = None
@@ -741,7 +827,10 @@ class FilePanel(wx.Panel):
         self.SetSizer(main_sizer)
 
     def on_open_file(self, event):
-        """Opens FileDialog, lets user select file and loads in text from file."""
+        """Open FileDialog.
+
+        Let user select file and load in text from file.
+        """
         self.currentDirectory = os.getcwd()
         dlg = wx.FileDialog(
             self, message="Choose a file",
@@ -770,29 +859,38 @@ class FilePanel(wx.Panel):
             self.path = path
 
     def on_gui_button(self, event):
-        """Attemps to go to gui, calls parser."""
+        """Attempt to go to gui, call parser.
+
+        If it fails display error.
+        """
         self.parent.parent.show_gui(self.path)
 
     def on_save_file(self, event):
-        """Opens save menu."""
+        """Open save menu.
+
+        Let user save file.
+        """
         self.parent.parent.save_file(self)
 
 
 class TextEditor(wx.Panel):
-    """
-    Text Editor Panel that stores file text and allows users to edit said text before parsing.
+    """Text Editor Panel that stores file text and allows users to edit said text before parsing.
 
     Parameters:
-
+    ------
     parent: MenuFrame object.
-
+    ------
     Public Methods:
-
+    ------
     set_text(self, path): Sets text.
 
     """
+
     def __init__(self, parent) -> None:
-        """Creates text control widget."""
+        """Create text control widget.
+
+        Holds the file content.
+        """
         super().__init__(parent=parent)
         self.file = None
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -801,7 +899,10 @@ class TextEditor(wx.Panel):
         self.SetSizer(main_sizer)
 
     def set_text(self, path):
-        """Sets text."""
+        """Set text.
+
+        Set the file to the textbox.
+        """
         try:
             """Open and return the file specified by path for reading"""
             with open(path) as f:
@@ -813,21 +914,25 @@ class TextEditor(wx.Panel):
 
 
 class GuiControlPanel(wx.Panel):
-    """
-    Control panel that handles switching back to menu frame, saving and help button
+    """Control panel that handles switching back to menu frame, saving and help button.
 
     Parameters:
-
+    ------
     parent: passes an instance of the GUI class
-    size: passes size 
-    
+    size: passes size
+    ------
     Public Methods:
-
+    ------
     on_return_button(self, event): event handler for the return_button, shows menu, hides gui
-    on_save_file(self, event): event handler for the save_as button, opens save menu
+    on_save_file(self, event): event handler for the save_as button, opens save menu.
+
     """
+
     def __init__(self, parent, size) -> None:
-        """Initialises widgets and layout"""
+        """Initialise widgets and layout.
+
+        Create widgets and sizers.
+        """
         super().__init__(parent=parent, size=size)
 
         self.parent = parent
@@ -849,11 +954,17 @@ class GuiControlPanel(wx.Panel):
         self.SetSizer(self.main_sizer)
 
     def on_return_button(self, event):
-        """Calls the FrameManager show_menu method, hides gui, shows menu"""
+        """Call the FrameManager show_menu method, hide gui, show menu.
+
+        Toggle between frames.
+        """
         self.parent.parent.show_menu()
 
     def on_save_file(self, event):
-        """Calls the FrameManager save_file method, opens file saving menu"""
+        """Call the FrameManager save_file method, open file saving menu.
+
+        Call FrameManager.save_file.
+        """
         self.parent.parent.save_file(self)
 
 
@@ -871,10 +982,14 @@ class Gui(wx.Frame):
     --------------
 
     closeWindow(self, event): Closes all frames
+
     """
 
     def __init__(self, parent, title, names, devices, network, monitors):
-        """Initialise widgets and layout."""
+        """Initialise widgets and layout.
+
+        Create widgets and sizers.
+        """
         super().__init__(parent=None, title=title, size=(800, 600))
 
         self.parent = parent
@@ -913,20 +1028,22 @@ class Gui(wx.Frame):
         self.SetSizer(self.top_level_sizer)
 
     def closeWindow(self, event):
-        """Closes all frames."""
+        """Close all frames.
+
+        Shutdown everything.
+        """
         sys.exit()
 
 
 class FrameManager:
-    """
-    Manage the two main frames for the GUI and starting menu, including showing and hiding frames
-    
+    """Manage the two main frames for the GUI and starting menu, including showing and hiding frames.
+
     Paramaters:
-
+    ------
     title: title of the Logic simulator
-
+    ------
     Public methods:
-
+    ------
     show_gui(self, path): Shows the gui, creates objects for devices, monitors, network.
 
     process_content(self): Reads in text_field and passes the text to parser, parsese and handles errors.
@@ -936,8 +1053,12 @@ class FrameManager:
     save_file(self, button): Opens file saving menu.
 
     """
+
     def __init__(self, title):
-        """Launches app, creates MenuFrame"""
+        """Launch app.
+
+        Create MenuFrame.
+        """
         self.title = title
         self.app = wx.App()
         self.menu = MenuFrame(self, title)
@@ -945,7 +1066,10 @@ class FrameManager:
         self.app.MainLoop()
 
     def show_gui(self, path):
-        """Shows the gui, creates objects for devices, monitors, network."""
+        """Show the gui.
+
+        Create objects for devices, monitors, network.
+        """
         self.path = path
         if self.menu.text_editor.text is not None:
             self.names = Names()
@@ -959,7 +1083,10 @@ class FrameManager:
             print("Please choose a file first!")
 
     def process_content(self):
-        """Reads in text_field and passes the text to parser, parsese and handles errors."""
+        """Read in text_field and pass the text to parser, parse and handle errors.
+
+        Process all the key backend logic.
+        """
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
         self.scanner = Scanner(self.path, self.file, self.names)
@@ -989,12 +1116,18 @@ class FrameManager:
             self.menu.error_panel.SetValue(error)
 
     def show_menu(self):
-        """Shows menu, hides gui."""
+        """Show menu.
+
+        Hide gui.
+        """
         self.menu.Show()
         self.gui.Hide()
 
     def save_file(self, button):
-        """Opens file saving menu."""
+        """Open file saving menu.
+
+        Allows saving of file to txt file.
+        """
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
         print("content", self.content)

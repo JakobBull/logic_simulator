@@ -1,0 +1,348 @@
+commit cb86568ccafff19d5df060e89177bedaa4570417
+Merge: 858aa8b b83e0b6
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 23:35:21 2021 +0100
+
+    Merge branch 'gui_scanner' of https://github.com/Jakob2000Cam/gf2 into gui_scanner
+
+commit 858aa8b9a737da1976c97ab4fb063abe8f21ec77
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 23:34:19 2021 +0100
+
+    tidying up
+
+commit 7becd3359996cde1888f195667a8098e1c85bfcf
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 22:04:35 2021 +0100
+
+    comments
+
+commit 1849a9be52abb4b593b3faf23c6891d9cfd92158
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 21:38:29 2021 +0100
+
+    merge with scanner
+
+commit d983a587f543c6b9063c49359c87b97bacfbd3fb
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 21:35:50 2021 +0100
+
+    errors
+
+commit eb92b002096dbd26e78795cdbfc06647625b7676
+Merge: 3139ada 1a7e63b
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 21:33:47 2021 +0100
+
+    Merge branch 'scanner' of https://github.com/Jakob2000Cam/gf2 into gui_scanner
+
+commit 3139adad59ac5d33bc80048c42a0a3fe72bc5a29
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 21:33:11 2021 +0100
+
+    merge
+
+commit ce7ded81aa5f00e5c25da91b248df5d5395012f7
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 21:13:25 2021 +0100
+
+    DTYPE
+
+commit e0efe7303c7292a00755b3304b66a58b1aafbd90
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 20:56:14 2021 +0100
+
+    fixed DTYPE
+
+commit 31386ffc4d9b63d7517ea167d1e475debe1a3092
+Merge: f6d436e 0334e8c
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 20:45:50 2021 +0100
+
+    Merge branch 'git_report_parse' into gui_doc
+
+commit f6d436ebbbb4bb595a479e9f5d5fa75523dfd3b7
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 20:42:26 2021 +0100
+
+    fixed DTYPE
+
+commit eed6a73a56373e04beb8c4cf785fd3dc1f7281e4
+Merge: 3c2345b 460fa82
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 17:34:35 2021 +0100
+
+    Merge branch 'git_report_parse' into gui_doc
+
+commit 3c2345b02252be20d274c3558c917c5525a74e2d
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 17:32:04 2021 +0100
+
+    docstrings
+
+commit d0cf25bf587bc73ec40abbdc606107970261b664
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 16:20:50 2021 +0100
+
+    changes
+
+commit ad39f23da4eba6b75c201e9538b7f52a3f64a634
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 15:52:45 2021 +0100
+
+    broken parser
+
+commit 3a28b2c867c68774562dfffdf968980f1a1446a4
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 15:38:12 2021 +0100
+
+    avoid crash
+
+commit 0d35dab5a80d05b7add476cc7d899b9f1668c32b
+Merge: aa1c7ab 1bd8d66
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 15:04:32 2021 +0100
+
+    merging parser with gui
+    Merge branch 'Charlie_silly' into gui_report
+
+commit aa1c7ab9d0b2cbea36710344775617f258a343d2
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 14:56:38 2021 +0100
+
+    saving files
+
+commit 1cbca0884de1298e52712b20c4b669a80aa990a9
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 14:48:16 2021 +0100
+
+    in editor editing
+
+commit 2362fa40303833a6e02e05f5378a6fd7d0ad4398
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 14:10:14 2021 +0100
+
+    clear error window
+
+commit 2a7df69a8662ba648abc9caf962b6951415999aa
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 13:46:43 2021 +0100
+
+    fixed font
+
+commit c2f1d24a0685a5e406f4fab18ec89ef6bf4ff06f
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 11:36:18 2021 +0100
+
+    error reporting in gui
+
+commit 036a60a15c4b2fa62265182364146970e2c97bb5
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 10:32:46 2021 +0100
+
+    fixed height
+
+commit 0c707392439c55a485e6b8cc5962a63d769418c7
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 10:20:14 2021 +0100
+
+    fixed :=
+
+commit 93f74d64857795796b4339c2bfaaf693bcae702a
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 10:17:55 2021 +0100
+
+    fixed remove
+
+commit 0a666b52054b3e80683beb316e160cd679595ab9
+Merge: 7d4834e 2ac87fe
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 10:03:10 2021 +0100
+
+    merge
+
+commit 7d4834ed88772ee77316bf935eada2537d23043f
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 00:06:08 2021 +0100
+
+    finalised features
+
+commit de44f6f02c3479e48c7505cb862c094a9b1ecd7b
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 00:01:25 2021 +0100
+
+    finalised features
+
+commit 3742943bac96606141bd83fd9513e50b7a813704
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu Jun 3 00:00:22 2021 +0100
+
+    finalised features
+
+commit a388feac90ebd9c38c22c41ed691edffd588b433
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed Jun 2 22:18:53 2021 +0100
+
+    control buttons
+
+commit 2ac87fe5c80b25e2cecc2a3cdba2c169e1cfedb1
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed Jun 2 21:24:05 2021 +0100
+
+    conflicts
+
+commit 4d56960bfd30e6c32e4ce3331f7c644097bfafbe
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed Jun 2 21:03:31 2021 +0100
+
+    test file
+
+commit 4dc486522192cb28f42974c2414dbed4595ec1e5
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed Jun 2 20:38:05 2021 +0100
+
+    fixed sys exit
+
+commit d814149edf4338486d0b4f181a705237702d1851
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed Jun 2 10:55:33 2021 +0100
+
+    signal trace works
+
+commit 6ac5d96f990e479424846461475508925004b3a3
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed Jun 2 00:29:54 2021 +0100
+
+    added signal traces
+
+commit 48ac8b21b54d6a0789d76d9e9ea8fa3b6a1e82ab
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Tue Jun 1 23:57:27 2021 +0100
+
+    added remaining buttons except continue
+
+commit bf184bac2aac6a92b6b7cb8f8b27aa5320fd66c4
+Merge: cba8197 ea3dd2e
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Tue Jun 1 19:59:55 2021 +0100
+
+    Merge branch 'Charlie_debug_p' into gui
+    needed merge # Please enter a commit message to explain why this merge is necessary,
+
+commit cba8197063acab29dc8519fe4f810e5d7d3ebf40
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Tue Jun 1 15:38:54 2021 +0100
+
+    buttons
+
+commit 8ec5563ff52e78688bbed4627b078d830b799f91
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Tue Jun 1 12:18:07 2021 +0100
+
+    remove button
+
+commit b6da8d5c3bc08dad2cfb5cfa07dc7da31eee9ea5
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Sat May 29 17:15:09 2021 +0100
+
+    added
+
+commit 4c8459d144defce7760adf7303f473ad582cbdb1
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Fri May 28 22:23:03 2021 +0100
+
+    added functionality to buttons
+
+commit 95dbbdf9ca7be8ce8bc3c88be22c0ef18c4bff28
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 27 16:56:55 2021 +0100
+
+    added add monitor
+
+commit e584364d8ebde865fadd2eac33766253013742e0
+Merge: bcfaef5 65cdfc5
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 27 15:27:48 2021 +0100
+
+    remove pycache
+
+commit 65cdfc57b9c0aa6820c3ac23b1e519a3c63714ec
+Merge: 25e9e9d 57f788c
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 27 15:26:40 2021 +0100
+
+    merge main into gui
+
+commit 25e9e9df3b399727e9bcbf27ca4688bffb800506
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 27 15:24:49 2021 +0100
+
+    gitignore
+
+commit bcfaef53a1264f6fe603748873fbeb7dd0d34166
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 27 15:19:25 2021 +0100
+
+    finished SidePanel Class
+
+commit 8dca4ad8bc53cfa0a7b0ba70da497cba28ae850a
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 27 10:51:12 2021 +0100
+
+    controller design gui
+
+commit eb831d8184444d7549be0cb2a832158d9a80f42d
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Tue May 25 20:50:44 2021 +0100
+
+    added menubar
+
+commit 39b4ac11a142c04af47a038970419c14b52f7731
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Sun May 16 21:54:45 2021 +0100
+
+    jakob prelim exercises
+
+commit 7783b10f7ff5f983987d0d151e265267d62ae600
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Fri May 14 17:01:40 2021 +0100
+
+    task 7 jakob
+
+commit cce25f98e98db9483c0301a1ece046b1d7b822f1
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Fri May 14 14:09:39 2021 +0100
+
+    task 6 jakob
+
+commit 20754500ef19814758904bfdeba3e07bba477092
+Merge: ad56861 da2614d
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 13 19:03:29 2021 +0100
+
+    Merge branch 'main' of https://github.com/Jakob2000Cam/gf2 into main
+
+commit ad5686197f36c89711f1a1ff74156d3a7b6293c4
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 13 19:02:59 2021 +0100
+
+    intro tasks jakob
+
+commit 36f242aaf1b1253cf067c6fab90575dcc1c61859
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Thu May 13 10:17:57 2021 +0100
+
+    added .gitignore
+
+commit a3cb2ee401d8b92be78021b55dbce0c35130fcd4
+Merge: cab37cd d72b6ff
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed May 12 21:21:17 2021 +0100
+
+    Merge remote-tracking branch 'origin/master' into main
+
+commit d72b6ff1efd2207df160bb401be92ad378a77e82
+Author: JaBu2000 <jakob.bull@yahoo.de>
+Date:   Wed May 12 21:15:41 2021 +0100
+
+    initial commit
