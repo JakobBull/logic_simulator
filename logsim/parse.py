@@ -194,12 +194,12 @@ class Parser:
             Error(2, self.symbol)
             self.advance_line_error()
 
-        else:
-            if self.symbol.id in self.device_names:
-                self.parse_errors += 1
-                Error(3, self.symbol)
-                self.advance_line_error()
+        elif self.symbol.id in self.device_names:
+            self.parse_errors += 1
+            Error(3, self.symbol)
+            self.advance_line_error()
             # add symbol id to a list of device ids
+        else:    
             self.device_names.append(self.symbol.id)
             self.new_device_id = self.symbol.id
             print(self.symbol.string)
@@ -324,7 +324,7 @@ class Parser:
             else:
                 self.symbol = self.scanner.get_symbol()
                 print(self.symbol.string)
-                if self.symbol.type != self.scanner.NAME:
+                if self.symbol.id not in self.device_names:
                     self.parse_errors += 1
                     Error(10, self.symbol)
                     self.advance_line_error()
@@ -492,27 +492,29 @@ class Parser:
             self.parse_errors += 1
             Error(24, self.symbol)
             self.advance_line_error()
+        
+        else:
 
-        [device_id, output_id] = self.signame_in()
+            [device_id, output_id] = self.signame_in()
 
-        error_type = self.monitors.make_monitor(device_id, output_id)
+            error_type = self.monitors.make_monitor(device_id, output_id)
 
-        if error_type == self.monitors.NOT_OUTPUT:
-            self.parse_errors += 1
-            Error(25, self.symbol)
-            self.advance_line_error()
+            if error_type == self.monitors.NOT_OUTPUT:
+                self.parse_errors += 1
+                Error(25, self.symbol)
+                self.advance_line_error()
 
-        elif error_type == self.monitors.MONITOR_PRESENT:
-            self.parse_errors += 1
-            Error(26, self.symbol)
-            self.advance_line_error()
+            elif error_type == self.monitors.MONITOR_PRESENT:
+                self.parse_errors += 1
+                Error(26, self.symbol)
+                self.advance_line_error()
 
-        self.symbol = self.scanner.get_symbol()
+            self.symbol = self.scanner.get_symbol()
 
-        if self.symbol.type != self.scanner.SEMICOLON:
-            self.parse_errors += 1
-            Error(27, self.symbol)
-            self.advance_line_error()
+            if self.symbol.type != self.scanner.SEMICOLON:
+                self.parse_errors += 1
+                Error(27, self.symbol)
+                self.advance_line_error()
 
     def advance_line_error(self):
         """Advances to the next ; xafter an error to continue parsing.
