@@ -13,7 +13,6 @@ import os
 
 
 class Symbol:
-
     """Encapsulate a symbol and store its properties.
 
     Parameters
@@ -38,7 +37,6 @@ class Symbol:
 
 
 class Scanner:
-
     """Read circuit definition file and translate the characters into symbols.
 
     Once supplied with the path to a valid definition file, the scanner
@@ -56,11 +54,12 @@ class Scanner:
     get_symbol(self): Translates the next sequence of characters into a symbol
                       and returns the symbol.
     """
+
     def __init__(self, path, file, names):
-        """"Open specified file and initialise reserved words and IDs."""
+        """Open specified file and initialise reserved words and IDs."""
         # opens specified file
         self.path = path
-        self.file  = file
+        self.file = file
         # opens specified file
         """
         try:
@@ -113,11 +112,12 @@ class Scanner:
         # initialise line number and character number counters
         self.current_line_number = 1
         self.current_char_number = 1
-        if char == '\n':  self.current_line_number += 1
+        if char == '\n':
+            self.current_line_number += 1
 
     def get_symbol(self):
         """
-        Translates the next sequence of characters into a symbol.
+        Translate the next sequence of characters into a symbol.
 
         RETURN: Symbol - the next symbol from input file of scanner instance
         """
@@ -177,8 +177,9 @@ class Scanner:
 
     def advance(self):
         # Need to advance once to get to fist character of file!
-        """advance: reads the next character from the definition file
-        and places it in current_character
+        """advance: reads the next character from the definition file.
+
+        Places it in current_character
 
         RETURN: None
         """
@@ -193,8 +194,8 @@ class Scanner:
     def skip_spaces(self):
         """
         Skips whitespace until a non-whitespace character is reached.
-        It calls advance until current_character is not whitespace.
 
+        It calls advance until current_character is not whitespace.
         Only skips to next non-whitespace character if current character is
         is a space. Then it will skip all whitespace between the current
         space until the next non whitespace character
@@ -204,15 +205,15 @@ class Scanner:
         while self.current_character.isspace():
             self.advance()
 
-
     def skip_comments(self):
-        if self.current_character == "/":      #comment
+        """Skip comments defined by //single_line or /* multi_line */  ."""
+        if self.current_character == "/":      # comment
             self.advance()
-            if self.current_character == "/":   #single line comment
+            if self.current_character == "/":   # single line comment
                 while True:
                     self.advance()
                     if self.current_character == "\n":
-                        #self.advance()
+                        # self.advance()
                         break
             elif self.current_character == "*":
                 while True:
@@ -220,10 +221,12 @@ class Scanner:
                     if self.current_character == "*":
                         self.advance()
                         if self.current_character == "/":
-                            #self.advance()
+                            # self.advance()
                             break
+
     def skip_unused(self):
-        used = ('{','}','=','.','-',';','')
+        """Skip any characters that aren't considered in EBNF."""
+        used = ('{', '}', '=', '.', '-', ';', '')
         while True:
             if self.current_character.isalnum():
                 break
@@ -233,9 +236,11 @@ class Scanner:
 
     def get_name(self):
         """
-        Assuming current_character is a letter, returns the word of the
-        following name that begins with current_character. It then stores
-        the next non-alphanumeric character into current_character
+        Get next name Assuming current_character is a letter.
+
+        Returns the word of the following name that begins with
+        current_character. It then stores the next non-alphanumeric character
+        into current_character
 
         RETURN: String - the current name
         """
@@ -251,9 +256,10 @@ class Scanner:
         return name
 
     def get_number(self):
-        """assumes the current_character is a digit, returns the number
-        that begins with current_character and places the next non-digit
-        character in current_character.
+        """Assumes the current_character is a digit, returns next number.
+
+        Returns the next number that begins with current_character and
+        places the next non-digit character in current_character.
 
         Note: get_number will return numbers that begin in 0.
         ex, if the input file is "0900" it will return "0900" NOT "900"
