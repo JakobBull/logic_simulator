@@ -540,7 +540,8 @@ class Monitor(scrolled.ScrolledPanel):
     def remove_monitor(self, text):
         self.item_list = [item for item in self.item_list if item.name != text]
         for item in self.sizer.GetChildren():
-            if (widget := item.GetWindow()).name == text:
+            widget = item.GetWindow()
+            if widget.name == text:
                 self.sizer.Hide(widget)
                 widget.Destroy()
         self.SetSizer(self.sizer)
