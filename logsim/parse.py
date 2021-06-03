@@ -151,6 +151,7 @@ class Parser:
                     self.symbol.type == self.scanner.EOF):
                 print(self.symbol.string)
                 print("complete")
+                print(self.monitors.monitors_dictionary)
                 return True
             elif self.symbol.type == self.scanner.EOF:
                 Error.print_error(self.scanner)
@@ -352,6 +353,8 @@ class Parser:
                                 self.parse_errors += 1
                                 Error(15, self.symbol)
                                 self.advance_line_error()
+                            else:
+                                print("No DTYPE error")
 
                 else:
 
