@@ -53,12 +53,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors):
+    def __init__(self, parent, devices, monitors, size):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
-                                     wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
+                                     wxcanvas.WX_GL_DEPTH_SIZE, 16, 0], size=size)
         GLUT.glutInit()
         self.init = False
         self.context = wxcanvas.GLContext(self)
@@ -574,13 +574,13 @@ class MonitorItem(wx.Panel):
         self.names = names
         self.monitors = monitors
         self.devices = devices
-        self.canvas = MyGLCanvas(self, self.devices, self.monitors)
+        self.canvas = MyGLCanvas(self, self.devices, self.monitors, size= (-1, 50))
 
         [self.device_id, self.output_id] = self.devices.get_signal_ids(self.name)
 
-        self.name_text = wx.StaticText(self, wx.ID_ANY, label= self.name, size=(100,-1))
+        self.name_text = wx.StaticText(self, wx.ID_ANY, label= self.name, size=(100,50))
         #self.signal_trace = wx.StaticText(self, wx.ID_ANY, "We will add the signal trace here")
-        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(100,-1))
+        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(100,50))
 
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
