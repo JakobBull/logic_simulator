@@ -271,7 +271,6 @@ class SidePanel(wx.Panel):
         add_switch_executes the add button"""
         self.switch_box_text = wx.StaticText(self, wx.ID_ANY, "Set Switch")
         self.switch_box = wx.ComboBox(self, wx.ID_ANY, "Switch", choices = [self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)])
-        self.switch_box_inter_text = wx.StaticText(self, wx.ID_ANY, "set to", style= wx.ALIGN_CENTER)
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
         self.add_switch_button = wx.Button(self, -1, "Add")
@@ -342,7 +341,6 @@ class SidePanel(wx.Panel):
         self.button_sizer.Add(self.continue_button, 1, wx.ALL | wx.EXPAND, 5)
 
         self.switch_sizer.Add(self.switch_box, 1, wx.ALL , 5)
-        self.switch_sizer.Add(self.switch_box_inter_text, 1, wx.ALL | wx.CENTRE, 5)
         #self.switch_sizer.Add(self.switch_box_values, 0, wx.ALL, 5)
         self.switch_sizer.Add(self.binary_choice_sizer, 1, wx.ALL, 5)
         self.switch_sizer.Add(self.add_switch_button, 1, wx.ALL, 5)
@@ -612,6 +610,9 @@ class MenuFrame(wx.Frame):
         self.file_panel = FilePanel(self)
         self.text_editor = TextEditor(self)
         self.error_panel = wx.TextCtrl(self, wx.ID_ANY, "", style = wx.TE_READONLY | wx.TE_MULTILINE)
+        fo = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        self.text_editor.SetFont(fo)
+        self.error_panel.SetFont(fo)
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 

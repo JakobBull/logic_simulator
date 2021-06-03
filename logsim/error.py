@@ -93,7 +93,7 @@ class Error:
             cursor = cls.symbols[i].start_char_number-start_spaces
             print("Cursor adding", cursor, "spaces")
             for _ in range(cursor):
-                error_string += '  '
+                error_string += ' '
             error_string += str("^")
             error_string += "\n"
             error_string += str(cls.error_message[cls.types[i]])
