@@ -43,13 +43,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     --------------
     init_gl(self): Configures the OpenGL context.
 
-    render(self, text): Handles all drawing operations.
+    render_value(self, values): Handles all drawing operations.
+
+    render_empty(self): Draws empty canvas.
 
     on_paint(self, event): Handles the paint event.
-
-    on_size(self, event): Handles the canvas resize event.
-
-    on_mouse(self, event): Handles mouse events.
 
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
@@ -123,37 +121,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glFlush()
         self.SwapBuffers()
 
-    def render(self, text):
-        """Handle all drawing operations."""
-        self.SetCurrent(self.context)
-        if not self.init:
-            # Configure the viewport, modelview and projection matrices
-            self.init_gl()
-            self.init = True
-
-        # Clear everything
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-
-        # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(10):
-            x = (i * 20) + 10
-            x_next = (i * 20) + 30
-            if i % 2 == 0:
-                y = 0
-            else:
-                y = 25
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
-
-        # We have been drawing to the back buffer, flush the graphics pipeline
-        # and swap the back buffer to the front
-        GL.glFlush()
-        self.SwapBuffers()
-
     def render_empty(self):
+        """Render empty canvas."""
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the viewport, modelview and projection matrices
@@ -182,52 +151,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # self.render(text)
         self.render_empty()
 
-    def on_size(self, event):
-        """Handle the canvas resize event."""
-        # Forces reconfiguration of the viewport, modelview and projection
-        # matrices on the next paint event
-        self.init = False
-
-    def on_mouse(self, event):
-        """Handle mouse events."""
-        text = ""
-        if event.ButtonDown():
-            self.last_mouse_x = event.GetX()
-            self.last_mouse_y = event.GetY()
-            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
-        if event.ButtonUp():
-            text = "".join(["Mouse button released at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
-        if event.Leaving():
-            text = "".join(["Mouse left canvas at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
-        if event.Dragging():
-            self.pan_x += event.GetX() - self.last_mouse_x
-            self.pan_y -= event.GetY() - self.last_mouse_y
-            self.last_mouse_x = event.GetX()
-            self.last_mouse_y = event.GetY()
-            self.init = False
-            text = "".join(["Mouse dragged to: ", str(event.GetX()),
-                            ", ", str(event.GetY()), ". Pan is now: ",
-                            str(self.pan_x), ", ", str(self.pan_y)])
-        if event.GetWheelRotation() < 0:
-            self.zoom *= (1.0 + (
-                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
-            self.init = False
-            text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
-        if event.GetWheelRotation() > 0:
-            self.zoom /= (1.0 - (
-                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
-            self.init = False
-            text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
-        if text:
-            self.render(text)
-        else:
-            self.Refresh()  # triggers the paint event
-
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
@@ -243,8 +166,49 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
 
 class SidePanel(wx.Panel):
+    """
+    SidePanel object is responsible for all runtime control in the GUI object.
+
+    Parameters:
+
+    parent: GUI object.
+    scrolled_pabel: MonitorPanel object.
+
+    Public Methods:
+
+    read_name(self, name_string): Return the name ID of the current string if valid,
+                                Return None if the current string is not a valid name string.
+
+    read_signal_name(self): Return the device and port IDs of the current signal name.
+                            Return None if either is invalid.
+
+    on_add_monitor(self, event): Handle the event when the add monitor button is pressed, adds a MonitorItem.
+
+    run_network(self, cycles): Run the network for the specified number of simulation cycles.
+                                Return True if successful.
+
+    on_update_signal(self, event): Set the specified switch to the specified signal level.
+
+    on_remove_monitor(self, event): Event handler, removes monitor.
+
+    on_remove_all_monitors(self, event): Event handler, removes all monitors.
+
+    on_menu(self, event): Event handler for the file menu.
+
+    on_run_button(self, event): Event handler for when the user clicks the run
+                                button.
+
+    on_continue_button(self, event): Continue a previously run simulation.
+
+    run_command(self): Run the simulation from scratch.
+
+    on_text_box(self, event): Event handler for when the user enters text.
+    
+    on_combo_select(self, event): Handle event from selecting an event from the combobox dropdown menu
+    """
 
     def __init__(self, parent, scrolled_panel) -> None:
+        """Initialise SidePanel object, set up widgets."""
         super().__init__(parent=parent)
 
         self.parent = parent
@@ -400,7 +364,7 @@ class SidePanel(wx.Panel):
         return [device_id, port_id]
 
     def on_add_monitor(self, event):
-        """Handle the event when the add monitor button is pressed"""
+        """Handle the event when the add monitor button is pressed, adds a MonitorItem"""
         monitor = self.monitor_combobox.GetValue()
 
         if monitor != "Select":
@@ -614,9 +578,9 @@ class Canvaspanel(scrolled.ScrolledPanel):
     Public Methods:
 
     None
-
     """
     def __init__(self, parent, monitors, devices) -> None:
+        """Set up panel."""
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
         self.monitors = monitors
@@ -904,15 +868,8 @@ class Gui(wx.Frame):
 
     Public methods
     --------------
-    on_menu(self, event): Event handler for the file menu.
 
-    on_spin(self, event): Event handler for when the user changes the spin
-                           control value.
-
-    on_run_button(self, event): Event handler for when the user clicks the run
-                                button.
-
-    on_text_box(self, event): Event handler for when the user enters text.
+    closeWindow(self, event): Closes all frames
     """
 
     def __init__(self, parent, title, names, devices, network, monitors):
@@ -955,6 +912,7 @@ class Gui(wx.Frame):
         self.SetSizer(self.top_level_sizer)
 
     def closeWindow(self, event):
+        """Closes all frames."""
         sys.exit()
 
 
@@ -968,13 +926,13 @@ class FrameManager:
 
     Public methods:
 
-    show_gui(self, path): shows the gui, creates objects for devices, monitors, network
+    show_gui(self, path): Shows the gui, creates objects for devices, monitors, network.
 
-    process_content(self): reads in text_field and passes the text to parser, parsese and handles errors
+    process_content(self): Reads in text_field and passes the text to parser, parsese and handles errors.
 
-    show_menu(self): shows menu, hides gui
+    show_menu(self): Shows menu, hides gui.
 
-    save_file(self, button): opens file saving menu
+    save_file(self, button): Opens file saving menu.
 
     """
     def __init__(self, title):
@@ -986,6 +944,7 @@ class FrameManager:
         self.app.MainLoop()
 
     def show_gui(self, path):
+        """Shows the gui, creates objects for devices, monitors, network."""
         self.path = path
         if self.menu.text_editor.text is not None:
             self.names = Names()
@@ -999,6 +958,7 @@ class FrameManager:
             print("Please choose a file first!")
 
     def process_content(self):
+        """Reads in text_field and passes the text to parser, parsese and handles errors."""
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
         self.scanner = Scanner(self.path, self.file, self.names)
@@ -1028,10 +988,12 @@ class FrameManager:
             self.menu.error_panel.SetValue(error)
 
     def show_menu(self):
+        """Shows menu, hides gui."""
         self.menu.Show()
         self.gui.Hide()
 
     def save_file(self, button):
+        """Opens file saving menu."""
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
         print("content", self.content)
