@@ -569,9 +569,10 @@ class Canvaspanel(scrolled.ScrolledPanel):
         self.devices = devices
 
         self.canvas = MyGLCanvas(self, self.devices, self.monitors, size= (-1, 50))
-        self.sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer = wx.BoxSizer()
         self.sizer.Add(self.canvas, -1, 0, 0)
         self.SetSizer(self.sizer)
+        self.SetupScrolling()
 
 class MonitorItem(wx.Panel):
 
