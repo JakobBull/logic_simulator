@@ -377,7 +377,7 @@ class Parser:
                             self.parse_errors += 1
                             Error(13, self.symbol)
                             self.advance_line_error()
-                        
+
                         error_type = self.network.make_connection(
                             in_device_id, in_port_id,
                             out_device_id, self.symbol.id)
@@ -407,77 +407,61 @@ class Parser:
         else:
             return [in_device.device_id, None]
 
-
-
-    
     def setsignal_list(self):
         """Parse the setsignal section."""
         self.OPENCURLY_search()
-        self.symbol = self.scanner.get_symbol() #Go to first symbol of the line
+        self.symbol = self.scanner.get_symbol()
+        #  Go to first symbol of the line
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
-            #print(self.symbol.string)
+            # print(self.symbol.string)
             self.setsignal_parsed = True
             self.sections_complete += 1
-            return 
+            return
         self.setsignal_parse()
         while self.symbol.type == self.scanner.SEMICOLON:
-            self.symbol = self.scanner.get_symbol() # Go to first symbol of next line
-            if self.symbol.type == self.scanner.RIGHT_BRACKET: # Check if } which denotes end of setsignal
-                #print(self.symbol.string)
+            self.symbol = self.scanner.get_symbol()
+            # Go to first symbol of next line
+            if self.symbol.type == self.scanner.RIGHT_BRACKET:
+                # Check if } which denotes end of setsignal
                 self.setsignal_parsed = True
                 self.sections_complete += 1
-                break 
+                break
             self.setsignal_parse()
-            
-        
-
 
     def setsignal_parse(self):
         """Parse a single line of the setsignal section."""
-        #Expected format : name EQUALS BINARYNUMBER "starttime" NUMBER SEMICOLON
-        
-        
-
+        # Expected format : name EQUALS BINARYNUMBER SEMICOLON
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
             Error(18, self.symbol)
             self.advance_line_error()
-            
-            
+
         switch_set_ID = self.devices.get_device(self.symbol.id)
 
-        self.symbol = self.scanner.get_symbol() 
-        
+        self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.EQUALS:
-                self.parse_errors += 1
-                Error(19, self.symbol)
-                self.advance_line_error()
-                
-
+            self.parse_errors += 1
+            Error(19, self.symbol)
+            self.advance_line_error()
         self.symbol = self.scanner.get_symbol()
         if self.symbol.string != "0" and self.symbol.string != "1":
             self.parse_errors += 1
             Error(20, self.symbol)
             self.advance_line_error()
-            
-        
+
         elif self.symbol.type != self.scanner.NUMBER:
             self.parse_errors += 1
             Error(20, self.symbol)
             self.advance_line_error()
-            
-
         elif self.symbol.string == "1":
             self.devices.set_switch(switch_set_ID, 1)
-        
+
         self.symbol = self.scanner.get_symbol()
 
         if self.symbol.type != self.scanner.SEMICOLON:
             self.parse_errors += 1
             Error(22, self.symbol)
             self.advance_line_error()
-            
-
 
     def monitor_list(self):
         """Parse the monitor section of the code."""
@@ -488,26 +472,22 @@ class Parser:
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
             self.parse_errors += 1
             Error(23, self.symbol)
-            
-        
-        
+
         else:
             self.monitor_parse()
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                    #print(self.symbol.string)
+                    # print(self.symbol.string)
                     self.sections_complete += 1
                     self.monitor_parsed = True
                     break
                 else:
                     self.monitor_parse()
 
-
-    
     def monitor_parse(self):
         """Parse a line in Monitor."""
-        #Expected format : name SEMICOLON
+        # Expected format : name SEMICOLON
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
             Error(24, self.symbol)
@@ -521,14 +501,12 @@ class Parser:
             self.parse_errors += 1
             Error(25, self.symbol)
             self.advance_line_error()
-            
 
         elif error_type == self.monitors.MONITOR_PRESENT:
             self.parse_errors += 1
             Error(26, self.symbol)
             self.advance_line_error()
-            
-        
+
         self.symbol = self.scanner.get_symbol()
 
         if self.symbol.type != self.scanner.SEMICOLON:
@@ -537,7 +515,8 @@ class Parser:
             self.advance_line_error()
 
     def advance_line_error(self):
-        """Advances to the next ; or heading after an error to continue parsing."""
-        while self.symbol.type != self.scanner.SEMICOLON or self.symbol.type!= self.scanner.RIGHT_BRACKET:
+        """Advances to the next ; xafter an error to continue parsing."""
+        while (self.symbol.type != self.scanner.SEMICOLON or
+                self.symbol.type != self.scanner.RIGHT_BRACKET):
             self.symbol = self.scanner.get_symbol()
-            #if self.symbol.id in self.heading_IDs:
+            # if self.symbol.id in self.heading_IDs:
