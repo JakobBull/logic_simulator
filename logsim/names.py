@@ -94,7 +94,7 @@ class Names:
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
-        
+
         If the name_id is not an index in the names list, return None.
         """
         # from prelim exercise
