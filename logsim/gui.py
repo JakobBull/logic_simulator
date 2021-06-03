@@ -854,6 +854,9 @@ class FrameManager:
         self.gui.Hide()
 
     def save_file(self, button):
+        self.content = self.menu.text_editor.text.GetValue()
+        self.file = io.StringIO(self.content)
+        print("content", self.content)
         self.currentDirectory = os.getcwd()
         dlg = wx.FileDialog(
             button, message="Save file as ...", 
@@ -863,5 +866,7 @@ class FrameManager:
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             print(f"You chose the following filename: {path}")
+            with open(path, "w") as file:
+                file.write(self.content)
         dlg.Destroy()
         
