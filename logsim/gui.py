@@ -658,7 +658,6 @@ class MonitorItem(wx.Panel):
         self.monitors = monitors
         self.devices = devices
         self.canvas_panel = Canvaspanel(self, self.monitors, self.devices)
-        self.render()
 
         [self.device_id, self.output_id] = self.devices.get_signal_ids(
             self.name)
