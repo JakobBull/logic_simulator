@@ -11,8 +11,8 @@ Parser - parses the definition file and builds the logic network.
 
 from error import Error
 
-class Parser:
 
+class Parser:
     """Parse the definition file and build the logic network.
 
     The parser deals with error handling. It analyses the syntactic and
@@ -156,7 +156,7 @@ class Parser:
 
 
     def OPENCURLY_search(self):
-        """Function which searches for a { after a heading"""
+        """Search for a { after a heading."""
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.LEFT_BRACKET:
             self.parse_errors += 1
@@ -165,8 +165,7 @@ class Parser:
         print('{')
               
     def device_list(self):
-        """ Function which parses the device list"""
-
+        """Parse the device list."""
         self.OPENCURLY_search()
         
         self.symbol = self.scanner.get_symbol()
@@ -186,12 +185,12 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()               
                
     def device_parse(self):
-        """Function which parses a single line of a device definition"""
+        """Parse a single line of a device definition."""
         # Expected format : name EQUALS device
 
         if self.symbol.type != self.scanner.NAME:
             self.parse_errors += 1
-            Error(3, self.symbol)
+            Error(2, self.symbol)
             self.advance_line_error() 
         
         
@@ -199,7 +198,7 @@ class Parser:
         else:
             if self.symbol.id in self.device_names:
                 self.parse_errors += 1
-                Error(4, self.symbol)
+                Error(3, self.symbol)
                 self.advance_line_error()
 
             self.device_names.append(self.symbol.id) # add symbol id to a list of device ids
@@ -278,8 +277,7 @@ class Parser:
                     
 
     def connection_list(self):
-        """Function whhich parses the connection list"""
-        
+        """Parse the connection list."""
         self.OPENCURLY_search()
 
         self.symbol = self.scanner.get_symbol() # Go to first symbol of line
@@ -298,7 +296,7 @@ class Parser:
 
                 
     def connection_parse(self):
-        """Function which parses a single connection"""
+        """Parse a single connection."""
         # Expected format : name DASH name PERIOD Inumber
         
         if self.symbol.id not in self.device_names:
@@ -389,6 +387,7 @@ class Parser:
 
 
     def signame_in(self):
+        """Return the device ID and port ID for a device."""
         in_device = self.devices.get_device(self.symbol.id)
         if in_device.device_kind == self.devices.D_TYPE:
             self.symbol = self.scanner.get_symbol()
@@ -414,8 +413,7 @@ class Parser:
 
     
     def setsignal_list(self):
-        """Function which parses the setsignal section"""
-
+        """Parse the setsignal section."""
         self.OPENCURLY_search()
         self.symbol = self.scanner.get_symbol() #Go to first symbol of the line
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
@@ -437,7 +435,7 @@ class Parser:
 
 
     def setsignal_parse(self):
-        """Function which parses a single line of the setsignal section"""
+        """Parse a single line of the setsignal section."""
         #Expected format : name EQUALS BINARYNUMBER "starttime" NUMBER SEMICOLON
         
         
@@ -484,8 +482,7 @@ class Parser:
 
 
     def monitor_list(self):
-        """Function that parses the monitor section of the code"""
-
+        """Parse the monitor section of the code."""
         self.OPENCURLY_search()
 
         self.symbol = self.scanner.get_symbol()
@@ -511,7 +508,7 @@ class Parser:
 
     
     def monitor_parse(self):
-        """Function which parses a line in Monitor """
+        """Parse a line in Monitor."""
         #Expected format : name SEMICOLON
         if self.symbol.id not in self.device_names:
             self.parse_errors += 1
@@ -542,7 +539,7 @@ class Parser:
             self.advance_line_error()
 
     def advance_line_error(self):
-        """Advances to the next ; or heading after an error to continue parsing"""
+        """Advances to the next ; or heading after an error to continue parsing."""
         while self.symbol.type != self.scanner.SEMICOLON or self.symbol.type!= self.scanner.RIGHT_BRACKET:
             self.symbol = self.scanner.get_symbol()
             #if self.symbol.id in self.heading_IDs:
