@@ -1,9 +1,9 @@
 NETWORK{
     DEVICES{
 	SW1 = SWITCH;
-	SW2 = CLOCK;
-	G1 = AND;
-	G2 = NAND;
+	SW2 = CLOCK halfperiod 2;
+	G1 = NAND inputs 2;
+	G2 = NAND inputs 2;
 	}
    CONNECTIONS{
 	SW1 - G1.I1;
@@ -12,14 +12,17 @@ NETWORK{
 	G2 - G1.I2;
 	}
    SIGNALS{
-	SETSIGNAL{
-		SW1 = 0 starttime 0;
-		SW2 = 0 starttime 0;
+		SW1 = 0 ;
+		SW2 = 0;
 		}
-	SETCLOCK{}
-	}
+	
+	
    MONITOR{
 	G1;
 	G2;
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> Charlie_debug_p

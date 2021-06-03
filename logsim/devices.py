@@ -260,6 +260,7 @@ class Devices:
         for output_id in self.dtype_output_ids:
             self.add_output(device_id, output_id)
         self.cold_startup()  # D-type initialised to a random state
+        print("DTYPE made")
 
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.

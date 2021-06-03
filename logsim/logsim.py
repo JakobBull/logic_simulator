@@ -31,7 +31,7 @@ def main(arg_list):
 
     Run either the command line user interface, the graphical user interface,
     or display the usage message.
-    """
+    
     usage_message = ("Usage:\n"
                      "Show help: logsim.py -h\n"
                      "Command line user interface: logsim.py -c <file path>\n"
@@ -64,7 +64,7 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
-
+    
     if not options:  # no option given, use the graphical user interface
         
         if len(arguments) != 1:  # wrong number of arguments
@@ -73,13 +73,13 @@ def main(arg_list):
             sys.exit()
 
         [path] = arguments
-        scanner = Scanner(path, names)
-        parser = Parser(names, devices, network, monitors, scanner)
+        #scanner = Scanner(self.file, names)
+        #parser = Parser(names, devices, network, monitors, scanner)
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             gui.FrameManager("Logic Simulator", names, devices, network,
-                      monitors)
-
+                      monitors)"""
+    gui.FrameManager("Logic Simulator")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
