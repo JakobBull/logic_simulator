@@ -38,64 +38,76 @@ class Error:
         "MONITOR: Device already monitored",
         "MONITOR: Expected ; to end line"
     )
-    def __init__(self, type, symbol):
-        Error.types.append(type)        # error type, number from list of error document
-        Error.symbols.append(symbol)    # symbol that causes the error
-        Error.num_errors += 1           # everytime an error called, number of errors increased
+    @classmethod
+    def __init__(cls, type, symbol):
+        cls.types.append(type)        # error type, number from list of error document
+        cls.symbols.append(symbol)    # symbol that causes the error
+        cls.num_errors += 1           # everytime an error called, number of errors increased
 
-    def print_error(scanner):
-        lines = Error.get_lines(scanner)
-        print(str(Error.num_errors) + " ERRORS!:\n")
-        for i in range(Error.num_errors):
+    @classmethod
+    def print_error(cls, scanner):
+        lines = cls.get_lines(scanner)
+        print(str(cls.num_errors) + " ERRORS!:\n")
+        for i in range(cls.num_errors):
             print("Error " + str(i) + ":")
-            line = lines[Error.symbols[i].line_number-1]
+            line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:
                 if c.isspace():
                     start_spaces+=1
                 else: break
-            start = Error.symbols[i].start_char_number
-            end = Error.symbols[i].end_char_number
+            start = cls.symbols[i].start_char_number
+            end = cls.symbols[i].end_char_number
             print("\"" + line.strip() + "\"")
-            cursor = Error.symbols[i].start_char_number-start_spaces
+            cursor = cls.symbols[i].start_char_number-start_spaces
             for n in range(cursor):
                 print(' ', end = '')
             print("^")
-            print(Error.error_message[Error.types[i]])
+            print(cls.error_message[cls.types[i]])
             #for n in range(len(Error.error_message[Error.types[i]])):
             #    print('-', end = '')
             for n in range(8):
                 print('-', end = '')
             print("")
 
-    def gui_report_error(path):
+    @classmethod
+    def gui_report_error(cls, path):
+        print("GUI reporting errros")
         error_string = ""
-        lines = Error.get_lines(path)
-        error_string.append(str(Error.num_errors) + " ERRORS!:\n")
-        for i in range(Error.num_errors):
-            error_string.append("Error " + str(i) + ":")
-            line = lines[Error.symbols[i].line_number-1]
+        lines = cls.get_lines(path)
+        error_string += str(str(cls.num_errors) + " ERRORS!:\n")
+        error_string += "\n"
+        for i in range(cls.num_errors):
+            error_string += str("Error " + str(i) + ":")
+            error_string += "\n"
+            line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:
                 if c.isspace():
                     start_spaces+=1
                 else: break
-            start = Error.symbols[i].start_char_number
-            end = Error.symbols[i].end_char_number
-            error_string.append("\"" + line.strip() + "\"")
-            cursor = Error.symbols[i].start_char_number-start_spaces
-            for n in range(cursor):
-                error_string.append(' ', end = '')
-            error_string.append("^")
-            error_string.append(Error.error_message[Error.types[i]])
+            start = cls.symbols[i].start_char_number
+            end = cls.symbols[i].end_char_number
+            error_string += str("\"" + line.strip() + "\"")
+            error_string += "\n"
+            cursor = cls.symbols[i].start_char_number-start_spaces
+            print("Cursor adding", cursor, "spaces")
+            for _ in range(cursor):
+                error_string += '  '
+            error_string += str("^")
+            error_string += "\n"
+            error_string += str(cls.error_message[cls.types[i]])
             #for n in range(len(Error.error_message[Error.types[i]])):
             #    print('-', end = '')
-            for n in range(8):
-                error_string.append('-', end = '')
-            error_string.append("")
-            return error_string
-
-    def get_lines(path):
+            error_string += "\n"
+            for _ in range(8):
+                error_string += str('-')
+            error_string += "\n"
+            error_string += ""
+        return error_string
+   
+    @classmethod
+    def get_lines(cls, scanner):
         try:
             """Open and return the file specified by path for reading"""
             file = open(scanner.path, "r", encoding="utf-8")

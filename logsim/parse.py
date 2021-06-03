@@ -41,7 +41,7 @@ class Parser:
         self.network = network
         self.monitors = monitors
         self.scanner = scanner
-        self.Error = Error
+        #self.Error = Error
 
         self.type = None
         self.id = None

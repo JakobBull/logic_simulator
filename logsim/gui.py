@@ -16,6 +16,7 @@ from wx.core import HORIZONTAL
 import wx.lib.scrolledpanel as scrolled
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
+from error import Error
 
 from names import Names
 from devices import Devices
@@ -610,11 +611,13 @@ class MenuFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.closeWindow)
         self.file_panel = FilePanel(self)
         self.text_editor = TextEditor(self)
+        self.error_panel = wx.TextCtrl(self, wx.ID_ANY, "", style = wx.TE_READONLY | wx.TE_MULTILINE)
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
         main_sizer.Add(self.file_panel, 1, wx.EXPAND, 0)
-        main_sizer.Add(self.text_editor, 5, wx.EXPAND, 0)
+        main_sizer.Add(self.text_editor, 7, wx.EXPAND, 0)
+        main_sizer.Add(self.error_panel, 2, wx.EXPAND, 0)
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
@@ -806,23 +809,26 @@ class FrameManager:
     
     def show_gui(self, path):
         if self.menu.text_editor.text != None:
-            try:
-                names = Names()
-                devices = Devices(names)
-                network = Network(names, devices)
-                monitors = Monitors(names, devices, network)
-                scanner = Scanner(path, names)
-                parser = Parser(names, devices, network, monitors, scanner)
-                if parser.parse_network():
-                    self.gui = Gui(self, self.title, names, devices, network,
-                        monitors)
-                    self.menu.Hide()
-                    self.gui.Show()
-                    self.gui.path = path
-                else:
-                    print("Sorry, can't parse network.")
-            except TypeError:
-                pass
+            names = Names()
+            devices = Devices(names)
+            network = Network(names, devices)
+            monitors = Monitors(names, devices, network)
+            scanner = Scanner(path, names)
+            parser = Parser(names, devices, network, monitors, scanner)
+
+            if parser.parse_network():
+                print("parsing")
+                self.gui = Gui(self, self.title, names, devices, network,
+                    monitors)
+                self.menu.Hide()
+                self.gui.Show()
+                self.gui.path = path
+            else:
+                error = Error.gui_report_error(scanner)
+                Error.print_error(scanner)
+                print("Sorry, can't parse network.")
+                self.menu.error_panel.SetValue(error)
+
         else:
             print("Please choose a file first!")
 
