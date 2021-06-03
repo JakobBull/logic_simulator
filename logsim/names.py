@@ -11,6 +11,7 @@ Names - maps variable names and string names to unique integers.
 
 class Names:
     """Map variable names and string names to unique integers.
+
     This class deals with storing grammatical keywords and user-defined words,
     and their corresponding name IDs, which are internal indexing integers. It
     provides functions for looking up either the name ID or the name string.
@@ -49,6 +50,7 @@ class Names:
 
     def query(self, name_string):
         """Return the corresponding name ID for name_string.
+
         If the name string is not present in the names list, return None.
         """
         # raise TypeError if name_string isn't a string
@@ -64,6 +66,7 @@ class Names:
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
+
         If the name string is not present in the names list, add it.
         """
         name_ids = []
@@ -91,6 +94,7 @@ class Names:
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
+        
         If the name_id is not an index in the names list, return None.
         """
         # from prelim exercise
