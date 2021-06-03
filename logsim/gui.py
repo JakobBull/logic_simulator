@@ -326,11 +326,7 @@ class SidePanel(wx.Panel):
         self.side_sizer.Add(self.button_sizer, 1, wx.ALL |wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.switch_box_text, 1, wx.ALIGN_CENTER, 0)
-<<<<<<< HEAD
-        self.side_sizer.Add(self.switch_sizer, 1, wx.ALIGN_CENTER, 0)
-=======
         self.side_sizer.Add(self.switch_sizer, 1, wx.EXPAND, 0)
->>>>>>> Charlie_debug_p
         self.side_sizer.Add(wx.StaticLine(self,-1), 0, wx.ALL|wx.EXPAND, 5)
         self.side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
         self.side_sizer.Add(self.monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
@@ -339,7 +335,7 @@ class SidePanel(wx.Panel):
         self.side_sizer.Add(self.remove_monitor_sizer, 1, wx.ALL|wx.EXPAND, 0)
 
         self.cycle_sizer.Add(self.text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
-        self.cycle_sizer.Add(self.spin, 2, wx.ALL | wx.ALIGN_RIGHT, 5)
+        self.cycle_sizer.Add(self.spin, 2, wx.ALL, 5)
 
         self.button_sizer.Add(self.run_button, 1, wx.ALL | wx.EXPAND, 5)
         self.button_sizer.Add(self.continue_button, 1, wx.ALL | wx.EXPAND, 5)
@@ -508,6 +504,7 @@ class Monitor(scrolled.ScrolledPanel):
     def __init__(self, parent, monitors, devices, names) -> None:
 
         scrolled.ScrolledPanel.__init__(self, parent, -1)
+        self.parent = parent
         self.monitors = monitors
         self.devices = devices
         self.names = names
@@ -595,6 +592,9 @@ class MonitorItem(wx.Panel):
 
     def on_remove_item(self, event):
         self.parent.item_list = [item for item in self.parent.item_list if item.name != self.name]
+        self.parent.parent.side_panel.remove_monitor_combobox.Clear()
+        for item in self.parent.item_list:
+            self.parent.parent.side_panel.remove_monitor_combobox.Append(item.name)
         self.parent.remove_child(self)
 
     def render(self):
