@@ -1,3 +1,8 @@
+"""
+A test independent from pytests, allowing visualisation of scanner output.
+
+Useful for debugging.
+"""
 from scanner import Symbol
 from scanner import Scanner
 from names import Names
@@ -6,6 +11,7 @@ import os
 
 
 def open_file(path):
+    """Open and returns file at path."""
     try:
         """Open and return the file specified by path for reading"""
         return open(path, "r", encoding="utf-8")
@@ -14,10 +20,8 @@ def open_file(path):
         sys.exit()
 
 
-
 def main():
-    """Preliminary exercises for Part IIA Project GF2."""
-
+    """Output all symbol from scanner for file at path of argument given."""
     # Check command line arguments
     arguments = sys.argv[1:]
     if len(arguments) != 1:
@@ -27,8 +31,8 @@ def main():
     else:
         print("\nNow opening file...")
         # Print the path provided and try to open the file for reading
-        path = os.getcwd()+ "/" + arguments[0]
-        print(path)    #print path
+        path = os.getcwd() + "/" + arguments[0]
+        print(path)    # print path
         scan = Scanner(path, Names())
         print("scanning from: " + path)
         print("")
@@ -44,6 +48,7 @@ def main():
             print(symbol.number)
             if(symbol.type == scan.EOF):
                 break
+
 
 if __name__ == "__main__":
     main()
