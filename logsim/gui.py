@@ -693,16 +693,19 @@ class MonitorItem(wx.Panel):
             self.name)
 
         self.name_text = wx.StaticText(
-            self, wx.ID_ANY, label=self.name, size=(50, 50))
+            self, wx.ID_ANY, label=self.name, size=(50, 50), style = wx.ALIGN_CENTER)
+        fo = wx.Font(13, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        self.name_text.SetFont(fo)
         self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(50, 50))
 
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.sizer.Add(self.name_text, 1, wx.ALIGN_CENTER, 0)
+        self.sizer.Add(self.name_text, 1, wx.CENTER, 0)
         self.sizer.Add(self.canvas_panel, 6, wx.EXPAND, 0)
         self.sizer.Add(self.remove_item, 1, wx.ALIGN_CENTER, 0)
+        self.Layout()
         self.SetSizer(self.sizer)
 
     def on_remove_item(self, event):
@@ -821,9 +824,9 @@ class FilePanel(wx.Panel):
 
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        main_sizer.Add(search_file_button, -1, 0, 0)
-        main_sizer.Add(save_as_button, -1, 0, 0)
-        main_sizer.Add(gui_button, -1, 0, 0)
+        main_sizer.Add(search_file_button, -1, wx.ALL , 5)
+        main_sizer.Add(save_as_button, -1, wx.ALL, 5)
+        main_sizer.Add(gui_button, -1, wx.ALL , 5)
         self.SetSizer(main_sizer)
 
     def on_open_file(self, event):
@@ -1109,6 +1112,7 @@ class FrameManager:
             self.menu.Hide()
             self.gui.Show()
             self.gui.path = self.path
+            self.menu.error_panel.SetValue("")
         else:
             error = Error.gui_report_error(self.scanner)
             Error.print_error(self.scanner)
