@@ -147,7 +147,8 @@ def test_scanner_example_file_comments():
     i = 0
     while True:
         symbol = scan.get_symbol()
-        assert symbol.type == correct_type_list[i] , "got symbol " + symbol.string
+        assert symbol.type == correct_type_list[i] , "got symbol \"" + \
+        symbol.string + "\""
         i += 1
         if(symbol.type == scan.EOF):
             break
