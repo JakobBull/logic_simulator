@@ -73,26 +73,34 @@ def test_error_detection(file, expected_errors):
     devices = Devices(names)
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
+    scanner = Scanner(path, names)
+    parser = Parser(names, devices, network, monitors, scanner)
+    Error.reset()
+    parser.parse_network()
+    print("error types list" + str(Error.types))
+    for i in range(len(expected_errors)):
+        error = expected_errors[i] # the list for the ith error from expected_errors
+        # make sure error types stored in error class align with those expected
+        # by expected_errors
+        assert Error.types[i] == error[0] , "error #" + str(i) \
+        + " has error type " + str(Error.types[i]) + ", should be "+  str(error[0])
 
+        assert Error.symbols[i].string == error[1]
+        #assert(Error.symbols[i].line_number == error[2])
+        #assert(Error.symbols[i].start_char_number == error[3])
+
+def test_num_error_detected(file, expected_errors):
+    path = "parse_test_files/"
+    path += file
+    path += ".txt"
+
+    names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
     scanner = Scanner(path, names)
     parser = Parser(names, devices, network, monitors, scanner)
     parser.parse_network()
-    print("number of errors detected: ", end="")
-    print(len(Error.types))
-    for i in range(len(expected_errors)):
-        error = expected_errors[i] # the list for the ith error from expected_errors
-        # make sure error types stored in error class align with those expected
-        # by expected_errors
-        print(str(i+1)+":", end="\t")
-        print(Error.types[i], end="\t")
-        print(Error.symbols[i].string, end="\t")
-        print(Error.symbols[i].line_number, end="\t")
-        print(Error.symbols[i].start_char_number)
-    for i in range(len(expected_errors)):
-        error = expected_errors[i] # the list for the ith error from expected_errors
-        # make sure error types stored in error class align with those expected
-        # by expected_errors
-        assert(Error.types[i] == error[0])
-        assert(Error.symbols[i].string == error[1])
-        assert(Error.symbols[i].line_number == error[2])
-        assert(Error.symbols[i].start_char_number == error[3])
+    assert Error.num_errors == len(expected_errors), "expected " + \
+    str(len(expected_errors)) + " errors but got " + str(Error.num_errors) + \
+    " errors"

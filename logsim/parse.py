@@ -113,6 +113,7 @@ class Parser:
                     else:
                         self.parse_errors += 1
                         Error(0, self.symbol)
+                        self.OPENCURLY_search()
 
                 elif self.symbol.id == self.scanner.CONNECTIONS_ID:
 
@@ -124,6 +125,7 @@ class Parser:
                     else:
                         self.parse_errors += 1
                         Error(0, self.symbol)
+                        self.OPENCURLY_search()
 
                 elif self.symbol.id == self.scanner.SIGNALS_ID:
                     if (self.sections_complete == 2 and
@@ -134,6 +136,7 @@ class Parser:
                     else:
                         self.parse_errors += 1
                         Error(0, self.symbol)
+                        self.OPENCURLY_search()
 
                 elif self.symbol.id == self.scanner.MONITOR_ID:
                     if (self.sections_complete == 3 and
@@ -144,6 +147,7 @@ class Parser:
                     else:
                         self.parse_errors += 1
                         Error(0, self.symbol)
+                        self.OPENCURLY_search()
 
             elif (self.sections_complete == 4 and
                     self.headings_found == 5 and
@@ -161,7 +165,6 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.LEFT_BRACKET:
             self.parse_errors += 1
-
             Error(1, self.symbol)
         # print('{')
 
