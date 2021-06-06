@@ -858,7 +858,7 @@ class FrameManager:
             self.gui.path = self.path
         else:
             error = Error.gui_report_error(self.scanner)
-            Error.print_error(self.scanner)
+            print(error)
             print("Sorry, can't parse network.")
             self.menu.error_panel.SetValue(error)
 
