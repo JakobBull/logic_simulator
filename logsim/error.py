@@ -49,7 +49,7 @@ class Error:
         lines = cls.get_lines(scanner)
         print(str(cls.num_errors) + " ERRORS!:\n")
         for i in range(cls.num_errors):
-            print("Error " + str(i) + ":")
+            print("Line " + str(cls.symbols[i].line_number) + ":")
             line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:
@@ -105,7 +105,7 @@ class Error:
             error_string += "\n"
             error_string += ""
         return error_string
-   
+
     @classmethod
     def get_lines(cls, scanner):
         try:
@@ -116,3 +116,10 @@ class Error:
         except IOError:
             print("error, can't find or open file")
             sys.exit()
+
+    @classmethod
+    def reset(cls):
+        """Reset error class variables"""
+        cls.num_errors = 0
+        types = []
+        symbols = []

@@ -89,16 +89,16 @@ class Parser:
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
 
-        print(self.gate_var_inputs_IDs)
-        print("Netowrk_ID: ", self.scanner.NETWORK_ID)
+        # print(self.gate_var_inputs_IDs)
+        # print("Netowrk_ID: ", self.scanner.NETWORK_ID)
         while True:
 
             # Call for the next symbol from scanner
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.KEYWORD:
                 # Check if symbol is a Heading
-                print('Keyword')
-                print(self.symbol.string)
+                # print('Keyword')
+                # print(self.symbol.string)
                 if self.symbol.id == self.scanner.NETWORK_ID:
                     self.headings_found += 1
                     self.OPENCURLY_search()
@@ -108,7 +108,7 @@ class Parser:
                     if (self.sections_complete == 0 and
                             self.headings_found == 1):
                         self.headings_found += 1
-                        print("devices")
+                        # print("devices")
                         self.device_list()
                     else:
                         self.parse_errors += 1
@@ -119,7 +119,7 @@ class Parser:
                     if (self.sections_complete == 1 and
                             self.headings_found == 2):
                         self.headings_found += 1
-                        print("connections")
+                        # print("connections")
                         self.connection_list()
                     else:
                         self.parse_errors += 1
@@ -129,7 +129,7 @@ class Parser:
                     if (self.sections_complete == 2 and
                             self.headings_found == 3):
                         self.headings_found += 1
-                        print("signals")
+                        # print("signals")
                         self.setsignal_list()
                     else:
                         self.parse_errors += 1
@@ -149,8 +149,8 @@ class Parser:
                     self.headings_found == 5 and
                     self.parse_errors == 0 and
                     self.symbol.type == self.scanner.EOF):
-                print(self.symbol.string)
-                print("complete")
+                # print(self.symbol.string)
+                # print("complete")
                 return True
             elif self.symbol.type == self.scanner.EOF:
                 Error.print_error(self.scanner)
@@ -163,7 +163,7 @@ class Parser:
             self.parse_errors += 1
 
             Error(1, self.symbol)
-        print('{')
+        # print('{')
 
     def device_list(self):
         """Parse the device list."""
@@ -172,12 +172,12 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         self.device_parse()
         self.symbol = self.scanner.get_symbol()
-        print(self.symbol.string)
+        # print(self.symbol.string)
         while self.symbol.type == self.scanner.SEMICOLON:
-            print(self.symbol.string)
+            # print(self.symbol.string)
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                print(self.symbol.string)
+                # print(self.symbol.string)
                 self.devices_parsed = True
                 self.sections_complete += 1
                 break
@@ -202,7 +202,7 @@ class Parser:
             # add symbol id to a list of device ids
             self.device_names.append(self.symbol.id)
             self.new_device_id = self.symbol.id
-            print(self.symbol.string)
+            # print(self.symbol.string)
             self.symbol = self.scanner.get_symbol()
             # Get next symbol which should be an = sign
             if self.symbol.type != self.scanner.EQUALS:
@@ -211,7 +211,7 @@ class Parser:
                 self.advance_line_error()
             else:
                 self.symbol = self.scanner.get_symbol()
-                print(self.symbol.string)
+                # print(self.symbol.string)
 
                 if self.symbol.id not in self.device_IDs:
                     self.new_device_id = self.symbol.id
@@ -228,15 +228,15 @@ class Parser:
                             self.new_device_id, self.new_device_type, None)
 
                     elif self.symbol.id == self.scanner.SWITCH_ID:
-                        print('switch found')
+                        # print('switch found')
                         # self.symbol = self.scanner.get_symbol()
                         self.devices.make_switch(self.new_device_id, 0)
 
                     elif self.symbol.id in self.gate_var_inputs_IDs:
-                        print("gate found")
-                        print("symbol string", self.symbol.string)
-                        print("symbol id: ", self.symbol.id)
-                        print("symbol type:", self.symbol.type)
+                        # print("gate found")
+                        # print("symbol string", self.symbol.string)
+                        # print("symbol id: ", self.symbol.id)
+                        # print("symbol type:", self.symbol.type)
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "inputs":
                             self.parse_errors += 1
@@ -244,7 +244,7 @@ class Parser:
                             self.advance_line_error()
                         else:
                             self.symbol = self.scanner.get_symbol()
-                            print(self.symbol.string)
+                            # print(self.symbol.string)
                             if self.symbol.type != self.scanner.NUMBER:
                                 self.parse_errors += 1
                                 Error(7, self.symbol)
@@ -292,7 +292,7 @@ class Parser:
             # Go to first symbol of next line
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
                 # Check if } which denotes end of connections
-                print(self.devices.devices_list)
+                # print(self.devices.devices_list)
                 self.connections_parsed = True
                 self.sections_complete += 1
                 break
@@ -323,7 +323,7 @@ class Parser:
 
             else:
                 self.symbol = self.scanner.get_symbol()
-                print(self.symbol.string)
+                # print(self.symbol.string)
                 if self.symbol.type != self.scanner.NAME:
                     self.parse_errors += 1
                     Error(10, self.symbol)
