@@ -95,5 +95,5 @@ class Error:
     def reset(cls):
         """Reset error class variables"""
         cls.num_errors = 0
-        types = []
-        symbols = []
+        cls.types = []
+        cls.symbols = []
