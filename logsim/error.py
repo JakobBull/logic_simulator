@@ -128,35 +128,35 @@ class Error:
         #error_string += str(str(cls.num_errors) + " ERRORS!:\n")
         error_string += "1 ERROR!: \n"
         error_string += "\n"
-        #for i in range(cls.num_errors):
-        i = 0
-        error_string += str("Error " + str(i+1) + ":")
-        error_string += "\n"
-        line = lines[cls.symbols[i].line_number - 1]
-        start_spaces = 0
-        for c in line:
-            if c.isspace():
-                start_spaces += 1
-            else:
-                break
-        start = cls.symbols[i].start_char_number
-        end = cls.symbols[i].end_char_number
-        error_string += str("\"" + line.strip() + "\"")
-        error_string += "\n"
-        cursor = cls.symbols[i].start_char_number - start_spaces
-        print("Cursor adding", cursor, "spaces")
-        for _ in range(cursor):
-            error_string += ' '
-        error_string += str("^")
-        error_string += "\n"
-        error_string += str(cls.error_message[cls.types[i]])
-        # for n in range(len(Error.error_message[Error.types[i]])):
-        #    print('-', end = '')
-        error_string += "\n"
-        for _ in range(8):
-            error_string += str('-')
-        error_string += "\n"
-        error_string += ""
+        for i in range(cls.num_errors):
+        #i = 0
+            error_string += str("Error " + str(i+1) + ":")
+            error_string += "\n"
+            line = lines[cls.symbols[i].line_number - 1]
+            start_spaces = 0
+            for c in line:
+                if c.isspace():
+                    start_spaces += 1
+                else:
+                    break
+            start = cls.symbols[i].start_char_number
+            end = cls.symbols[i].end_char_number
+            error_string += str("\"" + line.strip() + "\"")
+            error_string += "\n"
+            cursor = cls.symbols[i].start_char_number - start_spaces
+            print("Cursor adding", cursor, "spaces")
+            for _ in range(cursor):
+                error_string += ' '
+            error_string += str("^")
+            error_string += "\n"
+            error_string += str(cls.error_message[cls.types[i]])
+            # for n in range(len(Error.error_message[Error.types[i]])):
+            #    print('-', end = '')
+            error_string += "\n"
+            for _ in range(8):
+                error_string += str('-')
+            error_string += "\n"
+            error_string += ""
         return error_string
 
     @classmethod
