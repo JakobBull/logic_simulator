@@ -82,7 +82,10 @@ def test_error_detection(file, expected_errors):
         error = expected_errors[i] # the list for the ith error from expected_errors
         # make sure error types stored in error class align with those expected
         # by expected_errors
-        assert Error.types[i] == error[0] , "error #" + str(i) \
+        assert Error.types[i] == error[0] , str(i) + "/" + \
+        str(len(expected_errors)) + " error #" + str(i) + " on line " + \
+        str(Error.symbols[i].line_number) + " caused by symbol \"" + \
+        Error.symbols[i].string + "\"" \
         + " has error type " + str(Error.types[i]) + ", should be "+  str(error[0])
 
         assert Error.symbols[i].string == error[1]

@@ -51,14 +51,15 @@ class Parser:
             self.scanner.AND_ID,
             self.scanner.NAND_ID,
             self.scanner.OR_ID,
-            self.scanner.NOR_ID
+            self.scanner.NOR_ID,
+            self.scanner.XOR_ID,
+
         ]
         self.device_IDs = [
             self.scanner.AND_ID,
             self.scanner.NAND_ID,
             self.scanner.OR_ID,
             self.scanner.NOR_ID,
-            self.scanner.XOR_ID,
             self.scanner.XOR_ID,
             self.scanner.DTYPE_ID,
             self.scanner.SWITCH_ID,
@@ -92,73 +93,50 @@ class Parser:
         # print(self.gate_var_inputs_IDs)
         # print("Netowrk_ID: ", self.scanner.NETWORK_ID)
         while True:
-
             # Call for the next symbol from scanner
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.KEYWORD:
                 # Check if symbol is a Heading
-                # print('Keyword')
-                # print(self.symbol.string)
                 if self.symbol.id == self.scanner.NETWORK_ID:
                     self.headings_found += 1
                     self.OPENCURLY_search()
+                    # report error 0 if network isn't the first heading found
+                    if(self.headings_found != 1):
+                        Error(0, self.symbol)
 
                 elif self.symbol.id == self.scanner.DEVICES_ID:
-
-                    if (self.sections_complete == 0 and
-                            self.headings_found == 1):
-                        self.headings_found += 1
-                        # print("devices")
-                        self.device_list()
-                    else:
-                        self.parse_errors += 1
+                    self.headings_found += 1
+                    self.device_list()
+                    # report error 0 if network isn't the 2nd heading found
+                    if(self.headings_found != 2):
                         Error(0, self.symbol)
-                        self.OPENCURLY_search()
 
                 elif self.symbol.id == self.scanner.CONNECTIONS_ID:
-
-                    if (self.sections_complete == 1 and
-                            self.headings_found == 2):
-                        self.headings_found += 1
-                        # print("connections")
-                        self.connection_list()
-                    else:
-                        self.parse_errors += 1
+                    self.headings_found += 1
+                    self.connection_list()
+                    # report error 0 if network isn't the 3rd heading found
+                    if(self.headings_found != 3):
                         Error(0, self.symbol)
-                        self.OPENCURLY_search()
 
                 elif self.symbol.id == self.scanner.SIGNALS_ID:
-                    if (self.sections_complete == 2 and
-                            self.headings_found == 3):
-                        self.headings_found += 1
-                        # print("signals")
-                        self.setsignal_list()
-                    else:
-                        self.parse_errors += 1
+                    self.headings_found += 1
+                    self.setsignal_list()
+                    # report error 0 if network isn't the 4th heading found
+                    if(self.headings_found != 4):
                         Error(0, self.symbol)
-                        self.OPENCURLY_search()
 
                 elif self.symbol.id == self.scanner.MONITOR_ID:
-                    if (self.sections_complete == 3 and
-                            self.headings_found == 4):
-                        self.headings_found += 1
-                        self.monitor_list()
-
-                    else:
-                        self.parse_errors += 1
+                    self.headings_found += 1
+                    self.monitor_list()
+                    # report error 0 if network isn't the 2nd heading found
+                    if(self.headings_found != 5):
                         Error(0, self.symbol)
-                        self.OPENCURLY_search()
-
-            elif (self.sections_complete == 4 and
-                    self.headings_found == 5 and
-                    self.parse_errors == 0 and
-                    self.symbol.type == self.scanner.EOF):
-                # print(self.symbol.string)
-                # print("complete")
-                return True
-            elif self.symbol.type == self.scanner.EOF:
-                print(Error.gui_report_error(self.scanner))
-                return False
+            if self.symbol.type ==  self.scanner.EOF:
+                if Error.num_errors == 0:
+                    return True
+                else:
+                    print(Error.gui_report_error(self.scanner))
+                    return False
 
     def OPENCURLY_search(self):
         """Search for a { after a heading."""
@@ -190,32 +168,32 @@ class Parser:
 
     def device_parse(self):
         """Parse a single line of a device definition."""
+        errors_start = Error.num_errors # errors started with
         # Expected format : name EQUALS device
-
-        if self.symbol.type != self.scanner.NAME:
-            self.parse_errors += 1
-            Error(2, self.symbol)
-            self.advance_line_error()
-
-        else:
-            if self.symbol.id in self.device_names:
-                self.parse_errors += 1
+        #symbol 1: Name
+        if self.symbol.type == self.scanner.NAME: # if first symbol of line is a name
+            if self.symbol.id in self.device_names: # if a name has already been used as a device, call error 3
                 Error(3, self.symbol)
-                self.advance_line_error()
-            # add symbol id to a list of device ids
-            self.device_names.append(self.symbol.id)
-            self.new_device_id = self.symbol.id
-            # print(self.symbol.string)
-            self.symbol = self.scanner.get_symbol()
-            # Get next symbol which should be an = sign
-            if self.symbol.type != self.scanner.EQUALS:
-                self.parse_errors += 1
-                Error(4, self.symbol)
-                self.advance_line_error()
-            else:
-                self.symbol = self.scanner.get_symbol()
-                # print(self.symbol.string)
+        else: # if symbol isn't a name have error 2, and then consider future symbols for errors
+            Error(2, self.symbol)
 
+        self.symbol = self.scanner.get_symbol() # next symbol
+
+        #symbol 2: '='
+        if self.symbol.type != self.scanner.EQUALS:
+            Error(4, self.symbol)
+
+        self.symbol = self.scanner.get_symbol() # next symbol
+
+        #symbol 3: Device
+
+
+
+
+
+
+
+            # charlie's code
                 if self.symbol.id not in self.device_IDs:
                     self.new_device_id = self.symbol.id
                     self.parse_errors += 1
@@ -225,10 +203,10 @@ class Parser:
                 else:
                     self.new_device_type = self.symbol.id
 
-                    if (self.symbol.id == self.scanner.XOR_ID or
-                            self.symbol.id == self.scanner.DTYPE_ID):
-                        self.devices.make_device(
-                            self.new_device_id, self.new_device_type, None)
+                    if (self.symbol.id == self.scanner.DTYPE_ID):
+                        pass
+                        #self.devices.make_device(
+                        #    self.new_device_id, self.new_device_type, None)
 
                     elif self.symbol.id == self.scanner.SWITCH_ID:
                         # print('switch found')
@@ -236,10 +214,6 @@ class Parser:
                         self.devices.make_switch(self.new_device_id, 0)
 
                     elif self.symbol.id in self.gate_var_inputs_IDs:
-                        # print("gate found")
-                        # print("symbol string", self.symbol.string)
-                        # print("symbol id: ", self.symbol.id)
-                        # print("symbol type:", self.symbol.type)
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.string != "inputs":
                             self.parse_errors += 1

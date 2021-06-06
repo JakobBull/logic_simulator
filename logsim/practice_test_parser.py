@@ -1,9 +1,12 @@
+from names import Names
+from devices import Devices
+from network import Network
+from monitors import Monitors
+from parse import Parser
 from scanner import Symbol
 from scanner import Scanner
-from names import Names
-from parse import Parser
-#from devices import Device
-#from network import Network
+from error import Error
+
 import sys
 import os
 
@@ -31,9 +34,13 @@ def main():
         path = os.getcwd()+ "/" + arguments[0]
         print(path)    #print path
         names = Names()
-        scan = Scanner(path, names)
-        parse = Parser(names, scan)
-        parse.parse_network()
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        scanner = Scanner(path, names)
+        parser = Parser(names, devices, network, monitors, scanner)
+        Error.reset()
+        parser.parse_network()
 
 if __name__ == "__main__":
     main()
