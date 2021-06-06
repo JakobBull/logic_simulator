@@ -171,11 +171,11 @@ class Parser:
         errors_start = Error.num_errors # errors started with
         # Expected format : name EQUALS device
         #symbol 1: Name
-        if self.symbol.type == self.scanner.NAME: # if first symbol of line is a name
+        if self.symbol.type != self.scanner.NAME: # if first symbol of line is a not a name, error 2
+            Error(2, self.symbol)
+        else:   # if first symbol is a name
             if self.symbol.id in self.device_names: # if a name has already been used as a device, call error 3
                 Error(3, self.symbol)
-        else: # if symbol isn't a name have error 2, and then consider future symbols for errors
-            Error(2, self.symbol)
 
         self.symbol = self.scanner.get_symbol() # next symbol
 
@@ -186,7 +186,8 @@ class Parser:
         self.symbol = self.scanner.get_symbol() # next symbol
 
         #symbol 3: Device
-
+        if self.symbol.id not in self.device_IDs:
+            Error(5, self.symbol)
 
 
 
@@ -195,7 +196,7 @@ class Parser:
 
             # charlie's code
                 if self.symbol.id not in self.device_IDs:
-                    self.new_device_id = self.symbol.id
+                    self.new_device_id = self.symbol.id #!!! why this? what is this doing? new device id if not given a device?
                     self.parse_errors += 1
                     Error(5, self.symbol)
                     self.advance_line_error()
