@@ -45,41 +45,16 @@ class Error:
         cls.num_errors += 1           # everytime an error called, number of errors increased
 
     @classmethod
-    def print_error(cls, scanner):
-        lines = cls.get_lines(scanner)
-        print(str(cls.num_errors) + " ERRORS!:\n")
-        for i in range(cls.num_errors):
-            print("Line " + str(cls.symbols[i].line_number) + ":")
-            line = lines[cls.symbols[i].line_number-1]
-            start_spaces = 0
-            for c in line:
-                if c.isspace():
-                    start_spaces+=1
-                else: break
-            start = cls.symbols[i].start_char_number
-            end = cls.symbols[i].end_char_number
-            print("\"" + line.strip() + "\"")
-            cursor = cls.symbols[i].start_char_number-start_spaces
-            for n in range(cursor):
-                print(' ', end = '')
-            print("^")
-            print(cls.error_message[cls.types[i]])
-            #for n in range(len(Error.error_message[Error.types[i]])):
-            #    print('-', end = '')
-            for n in range(8):
-                print('-', end = '')
-            print("")
-
-    @classmethod
     def gui_report_error(cls, path):
-        print("GUI reporting errros")
         error_string = ""
         lines = cls.get_lines(path)
-        error_string += str(str(cls.num_errors) + " ERRORS!:\n")
+        error_string += str(str(cls.num_errors) + " ERRORS!\n")
+        error_string += "=========="
         error_string += "\n"
         for i in range(cls.num_errors):
-            error_string += str("Error " + str(i) + ":")
-            error_string += "\n"
+            error_string += "Error " + str(i) + " on line " + str(cls.symbols[i].line_number) + ":\n"
+            #error_string += str("Error " + str(i) + ":")
+            #error_string += "\n"
             line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:
@@ -100,8 +75,7 @@ class Error:
             #for n in range(len(Error.error_message[Error.types[i]])):
             #    print('-', end = '')
             error_string += "\n"
-            for _ in range(8):
-                error_string += str('-')
+            error_string += "--------"
             error_string += "\n"
             error_string += ""
         return error_string

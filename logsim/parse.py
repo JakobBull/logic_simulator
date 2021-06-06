@@ -153,7 +153,7 @@ class Parser:
                 # print("complete")
                 return True
             elif self.symbol.type == self.scanner.EOF:
-                Error.print_error(self.scanner)
+                print(Error.gui_report_error(self.scanner))
                 return False
 
     def OPENCURLY_search(self):
