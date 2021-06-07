@@ -22,6 +22,7 @@ import wx.lib.scrolledpanel as scrolled
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 from error import Error
+import builtins
 
 from names import Names
 from devices import Devices
@@ -1064,6 +1065,13 @@ class FrameManager:
         """
         self.title = title
         self.app = wx.App()
+        builtins._ = wx.GetTranslation
+
+        locale = wx.Locale()
+        locale.Init(wx.LANGUAGE_DEFAULT)
+        locale.AddCatalogLookupPathPrefix('./locale')
+        locale.AddCatalog('self.gui')
+        locale.AddCatalog('self.menu)')
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
