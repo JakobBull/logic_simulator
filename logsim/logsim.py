@@ -13,7 +13,7 @@ Graphical user interface: logsim.py <file path>
 import getopt
 import gui
 import sys
-
+import builtins
 import wx
 import io
 
@@ -27,6 +27,7 @@ from userint import UserInterface
 from gui import Gui
 
 
+
 def main(arg_list):
     """
     Parse the command line options and arguments specified in arg_list.
@@ -34,6 +35,24 @@ def main(arg_list):
     Run either the command line user interface, the graphical user interface,
     or display the usage message.
     """
+    app = wx.App()
+
+    # Internationalisation
+
+    builtins._ = wx.GetTranslation
+
+    locale = wx.Locale()
+
+    locale.Init(wx.LANGUAGE_DEFAULT)
+
+    locale.AddCatalogLookupPathPrefix('./locale')
+
+    locale.AddCatalog('gui')
+
+
+
+    # gui = Gui("Logic Simulator", path, names, devices, network, monitors)
+
 
     usage_message = ("Usage:\n"
                      "Show help: logsim.py -h\n"

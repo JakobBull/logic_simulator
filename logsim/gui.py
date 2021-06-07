@@ -241,12 +241,12 @@ class SidePanel(wx.Panel):
         # Configure the widgets
 
         # control setting number of cycles
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
+        self.text = wx.StaticText(self, wx.ID_ANY, _("Cycles"))
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
 
         # run and continue buttons
-        self.run_button = wx.Button(self, wx.ID_ANY, "Run")
-        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
+        self.run_button = wx.Button(self, wx.ID_ANY, _("Run"))
+        self.continue_button = wx.Button(self, wx.ID_ANY, _("Continue"))
 
         """Setting the value of a signal/ switch
         switch_box takes the value
@@ -259,10 +259,10 @@ class SidePanel(wx.Panel):
                     self.parent.devices.SWITCH)])
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
-        self.add_switch_button = wx.Button(self, -1, "Set")
+        self.add_switch_button = wx.Button(self, -1, _("Set"))
 
         self.monitor_text = wx.StaticText(
-            self, wx.ID_ANY, "Set outputs to monitor")
+            self, wx.ID_ANY, _("Set outputs to monitor"))
         # monitor_sizer
         all = [self.parent.names.get_name_string(
             i) for i in self.parent.devices.find_devices(None)]
@@ -272,17 +272,17 @@ class SidePanel(wx.Panel):
             i) for i in self.parent.devices.find_devices(self.parent.devices.CLOCK)]
         choices = [i for i in all if i not in switches and i not in clocks]
         self.monitor_combobox = wx.ComboBox(
-            self, wx.ID_ANY, "Select", choices=choices)
-        self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
+            self, wx.ID_ANY, _("Select"), choices=choices)
+        self.add_monitor_button = wx.Button(self, wx.ID_ANY, _("Add"))
 
         self.remove_monitor_text = wx.StaticText(
-            self, wx.ID_ANY, "Remove monitor")
+            self, wx.ID_ANY, _("Remove monitor"))
         # remove_monitor_sizer
         self.remove_monitor_combobox = wx.ComboBox(
-            self, wx.ID_ANY, "Select", choices=[
+            self, wx.ID_ANY, _("Select"), choices=[
                 item.name for item in self.scrolled_panel.item_list])
-        self.remove_monitor_button = wx.Button(self, wx.ID_ANY, "Remove")
-        self.remove_all_button = wx.Button(self, wx.ID_ANY, "Remove all")
+        self.remove_monitor_button = wx.Button(self, wx.ID_ANY, _("Remove"))
+        self.remove_all_button = wx.Button(self, wx.ID_ANY, _("Remove all"))
         self.remove_all_button.SetForegroundColour('#ff1a1a')
 
         # Bind events to widgets
@@ -814,9 +814,9 @@ class FilePanel(wx.Panel):
         self.parent = parent
         self.path = None
 
-        search_file_button = wx.Button(self, wx.ID_ANY, "Search file")
-        save_as_button = wx.Button(self, wx.ID_ANY, "Save as")
-        gui_button = wx.Button(self, wx.ID_ANY, "Continue to GUI")
+        search_file_button = wx.Button(self, wx.ID_ANY, _("Search file"))
+        save_as_button = wx.Button(self, wx.ID_ANY, _("Save as"))
+        gui_button = wx.Button(self, wx.ID_ANY, _("Continue to GUI"))
 
         search_file_button.Bind(wx.EVT_BUTTON, self.on_open_file)
         save_as_button.Bind(wx.EVT_BUTTON, self.on_save_file)
@@ -843,9 +843,9 @@ class FilePanel(wx.Panel):
         )
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            print("You chose the following file:")
+            print(_("You chose the following file:"))
         dlg.Destroy()
-        print("Filepath is", path)
+        print(_("Filepath is"), path)
         if path is not None:
             print("setting text")
             self.parent.text_editor.set_text(path)
@@ -857,7 +857,7 @@ class FilePanel(wx.Panel):
                     self.parent.parent.file = io.StringIO(
                         self.parent.parent.content)
             except IOError:
-                print("error, can't find or open file")
+                print(_("error, can't find or open file"))
                 sys.exit()
             self.path = path
 
@@ -941,9 +941,9 @@ class GuiControlPanel(wx.Panel):
         self.parent = parent
         self.path = None
 
-        self.return_button = wx.Button(self, wx.ID_ANY, "Back to text editor")
-        self.save_as_button = wx.Button(self, wx.ID_ANY, "Save as")
-        self.help_button = wx.Button(self, wx.ID_ANY, "Help")
+        self.return_button = wx.Button(self, wx.ID_ANY, _("Back to text editor"))
+        self.save_as_button = wx.Button(self, wx.ID_ANY, _("Save as"))
+        self.help_button = wx.Button(self, wx.ID_ANY, _("Help"))
 
         self.return_button.Bind(wx.EVT_BUTTON, self.on_return_button)
         self.save_as_button.Bind(wx.EVT_BUTTON, self.on_save_file)
