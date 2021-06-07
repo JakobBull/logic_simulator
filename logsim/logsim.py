@@ -116,24 +116,16 @@ def main(arg_list):
 
         Call the gui FrameManager to handle all operation.
         """
-        app = wx.App()
+
+        language = sys.argv[-1]
+
+
 
         # Internationalisation
+    
 
-        """builtins._ = wx.GetTranslation
-        
-        locale = wx.Locale()
 
-        locale.Init(wx.LANGUAGE_DEFAULT)
-        
-        # locale.AddCatalogLookupPathPrefix('./.locale')
-        print(locale.GetLanguage())
-        print(locale.GetLanguageCanonicalName(locale.GetLanguage()))
-        print(locale.GetLanguageCanonicalName(89))
-
-        locale.AddCatalog('./.locale/de_DE')
-        updateLanguage("de")"""
-        gui.FrameManager("Logic Simulator")
+        gui.FrameManager("Logic Simulator", language)
         #app.MainLoop()
 
 if __name__ == "__main__":

@@ -1059,7 +1059,7 @@ class FrameManager:
 
     """
 
-    def __init__(self, title):
+    def __init__(self, title, language):
         """Launch app.
 
         Create MenuFrame.
@@ -1067,18 +1067,14 @@ class FrameManager:
         self.title = title
         self.app = wx.App()
         builtins._ = wx.GetTranslation
-        locale = wx.Locale()
-        print(locale.getlocale())
-        """locale = wx.Locale()
-        locale.Init(wx.LANGUAGE_DEFAULT)
-        locale.AddCatalogLookupPathPrefix('/locale')
-        locale.AddCatalog('de_DE.mo')"""
-        de = gettext.translation('de_DE', localedir='locale', languages=['de'])
-        de.install()
-        _ = de.gettext
+        if language == "de":
+            de = gettext.translation('de_DE', localedir='locale', languages=['de'])
+            de.install()
+            _ = de.gettext
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
+        
 
     def show_gui(self, path):
         """Show the gui.
