@@ -117,7 +117,7 @@ class Parser:
                     # report error 0 if network isn't the 3rd heading found
                     if(self.headings_found != 3):
                         Error(0, self.symbol)
-                    self.connection_list()
+                    #self.connection_list()
 
                 elif self.symbol.id == self.scanner.SIGNALS_ID:
                     self.headings_found += 1
@@ -238,7 +238,7 @@ class Parser:
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
                 self.sections_complete += 1
                 break
-    
+
     def connection_parse(self):
         """Parse a single connection."""
         errors_start = Error.num_errors # errors started with
