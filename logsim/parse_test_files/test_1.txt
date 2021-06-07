@@ -12,6 +12,7 @@ CONNECTIONS{
   SIGNALS{
     SW19 = 0;
     SW2 0;
+    SW1 = 1;
   }
   MONITOR{
     G1
