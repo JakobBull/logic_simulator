@@ -11,6 +11,69 @@ import pytest
 import sys
 import os
 
+def test_device_list():
+    path = "parse_test_files/test_device_list.txt"
+    expected_errors = [
+        [1,"SW1",5,5],
+        [2,"912",6,5],
+        [3,"SW1",7,5],
+        [4,"-",8,8]
+    ]
+    names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
+    scanner = Scanner(path, names)
+    parser = Parser(names, devices, network, monitors, scanner)
+    Error.reset()
+    parser.device_list()
+    print(Error.gui_report_error(scanner))
+    for i in range(len(expected_errors)):
+        error = expected_errors[i] # the list for the ith error from expected_errors
+        # make sure error types stored in error class align with those expected
+        # by expected_errors
+        assert Error.types[i] == error[0] , str(i+1) + "/" + \
+        str(len(expected_errors)) + " error #" + str(i) + " on line " + \
+        str(Error.symbols[i].line_number) + " caused by symbol \"" + \
+        Error.symbols[i].string + "\"" \
+        + " has error type " + str(Error.types[i]) + ", should be "+  str(error[0])
+
+        assert Error.symbols[i].string == error[1]
+        #assert(Error.symbols[i].line_number == error[2])
+        #assert(Error.symbols[i].start_char_number == error[3])
+
+def test_connection_list():
+    path = "parse_test_files/test_connection_list.txt"
+    expected_errors = [
+        [13,"1",11,14],
+        [12,";",12,15],
+        [11,"G2.I1",13,8],
+        [10,"G22",14,5],
+    ]
+    names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
+    scanner = Scanner(path, names)
+    parser = Parser(names, devices, network, monitors, scanner)
+    Error.reset()
+    parser.connection_list()
+    print(Error.gui_report_error(scanner))
+    for i in range(len(expected_errors)):
+        error = expected_errors[i] # the list for the ith error from expected_errors
+        # make sure error types stored in error class align with those expected
+        # by expected_errors
+        assert Error.types[i] == error[0] , str(i+1) + "/" + \
+        str(len(expected_errors)) + " error #" + str(i) + " on line " + \
+        str(Error.symbols[i].line_number) + " caused by symbol \"" + \
+        Error.symbols[i].string + "\"" \
+        + " has error type " + str(Error.types[i]) + ", should be "+  str(error[0])
+
+        assert Error.symbols[i].string == error[1]
+        #assert(Error.symbols[i].line_number == error[2])
+        #assert(Error.symbols[i].start_char_number == error[3])
+
+"""
 @pytest.mark.parametrize(
     "file, expected_errors",
     # expected_errors, list of list of properties for each error that should occur
@@ -107,3 +170,4 @@ def test_num_error_detected(file, expected_errors):
     assert Error.num_errors == len(expected_errors), "expected " + \
     str(len(expected_errors)) + " errors but got " + str(Error.num_errors) + \
     " errors"
+"""

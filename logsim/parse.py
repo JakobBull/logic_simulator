@@ -47,6 +47,7 @@ class Parser:
         self.id = None
         self.parse_errors = 0
         self.device_names = []
+        self.connected_inputs = []
         self.gate_var_inputs_IDs = [
             self.scanner.AND_ID,
             self.scanner.NAND_ID,
@@ -106,28 +107,28 @@ class Parser:
 
                 elif self.symbol.id == self.scanner.DEVICES_ID:
                     self.headings_found += 1
-                    self.device_list()
                     # report error 0 if network isn't the 2nd heading found
                     if(self.headings_found != 2):
                         Error(0, self.symbol)
+                    self.device_list()
 
                 elif self.symbol.id == self.scanner.CONNECTIONS_ID:
                     self.headings_found += 1
-                    self.connection_list()
                     # report error 0 if network isn't the 3rd heading found
                     if(self.headings_found != 3):
                         Error(0, self.symbol)
+                    self.connection_list()
 
                 elif self.symbol.id == self.scanner.SIGNALS_ID:
                     self.headings_found += 1
-                    self.setsignal_list()
+                    #self.setsignal_list()
                     # report error 0 if network isn't the 4th heading found
                     if(self.headings_found != 4):
                         Error(0, self.symbol)
 
                 elif self.symbol.id == self.scanner.MONITOR_ID:
                     self.headings_found += 1
-                    self.monitor_list()
+                    #self.monitor_list()
                     # report error 0 if network isn't the 2nd heading found
                     if(self.headings_found != 5):
                         Error(0, self.symbol)
@@ -144,27 +145,21 @@ class Parser:
         if self.symbol.type != self.scanner.LEFT_BRACKET:
             self.parse_errors += 1
             Error(1, self.symbol)
-        # print('{')
 
     def device_list(self):
         """Parse the device list."""
-        self.OPENCURLY_search()
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != self.scanner.LEFT_BRACKET:
+            Error(1, self.symbol)
+        else:
+            self.symbol = self.scanner.get_symbol()
 
-        self.symbol = self.scanner.get_symbol()
-        self.device_parse()
-        self.symbol = self.scanner.get_symbol()
-        # print(self.symbol.string)
-        while self.symbol.type == self.scanner.SEMICOLON:
-            # print(self.symbol.string)
+        while True:
+            self.device_parse()
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                # print(self.symbol.string)
-                self.devices_parsed = True
                 self.sections_complete += 1
                 break
-            else:
-                self.device_parse()
-                self.symbol = self.scanner.get_symbol()
 
     def device_parse(self):
         """Parse a single line of a device definition."""
@@ -176,6 +171,8 @@ class Parser:
         else:   # if first symbol is a name
             if self.symbol.id in self.device_names: # if a name has already been used as a device, call error 3
                 Error(3, self.symbol)
+            else:
+                self.device_names.append(self.symbol.id)
 
         self.symbol = self.scanner.get_symbol() # next symbol
 
@@ -185,184 +182,105 @@ class Parser:
 
         self.symbol = self.scanner.get_symbol() # next symbol
 
+
         #symbol 3: Device
+        gate = False
+        clock = False
         if self.symbol.id not in self.device_IDs:
             Error(5, self.symbol)
+        elif self.symbol.id in self.gate_var_inputs_IDs: #symbol is a gate, next symbol must be inputs
+            gate = True
+        elif self.symbol.id == self.scanner.CLOCK_ID: #symbol is a gate, next symbol must be inputs
+            clock = True
 
+        self.symbol = self.scanner.get_symbol() # next symbol
 
+        #symbol 4: "inputs" if gate, ';' if not. "halfperiod" if clock, ';' if not.
+        if gate:
+            if self.symbol.string != "inputs":
+                Error(6, self.symbol)
+        elif clock:
+            if self.symbol.string != "halfperiod":
+                Error(8, self.symbol)
+        else:
+            if self.symbol.type != self.scanner.SEMICOLON:
+                Error(10, self.symbol)
+            else:
+                return Error.num_errors - errors_start
 
+        #symbol 5 should be a number if gate or clock device
+        if gate or clock:
+            self.symbol = self.scanner.get_symbol() # next symbol
+            if gate:
+                if self.symbol.type != self.scanner.NUMBER and self.symbol.number < 1:
+                    Error(7, self.symbol)
+            elif clock:
+                if self.symbol.type != self.scanner.NUMBER and self.symbol.number < 1:
+                    Error(9, self.symbol)
 
-
-
-            # charlie's code
-                if self.symbol.id not in self.device_IDs:
-                    self.new_device_id = self.symbol.id #!!! why this? what is this doing? new device id if not given a device?
-                    self.parse_errors += 1
-                    Error(5, self.symbol)
-                    self.advance_line_error()
-
-                else:
-                    self.new_device_type = self.symbol.id
-
-                    if (self.symbol.id == self.scanner.DTYPE_ID):
-                        pass
-                        #self.devices.make_device(
-                        #    self.new_device_id, self.new_device_type, None)
-
-                    elif self.symbol.id == self.scanner.SWITCH_ID:
-                        # print('switch found')
-                        # self.symbol = self.scanner.get_symbol()
-                        self.devices.make_switch(self.new_device_id, 0)
-
-                    elif self.symbol.id in self.gate_var_inputs_IDs:
-                        self.symbol = self.scanner.get_symbol()
-                        if self.symbol.string != "inputs":
-                            self.parse_errors += 1
-                            Error(6, self.symbol)
-                            self.advance_line_error()
-                        else:
-                            self.symbol = self.scanner.get_symbol()
-                            # print(self.symbol.string)
-                            if self.symbol.type != self.scanner.NUMBER:
-                                self.parse_errors += 1
-                                Error(7, self.symbol)
-                                self.advance_line_error()
-
-                            if (self.symbol.number < 1 or
-                                    self.symbol.number > 16):
-                                self.parse_errors += 1
-                                Error(7, self.symbol)
-                                self.advance_line_error()
-
-                            else:
-                                self.devices.make_gate(
-                                    self.new_device_id, self.new_device_type,
-                                    self.symbol.number)
-
-                    elif self.symbol.id == self.scanner.CLOCK_ID:
-                        self.symbol = self.scanner.get_symbol()
-                        if self.symbol.string != "halfperiod":
-                            self.parse_errors += 1
-                            Error(8, self.symbol)
-                            self.advance_line_error()
-
-                        else:
-                            self.symbol = self.scanner.get_symbol()
-                            if self.symbol.type != self.scanner.NUMBER:
-                                self.parse_errors += 1
-                                Error(9, self.symbol)
-                                self.advance_line_error()
-                            else:
-                                self.devices.make_clock(
-                                    self.new_device_id, self.symbol.number)
+        #symbol 6 should be a ';' if gate or clock device
+        if gate or clock:
+            self.symbol = self.scanner.get_symbol() # next symbol
+            if self.symbol.type != self.scanner.SEMICOLON:
+                Error(10, self.symbol)
 
     def connection_list(self):
-        """Parse the connection list."""
-        self.OPENCURLY_search()
-
+        """Parse the device list."""
         self.symbol = self.scanner.get_symbol()
-        # Go to first symbol of line
-        self.connection_parse()
-        self.symbol = self.scanner.get_symbol()
-        # Go to last symbol of line, should be ;
-        while self.symbol.type == self.scanner.SEMICOLON:
+        if self.symbol.type != self.scanner.LEFT_BRACKET:
+            Error(1, self.symbol)
+        else:
             self.symbol = self.scanner.get_symbol()
-            # Go to first symbol of next line
+
+        while True:
+            self.connection_parse()
+            self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                # Check if } which denotes end of connections
-                # print(self.devices.devices_list)
-                self.connections_parsed = True
                 self.sections_complete += 1
                 break
-            else:
-                self.connection_parse()
-                self.symbol = self.scanner.get_symbol()
-                # Go to last symbol of line, should be ;
-
+    
     def connection_parse(self):
         """Parse a single connection."""
+        errors_start = Error.num_errors # errors started with
         # Expected format : name DASH name PERIOD Inumber
-
+        #symbol 1: Name
         if self.symbol.id not in self.device_names:
-            #  print("Not defined:", self.symbol.string)
-            self.parse_errors += 1
-            Error(10, self.symbol)
-            self.advance_line_error()
+            Error(11, self.symbol)
+        self.symbol = self.scanner.get_symbol() # next symbol
 
+        #symbol 2: '-'
+        if self.symbol.type != self.scanner.DASH:
+            Error(12, self.symbol)
+
+        self.symbol = self.scanner.get_symbol() # next symbol
+        #symbol 3: name
+        if self.symbol.id not in self.device_names:
+            Error(11, self.symbol)
+
+        self.symbol = self.scanner.get_symbol() # next symbol
+
+        #symbol 3: '.'
+        if self.symbol.id != self.scanner.PERIOD:
+            Error(13, self.symbol)
+
+        self.symbol = self.scanner.get_symbol() # next symbol
+
+        #symbol 4: I + input#
+        if self.symbol.string[0] != 'I':
+            Error(13, self.symbol)
         else:
-            [in_device_id, in_port_id] = self.signame_in()
+            input_num = "" + self.symbol.string[1:]
+            if not input_num.isdigit():
+                Error(13, self.symbol)
 
-            self.symbol = self.scanner.get_symbol()
+        self.symbol = self.scanner.get_symbol() # next symbol
+        if self.symbol.type == self.scanner.EOF:
+            return 0
 
-            if self.symbol.type != self.scanner.DASH:
-                self.parse_errors += 1
-                Error(11, self.symbol)
-                self.advance_line_error()
-
-            else:
-                self.symbol = self.scanner.get_symbol()
-                # print(self.symbol.string)
-                if self.symbol.type != self.scanner.NAME:
-                    self.parse_errors += 1
-                    Error(10, self.symbol)
-                    self.advance_line_error()
-
-                elif self.devices.get_device(
-                        self.symbol.id).device_kind == self.devices.D_TYPE:
-                    out_device_id = self.symbol.id
-                    self.symbol = self.scanner.get_symbol()
-                    if self.symbol.type != self.scanner.PERIOD:
-                        self.parse_errors += 1
-                        Error(12, self.symbol)
-                        self.advance_line_error()
-
-                    else:
-                        self.symbol = self.scanner.get_symbol()
-                        if self.symbol.id not in self.devices.dtype_input_ids:
-                            self.parse_errors += 1
-                            Error(13, self.symbol)
-                            self.advance_line_error()
-                        else:
-                            error_type = self.network.make_connection(
-                                in_device_id, in_port_id,
-                                out_device_id, self.symbol.id)
-                            if error_type != self.network.NO_ERROR:
-                                self.parse_errors += 1
-                                Error(15, self.symbol)
-                                self.advance_line_error()
-
-                else:
-
-                    out_device = self.devices.get_device(self.symbol.id)
-                    # out_device_id = out_device.device_id
-                    out_device_id = self.symbol.id
-                    self.symbol = self.scanner.get_symbol()
-                    if self.symbol.type != self.scanner.PERIOD:
-                        self.parse_errors += 1
-                        Error(12, self.symbol)
-                        self.advance_line_error()
-
-                    else:
-                        self.symbol = self.scanner.get_symbol()
-                        out_port_id = self.symbol.id
-                        self.input_list = list(self.symbol.string)
-                        if self.input_list[0] != "I":
-                            self.parse_errors += 1
-                            Error(13, self.symbol)
-                        self.input_number = "".join(self.input_list[1:])
-
-                        if self.input_number.isdigit() is False:
-                            self.parse_errors += 1
-                            Error(13, self.symbol)
-                            self.advance_line_error()
-
-                        error_type = self.network.make_connection(
-                            in_device_id, in_port_id,
-                            out_device_id, self.symbol.id)
-                        if error_type != self.network.NO_ERROR:
-                            self.parse_errors += 1
-                            Error(15, self.symbol)
-                            self.advance_line_error()
+        #symbol 5: ';'
+        if self.symbol.type != self.scanner.SEMICOLON:
+            Error(18, self.symbol)
+        print("hello")
 
     def signame_in(self):
         """Return the device ID and port ID for a device."""
