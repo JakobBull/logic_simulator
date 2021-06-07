@@ -120,7 +120,7 @@ def main(arg_list):
 
         # Internationalisation
 
-        builtins._ = wx.GetTranslation
+        """builtins._ = wx.GetTranslation
         
         locale = wx.Locale()
 
@@ -132,12 +132,12 @@ def main(arg_list):
         print(locale.GetLanguageCanonicalName(89))
 
         locale.AddCatalog('./.locale/de_DE')
-        updateLanguage("de")
+        updateLanguage("de")"""
         gui.FrameManager("Logic Simulator")
-        app.MainLoop()
+        #app.MainLoop()
 
 if __name__ == "__main__":
-    print(sys.argv[1])
+    #print(sys.argv[1])
     main(sys.argv[1:])
 
 

@@ -1068,10 +1068,9 @@ class FrameManager:
         builtins._ = wx.GetTranslation
 
         locale = wx.Locale()
-        locale.Init(wx.LANGUAGE_DEFAULT)
-        locale.AddCatalogLookupPathPrefix('./locale')
-        locale.AddCatalog('self.gui')
-        locale.AddCatalog('self.menu)')
+        locale.Init(wx.LANGUAGE_GERMAN)
+        locale.AddCatalogLookupPathPrefix('/.locale/')
+        locale.AddCatalog('de_DE.mo')
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
