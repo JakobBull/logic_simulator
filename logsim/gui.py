@@ -17,6 +17,7 @@ import time
 import sys
 import os
 import io
+import gettext
 from wx.core import HORIZONTAL
 import wx.lib.scrolledpanel as scrolled
 import wx.glcanvas as wxcanvas
@@ -1066,11 +1067,15 @@ class FrameManager:
         self.title = title
         self.app = wx.App()
         builtins._ = wx.GetTranslation
-
         locale = wx.Locale()
-        locale.Init(wx.LANGUAGE_GERMAN)
-        locale.AddCatalogLookupPathPrefix('/.locale/')
-        locale.AddCatalog('de_DE.mo')
+        print(locale.getlocale())
+        """locale = wx.Locale()
+        locale.Init(wx.LANGUAGE_DEFAULT)
+        locale.AddCatalogLookupPathPrefix('/locale')
+        locale.AddCatalog('de_DE.mo')"""
+        de = gettext.translation('de_DE', localedir='locale', languages=['de'])
+        de.install()
+        _ = de.gettext
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
@@ -1154,3 +1159,6 @@ class FrameManager:
             with open(path, "w") as file:
                 file.write(self.content)
         dlg.Destroy()
+
+if __name__ == "__main__":
+    FrameManager("Logic Simulator")
