@@ -111,7 +111,7 @@ class Monitors:
             signal_level = self.get_monitor_signal(device_id, output_id)
             self.monitors_dictionary[(device_id,
                                       output_id)].append(signal_level)
-            print(self.monitors_dictionary)
+
 
     def get_signal_names(self):
         """Return two signal name lists: monitored and not monitored."""

@@ -333,14 +333,12 @@ class Network:
     def execute_siggen(self, device_id):
         """If it is time to do so, set clock signals to RISING or FALLING."""
         #siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
+        
         device = self.devices.get_device(device_id)
-        if device.siggen_counter == len(str(device.siggen_pulse)):
-            device.siggen_counter = 0
-        else:
-            device.siggen_counter += 1
-        #output = str(device.siggen_pulse)
-        device.outputs[None] = str(device.siggen_pulse)[device.siggen_counter-1]
-        print(device.outputs[None])
+        
+        output = str(device.siggen_pulse)[device.siggen_counter-1]
+        int_out = int(output)
+        device.outputs[None] = int_out
         return True
 
     def update_clocks(self):
@@ -357,6 +355,16 @@ class Network:
                 elif output_signal == self.devices.LOW:
                     device.outputs[None] = self.devices.RISING
             device.clock_counter += 1
+    
+    def update_siggen(self):
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
+        for device_id in siggen_devices:
+            device = self.devices.get_device(device_id)
+            if device.siggen_counter == len(str(device.siggen_pulse)):
+                device.siggen_counter = 0
+            else:
+                device.siggen_counter += 1
+
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
@@ -375,6 +383,7 @@ class Network:
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
+        self.update_siggen()
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable
