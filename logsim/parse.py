@@ -147,13 +147,14 @@ class Parser:
         """Parse a single line of a device definition."""
         errors_start = Error.num_errors # errors started with
         # Expected format : name EQUALS device
-        #symbol 1: Name
+        # symbol 1: Name
         if self.symbol.type != self.scanner.NAME: # if first symbol of line is a not a name, error 2
             Error(2, self.symbol)
         else:   # if first symbol is a name
             if self.symbol.id in self.device_names: # if a name has already been used as a device, call error 3
                 Error(3, self.symbol)
             else:
+                self.new_device_id = self.symbol.id
                 self.device_names.append(self.symbol.id)
 
         self.symbol = self.scanner.get_symbol() # next symbol
@@ -172,21 +173,20 @@ class Parser:
         if self.symbol.type == self.scanner.EOF:
             return 1
 
-        #symbol 3: Device
+        # symbol 3: Device
         gate = False
         clock = False
         if self.symbol.id not in self.device_IDs:
             Error(5, self.symbol)
-        elif self.symbol.id in self.gate_var_inputs_IDs: #symbol is a gate, next symbol must be inputs
+        elif self.symbol.id in self.gate_var_inputs_IDs: 
+            # symbol is a gate, next symbol must be inputs
             gate = True
-        elif self.symbol.id == self.scanner.CLOCK_ID: #symbol is a gate, next symbol must be inputs
+        elif self.symbol.id == self.scanner.CLOCK_ID: 
+            # symbol is a clock, next symbol must be halfperiod
             clock = True
-
+        self.new_device_type = self.symbol.id
         self.symbol = self.scanner.get_symbol() # next symbol
-        if self.symbol.type == self.scanner.SEMICOLON:
-            return 0
-        if self.symbol.type == self.scanner.EOF:
-            return 1
+        
 
         #symbol 4: "inputs" if gate, ';' if not. "halfperiod" if clock, ';' if not.
         if gate:
@@ -195,15 +195,29 @@ class Parser:
         elif clock:
             if self.symbol.string != "halfperiod":
                 Error(8, self.symbol)
+        elif (self.symbol.type == self.scanner.SEMICOLON and
+                self.new_device_type == self.scanner.SWITCH_ID):
+            # Must be a switch so make switch initially 0
+            self.devices.make_switch(self.new_device_id, 0)
+            return 0
+
+        elif self.symbol.type == self.scanner.SEMICOLON:
+            # Must be an xor or dtype so make that device
+            self.devices.make_device(
+                self.new_device_id, self.new_device_type, None)
+            return 0
+        elif self.symbol.type == self.scanner.EOF:
+            return 1
         else:
             if self.symbol.type != self.scanner.SEMICOLON:
                 Error(10, self.symbol)
-                for i in range(10): #tries to get a semi colon before going to next
+                for i in range(10): # tries to get a semi colon before going to next
                     self.symbol = self.scanner.get_symbol() # next symbol
                     if self.symbol.type == self.scanner.SEMICOLON:
                         return 0
                     if self.symbol.type == self.scanner.EOF:
                         return 1
+
             else:
                 return Error.num_errors - errors_start
 
@@ -216,11 +230,20 @@ class Parser:
                 return 1
 
             if gate:
-                if self.symbol.type != self.scanner.NUMBER and self.symbol.number < 1:
+                if self.symbol.type != self.scanner.NUMBER or self.symbol.number < 1:
                     Error(7, self.symbol)
+                else:
+                    # Build gate object
+                    self.devices.make_gate(
+                        self.new_device_id, self.new_device_type,
+                        self.symbol.number)
             elif clock:
-                if self.symbol.type != self.scanner.NUMBER and self.symbol.number < 1:
+                if self.symbol.type != self.scanner.NUMBER or self.symbol.number < 1:
                     Error(9, self.symbol)
+                else:
+                    # Build clock object
+                    self.devices.make_clock(
+                        self.new_device_id, self.symbol.number)
 
         #symbol 6 should be a ';' if gate or clock device
         if gate or clock:
@@ -257,6 +280,8 @@ class Parser:
         if self.symbol.id not in self.device_names:
             Error(11, self.symbol)
 
+        [in_device_id, in_port_id] = self.signame_in()
+
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
@@ -276,6 +301,13 @@ class Parser:
         #symbol 3: name
         if self.symbol.id not in self.device_names:
             Error(11, self.symbol)
+        
+        dtype = False
+        out_device_id = self.symbol.id
+        out_device = self.devices.get_device(self.symbol.id)
+
+        if out_device.device_kind == self.devices.D_TYPE:
+            dtype = True
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -295,12 +327,23 @@ class Parser:
             return 1
 
         #symbol 4: I + input#
-        if self.symbol.string[0] != 'I':
-            Error(13, self.symbol)
-        else:
-            input_num = "" + self.symbol.string[1:]
-            if not input_num.isdigit():
+        if dtype:
+            if self.symbol.id not in self.devices.dtype_input_ids:
                 Error(13, self.symbol)
+        else:
+            if self.symbol.string[0] != 'I':
+                Error(13, self.symbol)
+            else:
+                input_num = "" + self.symbol.string[1:]
+                if not input_num.isdigit():
+                    Error(13, self.symbol)
+        
+        error_type = self.network.make_connection(
+            in_device_id, in_port_id,
+            out_device_id, self.symbol.id)
+        
+        if error_type != self.network.NO_ERROR:
+            Error(13, self.symbol)
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -338,7 +381,8 @@ class Parser:
         if self.symbol.id not in self.device_names:
             Error(20, self.symbol)
 
-        switch_set_ID = self.devices.get_device(self.symbol.id) # What is this??
+        # Find the switch device ID
+        switch_set_ID = self.devices.get_device(self.symbol.id)
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
