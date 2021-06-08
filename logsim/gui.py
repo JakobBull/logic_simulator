@@ -1078,7 +1078,7 @@ class FrameManager:
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
-        
+
 
     def show_gui(self, path):
         """Show the gui.
@@ -1127,7 +1127,8 @@ class FrameManager:
             self.menu.error_panel.SetValue("")
         else:
             error = Error.gui_report_error(self.scanner)
-            Error.print_error(self.scanner)
+            print(error)
+            Error.reset()
             print("Sorry, can't parse network.")
             self.menu.error_panel.SetValue(error)
 

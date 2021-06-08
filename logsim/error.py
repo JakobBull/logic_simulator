@@ -51,7 +51,7 @@ class Error:
     symbols = []
 
     error_message = (
-        "Headings called in wrong order",
+        "FUNDAMENTAL HEADING ERROR, check EBNF and brackets",
         "Always need to follow a heading with {",
         "DEVICE: Name of device must contain a letter",
         "DEVICE: Name for device already used",
@@ -61,6 +61,7 @@ class Error:
         "DEVICE: Invalid number of inputs",
         "DEVICE: Word halfperiod required",
         "DEVICE: Invalid halfperiod",
+        "DEVICE: Expected a ;",
         "CONNECTION: Device not defined",
         "CONNECTION: No - found to define connection",
         "CONNECTION: No . found",
@@ -69,6 +70,7 @@ class Error:
         "Error creating connection",
         "D type output denoted by a .",
         "Not a valid D type output",
+        "CONNECTIONS: Expected a ;",
         "SIGNALS: Device not defined",
         "SIGNALS: = sign expected",
         "SIGNALS: Signal can only be set to 1 or 0",
@@ -92,47 +94,17 @@ class Error:
         # number of errors increased
 
     @classmethod
-    def print_error(cls, scanner):
-        """Print errors for terminal output."""
-        lines = cls.get_lines(scanner)
-        print(str(cls.num_errors) + " ERRORS!:\n")
-        for i in range(cls.num_errors):
-            print("Error " + str(i) + ":")
-            line = lines[cls.symbols[i].line_number - 1]
-            start_spaces = 0
-            for c in line:
-                if c.isspace():
-                    start_spaces += 1
-                else:
-                    break
-            start = cls.symbols[i].start_char_number
-            end = cls.symbols[i].end_char_number
-            print("\"" + line.strip() + "\"")
-            cursor = cls.symbols[i].start_char_number - start_spaces
-            for n in range(cursor):
-                print(' ', end='')
-            print("^")
-            print(cls.error_message[cls.types[i]])
-            # for n in range(len(Error.error_message[Error.types[i]])):
-            # print('-', end = '')
-            for n in range(8):
-                print('-', end='')
-            print("")
-
-    @classmethod
     def gui_report_error(cls, path):
-        """Return error output as a string for gui."""
-        print("GUI reporting errrors")
         error_string = ""
         lines = cls.get_lines(path)
-        #error_string += str(str(cls.num_errors) + " ERRORS!:\n")
-        error_string += "1 ERROR!: \n"
+        error_string += str(str(cls.num_errors) + " ERRORS!\n")
+        error_string += "=========="
         error_string += "\n"
         for i in range(cls.num_errors):
-        #i = 0
-            error_string += str("Error " + str(i+1) + ":")
-            error_string += "\n"
-            line = lines[cls.symbols[i].line_number - 1]
+            error_string += "Error " + str(i) + " on line " + str(cls.symbols[i].line_number) + ":\n"
+            #error_string += str("Error " + str(i) + ":")
+            #error_string += "\n"
+            line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:
                 if c.isspace():
@@ -153,8 +125,7 @@ class Error:
             # for n in range(len(Error.error_message[Error.types[i]])):
             #    print('-', end = '')
             error_string += "\n"
-            for _ in range(8):
-                error_string += str('-')
+            error_string += "--------"
             error_string += "\n"
             error_string += ""
         return error_string
@@ -169,3 +140,10 @@ class Error:
         except IOError:
             print("error, can't find or open file")
             sys.exit()
+
+    @classmethod
+    def reset(cls):
+        """Reset error class variables"""
+        cls.num_errors = 0
+        cls.types = []
+        cls.symbols = []

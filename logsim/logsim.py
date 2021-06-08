@@ -32,7 +32,7 @@ suplang = {"en" : wx.LANGUAGE_ENGLISH,
 langDomain = "LOGIC SIM APP"
 
 def updateLanguage(lang):
-        
+
         Update the language to the requested one.
 
         Make *sure* any existing locale is deleted before the new
@@ -43,7 +43,7 @@ def updateLanguage(lang):
 
         :param string `lang`: one of the supported language codes
 
-    
+
         # if an unsupported language is requested default to English
         if lang in supLang:
             selLang = supLang[lang]
@@ -109,9 +109,9 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
-    
+
     if not options:  # no option given, use the graphical user interface
-        
+
         """Call main loop.
 
         Call the gui FrameManager to handle all operation.
@@ -122,7 +122,7 @@ def main(arg_list):
 
 
         # Internationalisation
-    
+
 
 
         gui.FrameManager("Logic Simulator", language)
@@ -131,5 +131,3 @@ def main(arg_list):
 if __name__ == "__main__":
     #print(sys.argv[1])
     main(sys.argv[1:])
-
-
