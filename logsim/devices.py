@@ -270,6 +270,12 @@ class Devices:
         self.cold_startup()  # D-type initialised to a random state
         print("DTYPE made")
 
+    def is_bin_num(self, num):
+        for i in str(num):
+            if i in ("01") == False:
+                return False
+        return True
+
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.
 
@@ -287,6 +293,18 @@ class Devices:
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
                     random.randrange(device.clock_half_period)
+
+            elif device.device_kind == self.SIGGEN:
+                clock_signal = random.choice([self.LOW, self.HIGH])
+
+                # Initialise it to a random point in its cycle.
+                device.siggen_counter = \
+                    random.randrange(device.siggen_period)
+
+                siggen_signal = device.siggen_pulse[device.siggen_counter]
+
+                self.add_output(device.device_id, output_id=None,
+                                signal=clock_signal)
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
@@ -315,6 +333,16 @@ class Devices:
                 error_type = self.INVALID_QUALIFIER
             else:
                 self.make_clock(device_id, device_property)
+                error_type = self.NO_ERROR
+
+        elif device_kind == self.SIGGEN:
+            # Device property is the siggen_pulse
+            if device_property is None:
+                error_type = self.NO_QUALIFIER
+            elif not self.is_bin_num(device_property):
+                error_type = self.INVALID_QUALIFIER
+            else:
+                self.make_siggen(device_id, device_property)
                 error_type = self.NO_ERROR
 
         elif device_kind in self.gate_types:

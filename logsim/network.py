@@ -330,6 +330,21 @@ class Network:
         else:
             return False
 
+    def execute_siggen(self, device_id):
+        """Simulate a siggen and update its output signal value.
+
+        Return True if successful.
+        """
+        device = self.devices.get_device(device_id)
+        output_signal = device.outputs[device.siggen_counter]  # output ID is None
+
+        if output_signal == self.devices.RISING or output_signal == self.devices.FALLING:
+            device.siggen_counter = 0
+            new_signal = self.update_signal(output_signal, output_signal[0])
+            if new_signal is None:  # update is unsuccessful
+                return False
+            return True
+
     def update_clocks(self):
         """If it is time to do so, set clock signals to RISING or FALLING."""
         clock_devices = self.devices.find_devices(self.devices.CLOCK)
@@ -343,6 +358,17 @@ class Network:
                     device.outputs[None] = self.devices.FALLING
                 elif output_signal == self.devices.LOW:
                     device.outputs[None] = self.devices.RISING
+            device.clock_counter += 1
+
+    def update_siggen(self):
+        """If it is time to do so, set clock signals to RISING or FALLING."""
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
+        for device_id in siggen_devices:
+            device = self.devices.get_device(device_id)
+            if device.siggen_counter == len(device.siggen_pulse):
+                device.clock_counter = 0
+                output_signal = self.get_output_signal(device_id,
+                                                       output_id=None)
             device.clock_counter += 1
 
     def execute_network(self):
@@ -361,6 +387,7 @@ class Network:
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
+        self.update_siggen()
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable
