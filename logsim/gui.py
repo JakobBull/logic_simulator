@@ -844,7 +844,10 @@ class FilePanel(wx.Panel):
             style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
         )
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
+              # initially:
+            # path = dlg.GetPath()
+            # needed to change to paths for mac 10.10.5
+            path = dlg.GetPaths()[0]
             print(_("You chose the following file:"))
         dlg.Destroy()
         print(_("Filepath is"), path)
@@ -1104,7 +1107,7 @@ class FrameManager:
         """
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
-        self.scanner = Scanner(self.path, self.file, self.names)
+        self.scanner = Scanner(self.path, self.names)
         self.parser = Parser(
             self.names,
             self.devices,
