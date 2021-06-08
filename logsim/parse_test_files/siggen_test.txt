@@ -2,7 +2,7 @@ NETWORK{
     DEVICES{
     SW1 = SWITCH;
     sig = SIGGEN pulse 110000;
-    G1 = NAND inputs 2;
+    G1 = OR inputs 2;
     }
    CONNECTIONS{
     SW1 - G1.I1;
@@ -13,6 +13,7 @@ NETWORK{
         }
    MONITOR{
     G1;
+    sig;
     }
 }
 

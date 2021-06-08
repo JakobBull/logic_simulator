@@ -265,7 +265,6 @@ class Parser:
 
             else:
                 return Error.num_errors - errors_start
-
         #symbol 5 should be a number if gate or clock device
         if gate or clock or siggen:
             self.symbol = self.scanner.get_symbol() # next symbol
