@@ -296,12 +296,12 @@ class Devices:
 
             elif device.device_kind == self.SIGGEN:
                 clock_signal = random.choice([self.LOW, self.HIGH])
-
                 # Initialise it to a random point in its cycle.
+                device.siggen_period = len(str(device.siggen_pulse))
                 device.siggen_counter = \
                     random.randrange(device.siggen_period)
 
-                siggen_signal = device.siggen_pulse[device.siggen_counter]
+                siggen_signal = int(str(device.siggen_pulse)[device.siggen_counter])
 
                 self.add_output(device.device_id, output_id=None,
                                 signal=clock_signal)

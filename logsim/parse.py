@@ -232,7 +232,7 @@ class Parser:
             if self.symbol.string != "halfperiod":
                 Error(8, self.symbol)
         elif siggen:
-            if self.symbol.string != "parse":
+            if self.symbol.string != "pulse":
                 Error(30, self.symbol)   # need siggen error
         elif (self.symbol.type == self.scanner.SEMICOLON and
                 self.new_device_type == self.scanner.SWITCH_ID):
@@ -294,7 +294,7 @@ class Parser:
                         self.new_device_id, self.symbol.number)
                     self.device_names.append(self.new_device_id)
             elif siggen:
-                if self.symbol.type != self.scanner.NUMBER or self.is_bin_num(self.scanner.NUMBER):
+                if self.symbol.type != self.scanner.NUMBER or not self.is_bin_num(self.symbol.number):
                     Error(31, self.symbol)
                 else:
                     # Build siggen object
@@ -502,6 +502,7 @@ class Parser:
     def monitor_parse(self):
         # Parse a line in Monitor.
         errors_start = Error.num_errors # errors started with
+        error_type = 0
         # Expected format : name SEMICOLON
         device_id = None
         output_id = None

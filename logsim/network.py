@@ -365,11 +365,11 @@ class Network:
         siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
         for device_id in siggen_devices:
             device = self.devices.get_device(device_id)
-            if device.siggen_counter == len(device.siggen_pulse):
-                device.clock_counter = 0
+            if device.siggen_counter == len(str(device.siggen_pulse)):
+                device.siggen_counter = 0
                 output_signal = self.get_output_signal(device_id,
                                                        output_id=None)
-            device.clock_counter += 1
+            device.siggen_counter += 1
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
