@@ -287,13 +287,7 @@ class Devices:
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
                     random.randrange(device.clock_half_period)
-            elif device.device_kind == self.SIGGEN:
-                siggen_signal = random.choice([self.LOW, self.HIGH])
-                self.add_output(device.device_id, output_id=None,
-                                signal=siggen_signal)
-                # Initialise it to a random point in its cycle.
-                device.clock_counter = \
-                    random.randrange(device.clock_half_period)
+
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
 
