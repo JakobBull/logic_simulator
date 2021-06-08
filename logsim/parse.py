@@ -155,7 +155,7 @@ class Parser:
                 Error(3, self.symbol)
             else:
                 self.new_device_id = self.symbol.id
-                self.device_names.append(self.symbol.id)
+                
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -199,12 +199,14 @@ class Parser:
                 self.new_device_type == self.scanner.SWITCH_ID):
             # Must be a switch so make switch initially 0
             self.devices.make_switch(self.new_device_id, 0)
+            self.device_names.append(self.new_device_id)
             return 0
 
         elif self.symbol.type == self.scanner.SEMICOLON:
             # Must be an xor or dtype so make that device
             self.devices.make_device(
                 self.new_device_id, self.new_device_type, None)
+            self.device_names.append(self.new_device_id)
             return 0
         elif self.symbol.type == self.scanner.EOF:
             return 1
@@ -237,6 +239,7 @@ class Parser:
                     self.devices.make_gate(
                         self.new_device_id, self.new_device_type,
                         self.symbol.number)
+                    self.device_names.append(self.new_device_id)
             elif clock:
                 if self.symbol.type != self.scanner.NUMBER or self.symbol.number < 1:
                     Error(9, self.symbol)
@@ -244,6 +247,7 @@ class Parser:
                     # Build clock object
                     self.devices.make_clock(
                         self.new_device_id, self.symbol.number)
+                    self.device_names.append(self.new_device_id)
 
         #symbol 6 should be a ';' if gate or clock device
         if gate or clock:
@@ -277,10 +281,14 @@ class Parser:
         errors_start = Error.num_errors # errors started with
         # Expected format : name DASH name PERIOD Inumber
         #symbol 1: Name
+        dtype = False
+        out_device_id = None
+        in_device_id = None
+        in_port_id = None
         if self.symbol.id not in self.device_names:
             Error(11, self.symbol)
-
-        [in_device_id, in_port_id] = self.signame_in()
+        else:
+            [in_device_id, in_port_id] = self.signame_in()
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -302,12 +310,12 @@ class Parser:
         if self.symbol.id not in self.device_names:
             Error(11, self.symbol)
         
-        dtype = False
-        out_device_id = self.symbol.id
-        out_device = self.devices.get_device(self.symbol.id)
+        else:
+            out_device_id = self.symbol.id
+            out_device = self.devices.get_device(self.symbol.id)
 
-        if out_device.device_kind == self.devices.D_TYPE:
-            dtype = True
+            if out_device.device_kind == self.devices.D_TYPE:
+                dtype = True
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -418,6 +426,7 @@ class Parser:
 
     def monitor_list(self):
         """Parse the monitor section of the code."""
+        print(self.device_names)
         while True:
             if self.monitor_parse() == 1: break
             self.symbol = self.scanner.get_symbol()
@@ -430,10 +439,14 @@ class Parser:
         # Parse a line in Monitor.
         errors_start = Error.num_errors # errors started with
         # Expected format : name SEMICOLON
+        device_id = None
+        output_id = None
+
         if self.symbol.id not in self.device_names:
             Error(26, self.symbol)
-        """
-        [device_id, output_id] = self.signame_in()
+        else:
+            print(self.symbol.string)
+            [device_id, output_id] = self.signame_in()
 
         error_type = self.monitors.make_monitor(device_id, output_id)
 
@@ -442,7 +455,7 @@ class Parser:
 
         elif error_type == self.monitors.MONITOR_PRESENT:
             Error(28, self.symbol)
-        """
+        
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
