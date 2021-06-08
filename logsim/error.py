@@ -80,7 +80,9 @@ class Error:
         "MONITOR: Device not defined",
         "MONITOR: Output not properly defined",
         "MONITOR: Device already monitored",
-        "MONITOR: Expected ; to end line"
+        "MONITOR: Expected ; to end line",
+        "DEVICE: Word pulse required",
+        "DEVICE: pulse needs to be binary number",
     )
 
     @classmethod
