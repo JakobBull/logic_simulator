@@ -9,7 +9,7 @@ class Error:
     symbols = []
 
     error_message = (
-        "Headings called in wrong order",
+        "FUNDAMENTAL HEADING ERROR, check EBNF and brackets",
         "Always need to follow a heading with {",
         "DEVICE: Name of device must contain a letter",
         "DEVICE: Name for device already used",

@@ -93,34 +93,49 @@ class Parser:
 
         # print(self.gate_var_inputs_IDs)
         # print("Netowrk_ID: ", self.scanner.NETWORK_ID)
+        self.heading_search()
+        
+        print(Error.gui_report_error(self.scanner))
+        if Error.num_errors == 0:
+            return True
+
+    def heading_search(self):
         if self.symbol.id != self.scanner.NETWORK_ID:
             Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            return False
+        print('Network')
         self.OPENCURLY_search()
 
         if self.symbol.id != self.scanner.DEVICES_ID:
             Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            return False
+        print('Devices')
         self.OPENCURLY_search()
-
+        
         self.device_list()
 
         if self.symbol.id != self.scanner.CONNECTIONS_ID:
             Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            return False
+        print('Connections')
         self.OPENCURLY_search()
 
         self.connection_list()
 
         if self.symbol.id != self.scanner.SIGNALS_ID:
             Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            return False
         self.OPENCURLY_search()
-
+        print('Signals')
         self.setsignal_list()
 
         if self.symbol.id != self.scanner.MONITOR_ID:
             Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            return False
         self.OPENCURLY_search()
-
+        print('Monitor')
         self.monitor_list()
-        print(Error.gui_report_error(self.scanner))
+        
 
 
     def OPENCURLY_search(self):
@@ -136,18 +151,30 @@ class Parser:
         """Parse the device list."""
 
         while True:
-            if self.device_parse() == 1: break
-            self.symbol = self.scanner.get_symbol()
-            if self.symbol.type == self.scanner.RIGHT_BRACKET:
-                self.sections_complete += 1
+            error = self.device_parse()
+            if error == 1:
+                break
+            if error == 2:
                 self.symbol = self.scanner.get_symbol()
                 break
+            else:
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol.type == self.scanner.RIGHT_BRACKET:
+                    self.sections_complete += 1
+                    self.symbol = self.scanner.get_symbol()
+                    break
 
     def device_parse(self):
         """Parse a single line of a device definition."""
         errors_start = Error.num_errors # errors started with
         # Expected format : name EQUALS device
         # symbol 1: Name
+        if self.symbol.type == self.scanner.SEMICOLON:
+            return 0
+        if self.symbol.type == self.scanner.EOF:
+            return 1
+        if self.symbol.type == self.scanner.RIGHT_BRACKET:
+            return 2
         if self.symbol.type != self.scanner.NAME: # if first symbol of line is a not a name, error 2
             Error(2, self.symbol)
         else:   # if first symbol is a name
@@ -162,6 +189,8 @@ class Parser:
             return 0
         if self.symbol.type == self.scanner.EOF:
             return 1
+        if self.symbol.type == self.scanner.RIGHT_BRACKET:
+            return 2
 
         #symbol 2: '='
         if self.symbol.type != self.scanner.EQUALS:
@@ -172,6 +201,8 @@ class Parser:
             return 0
         if self.symbol.type == self.scanner.EOF:
             return 1
+        if self.symbol.type == self.scanner.RIGHT_BRACKET:
+            return 2
 
         # symbol 3: Device
         gate = False
@@ -210,6 +241,8 @@ class Parser:
             return 0
         elif self.symbol.type == self.scanner.EOF:
             return 1
+        elif self.symbol.type == self.scanner.RIGHT_BRACKET:
+            return 2    
         else:
             if self.symbol.type != self.scanner.SEMICOLON:
                 Error(10, self.symbol)
@@ -219,6 +252,8 @@ class Parser:
                         return 0
                     if self.symbol.type == self.scanner.EOF:
                         return 1
+                    if self.symbol.type == self.scanner.RIGHT_BRACKET:
+                        return 2
 
             else:
                 return Error.num_errors - errors_start
@@ -230,6 +265,8 @@ class Parser:
                 return 0
             if self.symbol.type == self.scanner.EOF:
                 return 1
+            if self.symbol.type == self.scanner.RIGHT_BRACKET:
+                return 2
 
             if gate:
                 if self.symbol.type != self.scanner.NUMBER or self.symbol.number < 1:
@@ -256,6 +293,8 @@ class Parser:
                 return 0
             if self.symbol.type == self.scanner.EOF:
                 return 1
+            if self.symbol.type == self.scanner.RIGHT_BRACKET:
+                return 2
             if self.symbol.type != self.scanner.SEMICOLON:
                 Error(10, self.symbol)
                 for i in range(10): #tries to get a semi colon before going to next
@@ -264,6 +303,8 @@ class Parser:
                         return 0
                     if self.symbol.type == self.scanner.EOF:
                         return 1
+                    if self.symbol.type == self.scanner.RIGHT_BRACKET:
+                        return 2
 
     def connection_list(self):
         """Parse the device list."""
@@ -427,6 +468,7 @@ class Parser:
     def monitor_list(self):
         """Parse the monitor section of the code."""
         print(self.device_names)
+        print(self.symbol.string)
         while True:
             if self.monitor_parse() == 1: break
             self.symbol = self.scanner.get_symbol()
