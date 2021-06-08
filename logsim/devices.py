@@ -38,6 +38,7 @@ class Device:
 
         self.device_kind = None
         self.clock_half_period = None
+        self.siggen_pulse = None
         self.clock_counter = None
         self.switch_state = None
         self.dtype_memory = None
@@ -105,7 +106,7 @@ class Devices:
         self.devices_list = []
 
         gate_strings = ["AND", "OR", "NAND", "NOR", "XOR"]
-        device_strings = ["CLOCK", "SWITCH", "DTYPE"]
+        device_strings = ["CLOCK", "SWITCH", "DTYPE", "SIGGEN"]
         dtype_inputs = ["CLK", "SET", "CLEAR", "DATA"]
         dtype_outputs = ["Q", "QBAR"]
 
@@ -118,7 +119,7 @@ class Devices:
         self.gate_types = [self.AND, self.OR, self.NAND, self.NOR,
                            self.XOR] = self.names.lookup(gate_strings)
         self.device_types = [self.CLOCK, self.SWITCH,
-                             self.D_TYPE] = self.names.lookup(device_strings)
+                             self.D_TYPE, self.SIGGEN] = self.names.lookup(device_strings)
         self.dtype_input_ids = [self.CLK_ID, self.SET_ID, self.CLEAR_ID,
                                 self.DATA_ID] = self.names.lookup(dtype_inputs)
         self.dtype_output_ids = [
@@ -152,7 +153,7 @@ class Devices:
         new_device = Device(device_id)
         new_device.device_kind = device_kind
         self.devices_list.append(new_device)
-        
+
 
     def add_input(self, device_id, input_id):
         """Add the specified input to the specified device.
@@ -242,6 +243,13 @@ class Devices:
         device.clock_half_period = clock_half_period
         self.cold_startup()  # clock initialised to a random point in its cycle
 
+    def make_siggen(self, device_id, siggen_pulse):
+        """Make a siggen device with the specified pulse"""
+        self.add_device(device_id, self.SIGGEN)
+        device = self.get_device(device_id)
+        device.siggen_pulse = siggen_pulse
+        self.cold_startup()  # clock initialised to a random point in its cycle
+
     def make_gate(self, device_id, device_kind, no_of_inputs):
         """Make logic gates with the specified number of inputs."""
         self.add_device(device_id, device_kind)
@@ -279,7 +287,13 @@ class Devices:
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
                     random.randrange(device.clock_half_period)
-
+            elif device.device_kind == self.SIGGEN:
+                siggen_signal = random.choice([self.LOW, self.HIGH])
+                self.add_output(device.device_id, output_id=None,
+                                signal=siggen_signal)
+                # Initialise it to a random point in its cycle.
+                device.clock_counter = \
+                    random.randrange(device.clock_half_period)
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
 
