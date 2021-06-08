@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-07 13:04+0100\n"
+"POT-Creation-Date: 2021-06-08 12:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,74 +17,82 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: gui.py:276
+#: gui.py:278
 msgid "Add"
 msgstr ""
 
-#: gui.py:944
+#: gui.py:946
 msgid "Back to text editor"
 msgstr ""
 
-#: gui.py:249
+#: gui.py:251
 msgid "Continue"
 msgstr ""
 
-#: gui.py:819
+#: gui.py:821
 msgid "Continue to GUI"
 msgstr ""
 
-#: gui.py:244
+#: gui.py:246
 msgid "Cycles"
 msgstr ""
 
-#: gui.py:848
+#: gui.py:850
 msgid "Filepath is"
 msgstr ""
 
-#: gui.py:946
+#: gui.py:948
 msgid "Help"
 msgstr ""
 
-#: gui.py:284
+#: gui.py:1164
+msgid "Logic Simulator"
+msgstr ""
+
+#: gui.py:286 gui.py:701
 msgid "Remove"
 msgstr ""
 
-#: gui.py:285
+#: gui.py:287
 msgid "Remove all"
 msgstr ""
 
-#: gui.py:279
+#: gui.py:281
 msgid "Remove monitor"
 msgstr ""
 
-#: gui.py:248
+#: gui.py:250
 msgid "Run"
 msgstr ""
 
-#: gui.py:818 gui.py:945
+#: gui.py:820 gui.py:947
 msgid "Save as"
 msgstr ""
 
-#: gui.py:817
+#: gui.py:819
 msgid "Search file"
 msgstr ""
 
-#: gui.py:275 gui.py:282
+#: gui.py:277 gui.py:284
 msgid "Select"
 msgstr ""
 
-#: gui.py:262
+#: gui.py:264
 msgid "Set"
 msgstr ""
 
-#: gui.py:265
+#: gui.py:257
+msgid "Set Switch"
+msgstr ""
+
+#: gui.py:267
 msgid "Set outputs to monitor"
 msgstr ""
 
-#: gui.py:846
+#: gui.py:848
 msgid "You chose the following file:"
 msgstr ""
 
-#: gui.py:860
+#: gui.py:862
 msgid "error, can't find or open file"
 msgstr ""

@@ -254,7 +254,7 @@ class SidePanel(wx.Panel):
         switch_box takes the value
         zero_button and one_button allow toggling between 0 and 1
         add_switch_executes the add button"""
-        self.switch_box_text = wx.StaticText(self, wx.ID_ANY, "Set Switch")
+        self.switch_box_text = wx.StaticText(self, wx.ID_ANY, _("Set Switch"))
         self.switch_box = wx.ComboBox(
             self, wx.ID_ANY, "Switch", choices=[
                 self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(
@@ -698,7 +698,7 @@ class MonitorItem(wx.Panel):
             self, wx.ID_ANY, label=self.name, size=(50, 50), style = wx.ALIGN_CENTER)
         fo = wx.Font(13, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.name_text.SetFont(fo)
-        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove", size=(50, 50))
+        self.remove_item = wx.Button(self, wx.ID_ANY, _("Remove"), size=(50, 50))
 
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
@@ -1071,6 +1071,10 @@ class FrameManager:
             de = gettext.translation('de_DE', localedir='locale', languages=['de'])
             de.install()
             _ = de.gettext
+        if language == "el":
+            el = gettext.translation('el_GR', localedir='locale', languages=['el'])
+            el.install()
+            _ = el.gettext
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
@@ -1157,4 +1161,4 @@ class FrameManager:
         dlg.Destroy()
 
 if __name__ == "__main__":
-    FrameManager("Logic Simulator")
+    FrameManager(_("Logic Simulator"))
