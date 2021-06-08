@@ -267,7 +267,7 @@ class Parser:
                 return Error.num_errors - errors_start
 
         #symbol 5 should be a number if gate or clock device
-        if gate or clock:
+        if gate or clock or siggen:
             self.symbol = self.scanner.get_symbol() # next symbol
             if self.symbol.type == self.scanner.SEMICOLON:
                 return 0
@@ -297,13 +297,13 @@ class Parser:
                 if self.symbol.type != self.scanner.NUMBER or self.is_bin_num(self.scanner.NUMBER):
                     Error(31, self.symbol)
                 else:
-                    # Build clock object
+                    # Build siggen object
                     self.devices.make_siggen(
                         self.new_device_id, self.symbol.number)
                     self.device_names.append(self.new_device_id)
 
         #symbol 6 should be a ';' if gate or clock device
-        if gate or clock or siggen: 
+        if gate or clock or siggen:
             self.symbol = self.scanner.get_symbol() # next symbol
             if self.symbol.type == self.scanner.SEMICOLON:
                 return 0
