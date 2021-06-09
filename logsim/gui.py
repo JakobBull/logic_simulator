@@ -127,7 +127,6 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
         GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
         GL.glBegin(GL.GL_LINE_STRIP)
         for i in range(len(values)):
-            print("i is", i)
             x = (i * 20) + 10
             x_next = (i * 20) + 30
             if values[i] == 1:
@@ -715,7 +714,10 @@ class SidePanel(wx.Panel):
 
         self.toggle_gui_text = wx.StaticText(
             self, wx.ID_ANY, "Change between 2D and 3D view mode")
-        self.toggle_gui_button = wx.Button(self, wx.ID_ANY, "3D")
+        if self.parent.dimension == 2:
+            self.toggle_gui_button = wx.Button(self, wx.ID_ANY, "3D")
+        else:
+            self.toggle_gui_button = wx.Button(self, wx.ID_ANY, "2D")
 
         # Bind events to widgets
 
@@ -728,6 +730,8 @@ class SidePanel(wx.Panel):
 
         self.remove_monitor_button.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
         self.remove_all_button.Bind(wx.EVT_BUTTON, self.on_remove_all_monitors)
+    
+        self.toggle_gui_button.Bind(wx.EVT_BUTTON, self.on_toggle_gui)
 
         self.side_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -791,6 +795,17 @@ class SidePanel(wx.Panel):
             self.remove_all_button, 0, wx.ALL | wx.EXPAND, 5)
 
         self.SetSizer(self.side_sizer)
+
+    def on_toggle_gui(self, event):
+        """Toggle between 2D and 3D signal traces."""
+        self.parent.parent.gui.Hide()
+
+        if self.parent.dimension == 2:
+            self.parent.parent.show_gui(self.parent.path, 3)
+        elif self.parent.dimension == 3:
+            self.parent.parent.show_gui(self.parent.path, 2)
+        else:
+            print("Unknown error!")
 
     def read_name(self, name_string):
         """Return the name ID of the current string if valid.
@@ -973,17 +988,31 @@ class MonitorPanel(scrolled.ScrolledPanel):
 
         self.item_list = []
 
-        for key, value in self.monitors.monitors_dictionary.items():
-            self.item_list.append(
-                MonitorItem3D(
-                    self,
-                    self.names.get_name_string(
-                        key[0]),
-                    self.monitors,
-                    self.devices,
-                    self.names))
-            self.item_list[-1].SetBackgroundColour('#b0bcda')
-            self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
+        if self.parent.dimension == 2:
+            for key, value in self.monitors.monitors_dictionary.items():
+                self.item_list.append(
+                    MonitorItem2D(
+                        self,
+                        self.names.get_name_string(
+                            key[0]),
+                        self.monitors,
+                        self.devices,
+                        self.names))
+                self.item_list[-1].SetBackgroundColour('#b0bcda')
+                self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
+        
+        elif self.parent.dimension == 3:
+            for key, value in self.monitors.monitors_dictionary.items():
+                self.item_list.append(
+                    MonitorItem3D(
+                        self,
+                        self.names.get_name_string(
+                            key[0]),
+                        self.monitors,
+                        self.devices,
+                        self.names))
+                self.item_list[-1].SetBackgroundColour('#b0bcda')
+                self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizer(self.sizer)
 
@@ -1003,13 +1032,22 @@ class MonitorPanel(scrolled.ScrolledPanel):
         """
         [child_device_id, child_output_id] = self.devices.get_signal_ids(text)
         self.monitors.make_monitor(child_device_id, child_output_id)
-        self.item_list.append(
-            MonitorItem3D(
-                self,
-                text,
-                self.monitors,
-                self.devices,
-                self.names))
+        if self.parent.dimension == 2:
+            self.item_list.append(
+                MonitorItem2D(
+                    self,
+                    text,
+                    self.monitors,
+                    self.devices,
+                    self.names))
+        elif self.parent.dimension == 3:
+            self.item_list.append(
+                MonitorItem3D(
+                    self,
+                    text,
+                    self.monitors,
+                    self.devices,
+                    self.names))
         self.item_list[-1].SetBackgroundColour('#b0bcda')
         self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
         self.SetSizer(self.sizer)
@@ -1210,7 +1248,7 @@ class MonitorItem2D(MonitorItem):
         """
         super().__init__(parent=parent, name=name, monitors=monitors, devices=devices, names=names)
         
-        self.canvas = MyGLCanvas(
+        self.canvas = MyGLCanvas2D(
             self, self.devices, self.monitors, size=(100, -1))
 
 
@@ -1364,7 +1402,7 @@ class FilePanel(wx.Panel):
 
         If it fails display error.
         """
-        self.parent.parent.show_gui(self.path)
+        self.parent.parent.show_gui(self.path, 2)
 
     def on_save_file(self, event):
         """Open save menu.
@@ -1486,7 +1524,7 @@ class Gui(wx.Frame):
 
     """
 
-    def __init__(self, parent, title, names, devices, network, monitors):
+    def __init__(self, parent, title, names, devices, network, monitors, path, dimension):
         """Initialise widgets and layout.
 
         Create widgets and sizers.
@@ -1494,6 +1532,8 @@ class Gui(wx.Frame):
         super().__init__(parent=None, title=title, size=(800, 600))
 
         self.parent = parent
+        self.path = path
+        self.dimension = dimension
         self.Bind(wx.EVT_CLOSE, self.closeWindow)
 
         self.names = names
@@ -1566,11 +1606,12 @@ class FrameManager:
         self.menu.Show()
         self.app.MainLoop()
 
-    def show_gui(self, path):
+    def show_gui(self, path, dimension):
         """Show the gui.
 
         Create objects for devices, monitors, network.
         """
+
         self.path = path
         if self.menu.text_editor.text is not None:
             self.names = Names()
@@ -1578,12 +1619,12 @@ class FrameManager:
             self.network = Network(self.names, self.devices)
             self.monitors = Monitors(self.names, self.devices, self.network)
 
-            self.process_content()
+            self.process_content(dimension)
 
         else:
             print("Please choose a file first!")
 
-    def process_content(self):
+    def process_content(self, dimension):
         """Read in text_field and pass the text to parser, parse and handle errors.
 
         Process all the key backend logic.
@@ -1606,7 +1647,8 @@ class FrameManager:
                 self.names,
                 self.devices,
                 self.network,
-                self.monitors)
+                self.monitors, self.path,
+                dimension)
             self.menu.Hide()
             self.gui.Show()
             self.gui.path = self.path
