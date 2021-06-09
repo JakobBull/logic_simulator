@@ -90,6 +90,13 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
 
         # Bind events to the canvas
         self.Bind(wx.EVT_PAINT, self.on_paint)
+        self.Bind(wx.EVT_SIZE, self.on_size)
+
+    def on_size(self, event):
+        """Handle the canvas resize event."""
+        # Forces reconfiguration of the viewport, modelview and projection
+        # matrices on the next paint event
+        self.init = False
 
     def init_gl(self):
         """Configure and initialise the OpenGL context.
@@ -1136,6 +1143,9 @@ class MonitorItem(wx.Panel):
             self, wx.ID_ANY, label=self.name, size=(50, 50), style = wx.ALIGN_CENTER)
         fo = wx.Font(13, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.name_text.SetFont(fo)
+        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove")
+        
+        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
 
     def on_remove_item(self, event):
@@ -1196,25 +1206,11 @@ class MonitorItem3D(MonitorItem):
         self.canvas = MyGLCanvas3D(
             self, self.devices, self.monitors, size=(100, -1))
 
-
-        self.switch_to_2d_button = wx.Button(self, wx.ID_ANY, "2D mode")
-        self.next_trace_button = wx.Button(self, wx.ID_ANY, "Next trace")
-        self.prev_trace_button = wx.Button(self, wx.ID_ANY, "Previous trace")
-        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove")
-        
-        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
-
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.button_sizer = wx.GridSizer(rows=2, cols=2, hgap=0, vgap=0)
 
-        self.sizer.Add(self.name_text, 1, wx.CENTER, 0)
+        self.sizer.Add(self.name_text, 1, wx.EXPAND, 0)
         self.sizer.Add(self.canvas, 6, wx.EXPAND, 0)
-        self.sizer.Add(self.button_sizer, 1, wx.ALIGN_CENTER, 0)
-
-        self.button_sizer.Add(self.next_trace_button, 1, wx.EXPAND, 0)
-        self.button_sizer.Add(self.prev_trace_button, 1, wx.EXPAND, 0)
-        self.button_sizer.Add(self.switch_to_2d_button, 1, wx.EXPAND, 0)
-        self.button_sizer.Add(self.remove_item, 1, wx.EXPAND, 0)
+        self.sizer.Add(self.remove_item, 1, wx.EXPAND, 0)
 
         self.Layout()
         self.SetSizer(self.sizer)
@@ -1251,22 +1247,11 @@ class MonitorItem2D(MonitorItem):
         self.canvas = MyGLCanvas2D(
             self, self.devices, self.monitors, size=(100, -1))
 
-
-        self.switch_to_3d_button = wx.Button(self, wx.ID_ANY, "3D mode")
-        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove")
-        
-
-        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
-
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.button_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.sizer.Add(self.name_text, 1, wx.CENTER, 0)
+        self.sizer.Add(self.name_text, 1, wx.EXPAND, 0)
         self.sizer.Add(self.canvas, 4, wx.EXPAND, 0)
-        self.sizer.Add(self.button_sizer, 1, wx.ALIGN_CENTER, 0)
-
-        self.button_sizer.Add(self.switch_to_3d_button, 1, wx.EXPAND, 0)
-        self.button_sizer.Add(self.remove_item, 1, wx.EXPAND, 0)
+        self.sizer.Add(self.remove_item, 1, wx.EXPAND, 0)
 
         self.Layout()
         self.SetSizer(self.sizer)
