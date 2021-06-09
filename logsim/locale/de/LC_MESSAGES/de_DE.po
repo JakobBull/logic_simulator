@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-08 12:00+0100\n"
-"PO-Revision-Date: 2021-06-08 12:09+0100\n"
+"POT-Creation-Date: 2021-06-09 16:30+0100\n"
+"PO-Revision-Date: 2021-06-09 16:59+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -18,82 +18,98 @@ msgstr ""
 "X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: gui.py:278
+#: gui.py:790
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: gui.py:946
+#: gui.py:1585
 msgid "Back to text editor"
 msgstr "Zurück zum Texteditor"
 
-#: gui.py:251
+#: gui.py:803
+msgid "Change between 2D and 3D view mode"
+msgstr "Zwischen 2D und 3D Modus wechseln"
+
+#: gui.py:763
 msgid "Continue"
 msgstr "Weiter"
 
-#: gui.py:821
+#: gui.py:1457
 msgid "Continue to GUI"
 msgstr "Weiter zur GUI"
 
-#: gui.py:246
+#: gui.py:758
 msgid "Cycles"
 msgstr "Zyklen"
 
-#: gui.py:850
+#: gui.py:1489
 msgid "Filepath is"
 msgstr "Dateipfad ist"
 
-#: gui.py:948
+#: gui.py:1587
 msgid "Help"
 msgstr "Hilfe"
 
-#: gui.py:1164
+#: gui.py:1455
+msgid "Load file"
+msgstr "Datei hochladen"
+
+#: gui.py:1819
 msgid "Logic Simulator"
 msgstr "Logiksimulator"
 
-#: gui.py:286 gui.py:701
+#: gui.py:798 gui.py:1240
 msgid "Remove"
 msgstr "Entfernen"
 
-#: gui.py:287
+#: gui.py:799
 msgid "Remove all"
 msgstr "Alle entfernen"
 
-#: gui.py:281
+#: gui.py:793
 msgid "Remove monitor"
 msgstr "Monitor entfernen"
 
-#: gui.py:250
+#: gui.py:1241
+msgid "Reset View"
+msgstr "Sicht zurücksetzen"
+
+#: gui.py:762
 msgid "Run"
 msgstr "Lauf"
 
-#: gui.py:820 gui.py:947
+#: gui.py:1456 gui.py:1586
 msgid "Save as"
 msgstr "Speichern als"
 
-#: gui.py:819
-msgid "Search file"
-msgstr "Datei suchen"
-
-#: gui.py:277 gui.py:284
+#: gui.py:789 gui.py:796
 msgid "Select"
 msgstr "Wählen"
 
-#: gui.py:264
+#: gui.py:776
 msgid "Set"
 msgstr "Einstellen"
 
-#: gui.py:257
+#: gui.py:769
 msgid "Set Switch"
 msgstr "Schalter einstellen"
 
-#: gui.py:267
+#: gui.py:779
 msgid "Set outputs to monitor"
 msgstr "Messsignale einstellen"
 
-#: gui.py:848
+#: gui.py:771
+msgid "Switch"
+msgstr "Schalter"
+
+#: gui.py:1487
 msgid "You chose the following file:"
 msgstr "Sie haben die folgende Datei ausgewählt:"
 
-#: gui.py:862
+#: gui.py:1501
 msgid "error, can't find or open file"
 msgstr "Fehler, Datei kann nicht gefunden oder geöffnet werden"
+
+#: gui.py:198
+msgid "time"
+msgstr "Zeit"
