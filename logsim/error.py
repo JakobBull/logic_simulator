@@ -104,8 +104,6 @@ class Error:
         error_string += "\n"
         for i in range(cls.num_errors):
             error_string += "Error " + str(i) + " on line " + str(cls.symbols[i].line_number) + ":\n"
-            #error_string += str("Error " + str(i) + ":")
-            #error_string += "\n"
             line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:

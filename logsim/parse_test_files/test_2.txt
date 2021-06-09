@@ -1,5 +1,5 @@
 NETWORK{
-  DEVICES{}
+  DEVICES{
     SW1 = ;
     SW2 = SWITCH;
     G1 = NAND inputs 0;

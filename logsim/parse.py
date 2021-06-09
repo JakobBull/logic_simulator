@@ -510,7 +510,9 @@ class Parser:
             Error(26, self.symbol)
         else:
             print(self.symbol.string)
-            [device_id, output_id] = self.signame_in()
+            out = self.signame_in()
+            if out is not None:
+                [device_id, output_id] = out
 
             error_type = self.monitors.make_monitor(device_id, output_id)
 
