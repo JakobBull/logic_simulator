@@ -2,21 +2,21 @@ NETWORK{
   DEVICES{
     SW1 = SWITCH;
     912 = SWITCH;
-    SW1 = NAND inputs 2;
+    G1 = NAND inputs 2;
     G2 - NAND inputs 2;
   }
   CONNECTIONS{
     SW1 - G1.1;
-    SW2 - G2I2;
-    G1 G2.I1;
+    G1 - G2I2;
+    G1 - G2.I1;
     G22 - G1.I2;
   }
   SIGNALS{
     SW19 = 0;
-    SW2 0;
+    SW2 = 0;
   }
   MONITOR{
-    G1
+    G1;
     W2;
   }
 }
