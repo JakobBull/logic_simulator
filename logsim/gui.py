@@ -1750,7 +1750,7 @@ class FrameManager:
         """
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
-        self.scanner = Scanner(self.path, self.names)
+        self.scanner = Scanner(self.path, self.file, self.names)
         self.parser = Parser(
             self.names,
             self.devices,
@@ -1759,7 +1759,6 @@ class FrameManager:
             self.scanner)
 
         if self.parser.parse_network():
-            print("parsing")
             self.gui = Gui(
                 self,
                 self.title,

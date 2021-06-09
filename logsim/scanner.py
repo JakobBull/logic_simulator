@@ -54,19 +54,20 @@ class Scanner:
     get_symbol(self): Translates the next sequence of characters into a symbol
                       and returns the symbol.
     """
-    def __init__(self, path, names):
+    def __init__(self, path, file, names):
         """"Open specified file and initialise reserved words and IDs."""
         # opens specified file
         self.path = path
         # self.file  = file
         # opens specified file
-
+        self.file = file
+        """
         try:
             # Open and return the file specified by path for reading
             self.file = open(path, "r", encoding="utf-8")
         except IOError:
             print("error, can't find or open file")
-            sys.exit()
+            sys.exit()"""
         # initialises reserved words and IDs
         self.names = names
 
