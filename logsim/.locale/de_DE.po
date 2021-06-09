@@ -1,0 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-06-07 13:04+0100\n"
+"PO-Revision-Date: 2021-06-07 21:06+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de_DE\n"
+
+#: gui.py:276
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: gui.py:944
+msgid "Back to text editor"
+msgstr "Zurück zum Texteditor"
+
+#: gui.py:249
+msgid "Continue"
+msgstr "Weiter"
+
+#: gui.py:819
+msgid "Continue to GUI"
+msgstr "Weiter zur GUI"
+
+#: gui.py:244
+msgid "Cycles"
+msgstr "Zyklen"
+
+#: gui.py:848
+msgid "Filepath is"
+msgstr "Dateipfad ist"
+
+#: gui.py:946
+msgid "Help"
+msgstr "Hilfe"
+
+#: gui.py:284
+msgid "Remove"
+msgstr "Entfernen"
+
+#: gui.py:285
+msgid "Remove all"
+msgstr "Alle entfernen"
+
+#: gui.py:279
+msgid "Remove monitor"
+msgstr "Monitor entfernen"
+
+#: gui.py:248
+msgid "Run"
+msgstr "Lauf"
+
+#: gui.py:818 gui.py:945
+msgid "Save as"
+msgstr "Speichern als"
+
+#: gui.py:817
+msgid "Search file"
+msgstr "Datei suchen"
+
+#: gui.py:275 gui.py:282
+msgid "Select"
+msgstr "Wählen"
+
+#: gui.py:262
+msgid "Set"
+msgstr "Einstellen"
+
+#: gui.py:265
+msgid "Set outputs to monitor"
+msgstr "Messsignale einstellen"
+
+#: gui.py:846
+msgid "You chose the following file:"
+msgstr "Sie haben die folgende Datei ausgewählt:"
+
+#: gui.py:860
+msgid "error, can't find or open file"
+msgstr "Fehler, Datei kann nicht gefunden oder geöffnet werden"

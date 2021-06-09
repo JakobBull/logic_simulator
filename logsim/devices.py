@@ -38,6 +38,7 @@ class Device:
 
         self.device_kind = None
         self.clock_half_period = None
+        self.siggen_pulse = None
         self.clock_counter = None
         self.switch_state = None
         self.dtype_memory = None
@@ -105,7 +106,7 @@ class Devices:
         self.devices_list = []
 
         gate_strings = ["AND", "OR", "NAND", "NOR", "XOR"]
-        device_strings = ["CLOCK", "SWITCH", "DTYPE"]
+        device_strings = ["CLOCK", "SWITCH", "DTYPE", "SIGGEN"]
         dtype_inputs = ["CLK", "SET", "CLEAR", "DATA"]
         dtype_outputs = ["Q", "QBAR"]
 
@@ -118,7 +119,7 @@ class Devices:
         self.gate_types = [self.AND, self.OR, self.NAND, self.NOR,
                            self.XOR] = self.names.lookup(gate_strings)
         self.device_types = [self.CLOCK, self.SWITCH,
-                             self.D_TYPE] = self.names.lookup(device_strings)
+                             self.D_TYPE, self.SIGGEN] = self.names.lookup(device_strings)
         self.dtype_input_ids = [self.CLK_ID, self.SET_ID, self.CLEAR_ID,
                                 self.DATA_ID] = self.names.lookup(dtype_inputs)
         self.dtype_output_ids = [
@@ -152,7 +153,7 @@ class Devices:
         new_device = Device(device_id)
         new_device.device_kind = device_kind
         self.devices_list.append(new_device)
-        
+
 
     def add_input(self, device_id, input_id):
         """Add the specified input to the specified device.
@@ -242,6 +243,13 @@ class Devices:
         device.clock_half_period = clock_half_period
         self.cold_startup()  # clock initialised to a random point in its cycle
 
+    def make_siggen(self, device_id, siggen_pulse):
+        """Make a siggen device with the specified pulse"""
+        self.add_device(device_id, self.SIGGEN)
+        device = self.get_device(device_id)
+        device.siggen_pulse = siggen_pulse
+        self.cold_startup()  # clock initialised to a random point in its cycle
+
     def make_gate(self, device_id, device_kind, no_of_inputs):
         """Make logic gates with the specified number of inputs."""
         self.add_device(device_id, device_kind)
@@ -262,6 +270,12 @@ class Devices:
         self.cold_startup()  # D-type initialised to a random state
         print("DTYPE made")
 
+    def is_bin_num(self, num):
+        for i in str(num):
+            if i in ("01") == False:
+                return False
+        return True
+
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.
 
@@ -279,6 +293,18 @@ class Devices:
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
                     random.randrange(device.clock_half_period)
+
+            elif device.device_kind == self.SIGGEN:
+                clock_signal = random.choice([self.LOW, self.HIGH])
+                # Initialise it to a random point in its cycle.
+                device.siggen_period = len(str(device.siggen_pulse))
+                device.siggen_counter = \
+                    random.randrange(device.siggen_period)
+
+                siggen_signal = int(str(device.siggen_pulse)[device.siggen_counter])
+
+                self.add_output(device.device_id, output_id=None,
+                                signal=clock_signal)
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
@@ -307,6 +333,16 @@ class Devices:
                 error_type = self.INVALID_QUALIFIER
             else:
                 self.make_clock(device_id, device_property)
+                error_type = self.NO_ERROR
+
+        elif device_kind == self.SIGGEN:
+            # Device property is the siggen_pulse
+            if device_property is None:
+                error_type = self.NO_QUALIFIER
+            elif not self.is_bin_num(device_property):
+                error_type = self.INVALID_QUALIFIER
+            else:
+                self.make_siggen(device_id, device_property)
                 error_type = self.NO_ERROR
 
         elif device_kind in self.gate_types:

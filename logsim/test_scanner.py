@@ -100,7 +100,6 @@ def test_scanner():
 # NAME      8
 # EOF       9
 
-
 correct_type_list = [
     6, 0,                   # :NETWORK{
     6, 0,                   # :  DEVICES{
@@ -129,8 +128,7 @@ correct_type_list = [
     1,                      # :}
     9                       # :EOF
 ]
-
-
+# test that the scanner works on our example_1
 def test_scanner_example_file():
     """test that the scanner works on our example_1"""
     scan = Scanner("scanner_test_files/example_1.txt", Names())
@@ -163,6 +161,17 @@ def test_scanner_example_file_with_comments():
         if(i == 10):
             assert(symbol.line_number == 13)
             assert(symbol.start_char_number == 8)
+        i += 1
+        if(symbol.type == scan.EOF):
+            break
+# test that the scanner works on our example_1_comments
+def test_scanner_example_file_comments():
+    scan = Scanner("scanner_test_files/example_1_comments.txt", Names())
+    i = 0
+    while True:
+        symbol = scan.get_symbol()
+        assert symbol.type == correct_type_list[i] , "got symbol \"" + \
+        symbol.string + "\""
         i += 1
         if(symbol.type == scan.EOF):
             break

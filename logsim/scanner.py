@@ -54,21 +54,20 @@ class Scanner:
     get_symbol(self): Translates the next sequence of characters into a symbol
                       and returns the symbol.
     """
-
-    def __init__(self, path, file, names):
-        """Open specified file and initialise reserved words and IDs."""
+    def __init__(self, path, names):
+        """"Open specified file and initialise reserved words and IDs."""
         # opens specified file
         self.path = path
-        self.file = file
+        # self.file  = file
         # opens specified file
-        """
+
         try:
-            Open and return the file specified by path for reading
+            # Open and return the file specified by path for reading
             self.file = open(path, "r", encoding="utf-8")
         except IOError:
             print("error, can't find or open file")
             sys.exit()
-        # initialises reserved words and IDs"""
+        # initialises reserved words and IDs
         self.names = names
 
         # SIMPLE EBNF
@@ -89,7 +88,7 @@ class Scanner:
             "NETWORK", "DEVICES", "CLOCK", "SWITCH", "DTYPE", "AND",
             "NAND", "NOR", "OR", "XOR", "CONNECTIONS", "SIGNALS",
             "SETSIGNAL", "SETCLOCK", "MONITOR", "starttime", "period",
-            "firstchange"
+            "firstchange", "SIGGEN", "pulse"
         ]
 
         # SIMPLE EBNF
@@ -102,7 +101,8 @@ class Scanner:
             self.DTYPE_ID, self.AND_ID, self.NAND_ID, self.NOR_ID, self.OR_ID,
             self.XOR_ID, self.CONNECTIONS_ID, self.SIGNALS_ID,
             self.SETSIGNALS_ID, self.SETCLOCK_ID, self.MONITOR_ID,
-            self.starttime_ID, self.period_ID, self.firstchange_ID
+            self.starttime_ID, self.period_ID, self.firstchange_ID,
+            self.SIGGEN_ID, self.pulse_ID
             ] = self.names.lookup(self.keywords_list)
 
         # initialise current character to be first character

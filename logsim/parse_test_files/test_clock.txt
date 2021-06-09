@@ -15,8 +15,8 @@ NETWORK{
 		SW1 = 0 ;
 		SW2 = 0;
 		}
-	
-	
+
+
    MONITOR{
 	G1;
 	G2;

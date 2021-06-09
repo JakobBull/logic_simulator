@@ -21,6 +21,7 @@ import os
 import math
 import numpy as np
 import io
+import gettext
 from wx.core import HORIZONTAL
 import wx.lib.scrolledpanel as scrolled
 import wx.glcanvas as wxcanvas
@@ -28,6 +29,7 @@ import wx.lib.sized_controls as sc
 from wx.lib.pdfviewer import pdfViewer, pdfButtonPanel
 from OpenGL import GL, GLUT, GLU
 from error import Error
+import builtins
 
 from names import Names
 from devices import Devices
@@ -753,28 +755,28 @@ class SidePanel(wx.Panel):
         # Configure the widgets
 
         # control setting number of cycles
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
+        self.text = wx.StaticText(self, wx.ID_ANY, _("Cycles"))
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
 
         # run and continue buttons
-        self.run_button = wx.Button(self, wx.ID_ANY, "Run")
-        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
+        self.run_button = wx.Button(self, wx.ID_ANY, _("Run"))
+        self.continue_button = wx.Button(self, wx.ID_ANY, _("Continue"))
 
         """Setting the value of a signal/ switch
         switch_box takes the value
         zero_button and one_button allow toggling between 0 and 1
         add_switch_executes the add button"""
-        self.switch_box_text = wx.StaticText(self, wx.ID_ANY, "Set Switch")
+        self.switch_box_text = wx.StaticText(self, wx.ID_ANY, _("Set Switch"))
         self.switch_box = wx.ComboBox(
             self, wx.ID_ANY, "Switch", choices=[
                 self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(
                     self.parent.devices.SWITCH)])
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
-        self.add_switch_button = wx.Button(self, -1, "Set")
+        self.add_switch_button = wx.Button(self, -1, _("Set"))
 
         self.monitor_text = wx.StaticText(
-            self, wx.ID_ANY, "Set outputs to monitor")
+            self, wx.ID_ANY, _("Set outputs to monitor"))
         # monitor_sizer
         all = [self.parent.names.get_name_string(
             i) for i in self.parent.devices.find_devices(None)]
@@ -784,17 +786,17 @@ class SidePanel(wx.Panel):
             i) for i in self.parent.devices.find_devices(self.parent.devices.CLOCK)]
         choices = [i for i in all if i not in switches and i not in clocks]
         self.monitor_combobox = wx.ComboBox(
-            self, wx.ID_ANY, "Select", choices=choices)
-        self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
+            self, wx.ID_ANY, _("Select"), choices=choices)
+        self.add_monitor_button = wx.Button(self, wx.ID_ANY, _("Add"))
 
         self.remove_monitor_text = wx.StaticText(
-            self, wx.ID_ANY, "Remove monitor")
+            self, wx.ID_ANY, _("Remove monitor"))
         # remove_monitor_sizer
         self.remove_monitor_combobox = wx.ComboBox(
-            self, wx.ID_ANY, "Select", choices=[
+            self, wx.ID_ANY, _("Select"), choices=[
                 item.name for item in self.scrolled_panel.item_list])
-        self.remove_monitor_button = wx.Button(self, wx.ID_ANY, "Remove")
-        self.remove_all_button = wx.Button(self, wx.ID_ANY, "Remove all")
+        self.remove_monitor_button = wx.Button(self, wx.ID_ANY, _("Remove"))
+        self.remove_all_button = wx.Button(self, wx.ID_ANY, _("Remove all"))
         self.remove_all_button.SetForegroundColour('#ff1a1a')
 
         self.toggle_gui_text = wx.StaticText(
@@ -1478,10 +1480,13 @@ class FilePanel(wx.Panel):
             style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
         )
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            print("You chose the following file:")
+              # initially:
+            # path = dlg.GetPath()
+            # needed to change to paths for mac 10.10.5
+            path = dlg.GetPaths()[0]
+            print(_("You chose the following file:"))
         dlg.Destroy()
-        print("Filepath is", path)
+        print(_("Filepath is"), path)
         if path is not None:
             print("setting text")
             self.parent.text_editor.set_text(path)
@@ -1493,7 +1498,7 @@ class FilePanel(wx.Panel):
                     self.parent.parent.file = io.StringIO(
                         self.parent.parent.content)
             except IOError:
-                print("error, can't find or open file")
+                print(_("error, can't find or open file"))
                 sys.exit()
             self.path = path
 
@@ -1577,9 +1582,9 @@ class GuiControlPanel(wx.Panel):
         self.parent = parent
         self.path = None
 
-        self.return_button = wx.Button(self, wx.ID_ANY, "Back to text editor")
-        self.save_as_button = wx.Button(self, wx.ID_ANY, "Save as")
-        self.help_button = wx.Button(self, wx.ID_ANY, "Help")
+        self.return_button = wx.Button(self, wx.ID_ANY, _("Back to text editor"))
+        self.save_as_button = wx.Button(self, wx.ID_ANY, _("Save as"))
+        self.help_button = wx.Button(self, wx.ID_ANY, _("Help"))
 
         self.return_button.Bind(wx.EVT_BUTTON, self.on_return_button)
         self.save_as_button.Bind(wx.EVT_BUTTON, self.on_save_file)
@@ -1700,13 +1705,22 @@ class FrameManager:
 
     """
 
-    def __init__(self, title):
+    def __init__(self, title, language):
         """Launch app.
 
         Create MenuFrame.
         """
         self.title = title
         self.app = wx.App()
+        builtins._ = wx.GetTranslation
+        if language == "de":
+            de = gettext.translation('de_DE', localedir='locale', languages=['de'])
+            de.install()
+            _ = de.gettext
+        if language == "el":
+            el = gettext.translation('el_GR', localedir='locale', languages=['el'])
+            el.install()
+            _ = el.gettext
         self.menu = MenuFrame(self, title)
         self.menu.Show()
         self.app.MainLoop()
@@ -1736,7 +1750,7 @@ class FrameManager:
         """
         self.content = self.menu.text_editor.text.GetValue()
         self.file = io.StringIO(self.content)
-        self.scanner = Scanner(self.path, self.file, self.names)
+        self.scanner = Scanner(self.path, self.names)
         self.parser = Parser(
             self.names,
             self.devices,
@@ -1760,7 +1774,8 @@ class FrameManager:
             self.menu.error_panel.SetValue("")
         else:
             error = Error.gui_report_error(self.scanner)
-            Error.print_error(self.scanner)
+            print(error)
+            Error.reset()
             print("Sorry, can't parse network.")
             self.menu.error_panel.SetValue(error)
 
@@ -1800,3 +1815,6 @@ class FrameManager:
         pdfV.viewer.LoadFile(r'user_guide/user_guide.pdf')
         pdfV.Show()
         os.chdir(r'final_test_files')
+
+if __name__ == "__main__":
+    FrameManager(_("Logic Simulator"))
