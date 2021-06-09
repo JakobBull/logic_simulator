@@ -64,7 +64,8 @@ class Parser:
             self.scanner.XOR_ID,
             self.scanner.DTYPE_ID,
             self.scanner.SWITCH_ID,
-            self.scanner.CLOCK_ID
+            self.scanner.CLOCK_ID,
+            self.scanner.SIGGEN_ID
         ]
         self.heading_IDs = [self.scanner.NETWORK_ID, self.scanner.DEVICES_ID,
                             self.scanner.CONNECTIONS_ID,
@@ -207,6 +208,7 @@ class Parser:
         # symbol 3: Device
         gate = False
         clock = False
+        siggen = False
         if self.symbol.id not in self.device_IDs:
             Error(5, self.symbol)
         elif self.symbol.id in self.gate_var_inputs_IDs:
@@ -215,6 +217,9 @@ class Parser:
         elif self.symbol.id == self.scanner.CLOCK_ID:
             # symbol is a clock, next symbol must be halfperiod
             clock = True
+        elif self.symbol.id == self.scanner.SIGGEN_ID:
+            # symbol is a siggen, next symbol must be halfperiod
+            siggen = True
         self.new_device_type = self.symbol.id
         self.symbol = self.scanner.get_symbol() # next symbol
 
@@ -226,6 +231,9 @@ class Parser:
         elif clock:
             if self.symbol.string != "halfperiod":
                 Error(8, self.symbol)
+        elif siggen:
+            if self.symbol.string != "pulse":
+                Error(30, self.symbol)   # need siggen error
         elif (self.symbol.type == self.scanner.SEMICOLON and
                 self.new_device_type == self.scanner.SWITCH_ID):
             # Must be a switch so make switch initially 0
@@ -257,9 +265,8 @@ class Parser:
 
             else:
                 return Error.num_errors - errors_start
-
         #symbol 5 should be a number if gate or clock device
-        if gate or clock:
+        if gate or clock or siggen:
             self.symbol = self.scanner.get_symbol() # next symbol
             if self.symbol.type == self.scanner.SEMICOLON:
                 return 0
@@ -285,9 +292,17 @@ class Parser:
                     self.devices.make_clock(
                         self.new_device_id, self.symbol.number)
                     self.device_names.append(self.new_device_id)
+            elif siggen:
+                if self.symbol.type != self.scanner.NUMBER or not self.is_bin_num(self.symbol.number):
+                    Error(31, self.symbol)
+                else:
+                    # Build siggen object
+                    self.devices.make_siggen(
+                        self.new_device_id, self.symbol.number)
+                    self.device_names.append(self.new_device_id)
 
         #symbol 6 should be a ';' if gate or clock device
-        if gate or clock:
+        if gate or clock or siggen:
             self.symbol = self.scanner.get_symbol() # next symbol
             if self.symbol.type == self.scanner.SEMICOLON:
                 return 0
@@ -305,6 +320,12 @@ class Parser:
                         return 1
                     if self.symbol.type == self.scanner.RIGHT_BRACKET:
                         return 2
+
+    def is_bin_num(self, num):
+        for i in str(num):
+            if i in ("01") == False:
+                return False
+        return True
 
     def connection_list(self):
         """Parse the device list."""
@@ -480,6 +501,7 @@ class Parser:
     def monitor_parse(self):
         # Parse a line in Monitor.
         errors_start = Error.num_errors # errors started with
+        error_type = 0
         # Expected format : name SEMICOLON
         device_id = None
         output_id = None

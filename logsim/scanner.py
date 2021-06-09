@@ -88,7 +88,7 @@ class Scanner:
             "NETWORK", "DEVICES", "CLOCK", "SWITCH", "DTYPE", "AND",
             "NAND", "NOR", "OR", "XOR", "CONNECTIONS", "SIGNALS",
             "SETSIGNAL", "SETCLOCK", "MONITOR", "starttime", "period",
-            "firstchange"
+            "firstchange", "SIGGEN", "pulse"
         ]
 
         # SIMPLE EBNF
@@ -101,7 +101,8 @@ class Scanner:
             self.DTYPE_ID, self.AND_ID, self.NAND_ID, self.NOR_ID, self.OR_ID,
             self.XOR_ID, self.CONNECTIONS_ID, self.SIGNALS_ID,
             self.SETSIGNALS_ID, self.SETCLOCK_ID, self.MONITOR_ID,
-            self.starttime_ID, self.period_ID, self.firstchange_ID
+            self.starttime_ID, self.period_ID, self.firstchange_ID,
+            self.SIGGEN_ID, self.pulse_ID
             ] = self.names.lookup(self.keywords_list)
 
         # initialise current character to be first character

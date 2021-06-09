@@ -1,0 +1,19 @@
+NETWORK{
+    DEVICES{
+    SW1 = SWITCH;
+    sig = SIGGEN pulse 110000;
+    G1 = OR inputs 2;
+    }
+   CONNECTIONS{
+    SW1 - G1.I1;
+    sig - G1.I2;
+    }
+   SIGNALS{
+        SW1 = 1;
+        }
+   MONITOR{
+    G1;
+    sig;
+    }
+}
+
