@@ -246,7 +246,7 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
         for i in range(len(values) + 1):
             self.render_text(str(i), (i * 20) + 10, 0.0)
 
-        self.render_text("time", (len(values) * 20) + 35, 5.0)
+        self.render_text(_("time"), (len(values) * 20) + 35, 5.0)
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
         GL.glFlush()
@@ -848,14 +848,9 @@ class SidePanel(wx.Panel):
         add_switch_executes the add button"""
         self.switch_box_text = wx.StaticText(self, wx.ID_ANY, _("Set Switch"))
         self.switch_box = wx.ComboBox(
-            self,
-            wx.ID_ANY,
-            "Switch",
-            choices=[
-                self.parent.names.get_name_string(i)
-                for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)
-            ],
-        )
+            self, wx.ID_ANY, _("Switch"), choices=[
+                self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(
+                    self.parent.devices.SWITCH)])
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
         self.add_switch_button = wx.Button(self, -1, _("Set"))
@@ -893,8 +888,7 @@ class SidePanel(wx.Panel):
         self.remove_all_button.SetForegroundColour("#ff1a1a")
 
         self.toggle_gui_text = wx.StaticText(
-            self, wx.ID_ANY, "Change between 2D and 3D view mode"
-        )
+            self, wx.ID_ANY, _("Change between 2D and 3D view mode"))
         if self.parent.dimension == 2:
             self.toggle_gui_button = wx.Button(self, wx.ID_ANY, "3D")
         else:
@@ -1319,8 +1313,10 @@ class MonitorItem(wx.Panel):
         )
         fo = wx.Font(13, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.name_text.SetFont(fo)
-        self.remove_item = wx.Button(self, wx.ID_ANY, "Remove")
-        self.reset_button = wx.Button(self, wx.ID_ANY, "Reset View")
+        self.remove_item = wx.Button(self, wx.ID_ANY, _("Remove"))
+        self.reset_button = wx.Button(self, wx.ID_ANY, _("Reset View"))
+        
+        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
@@ -1536,9 +1532,9 @@ class FilePanel(wx.Panel):
         self.parent = parent
         self.path = None
 
-        search_file_button = wx.Button(self, wx.ID_ANY, "Load file")
-        save_as_button = wx.Button(self, wx.ID_ANY, "Save as")
-        gui_button = wx.Button(self, wx.ID_ANY, "Continue to GUI")
+        search_file_button = wx.Button(self, wx.ID_ANY, _("Load file"))
+        save_as_button = wx.Button(self, wx.ID_ANY, _("Save as"))
+        gui_button = wx.Button(self, wx.ID_ANY, _("Continue to GUI"))
 
         search_file_button.Bind(wx.EVT_BUTTON, self.on_open_file)
         save_as_button.Bind(wx.EVT_BUTTON, self.on_save_file)
@@ -1909,6 +1905,7 @@ class FrameManager:
         """
         pdfV = PDFViewer(None, size=(800, 800), title="User Guide")
         pdfV.viewer.UsePrintDirect = False
+        print(os.getcwd())
         os.chdir(r"..")
         pdfV.viewer.LoadFile(r"user_guide/user_guide.pdf")
         pdfV.Show()

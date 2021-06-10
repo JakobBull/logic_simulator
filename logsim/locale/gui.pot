@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-08 12:00+0100\n"
+"POT-Creation-Date: 2021-06-09 16:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,82 +17,98 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: gui.py:278
+#: gui.py:790
 msgid "Add"
 msgstr ""
 
-#: gui.py:946
+#: gui.py:1585
 msgid "Back to text editor"
 msgstr ""
 
-#: gui.py:251
+#: gui.py:803
+msgid "Change between 2D and 3D view mode"
+msgstr ""
+
+#: gui.py:763
 msgid "Continue"
 msgstr ""
 
-#: gui.py:821
+#: gui.py:1457
 msgid "Continue to GUI"
 msgstr ""
 
-#: gui.py:246
+#: gui.py:758
 msgid "Cycles"
 msgstr ""
 
-#: gui.py:850
+#: gui.py:1489
 msgid "Filepath is"
 msgstr ""
 
-#: gui.py:948
+#: gui.py:1587
 msgid "Help"
 msgstr ""
 
-#: gui.py:1164
+#: gui.py:1455
+msgid "Load file"
+msgstr ""
+
+#: gui.py:1819
 msgid "Logic Simulator"
 msgstr ""
 
-#: gui.py:286 gui.py:701
+#: gui.py:798 gui.py:1240
 msgid "Remove"
 msgstr ""
 
-#: gui.py:287
+#: gui.py:799
 msgid "Remove all"
 msgstr ""
 
-#: gui.py:281
+#: gui.py:793
 msgid "Remove monitor"
 msgstr ""
 
-#: gui.py:250
+#: gui.py:1241
+msgid "Reset View"
+msgstr ""
+
+#: gui.py:762
 msgid "Run"
 msgstr ""
 
-#: gui.py:820 gui.py:947
+#: gui.py:1456 gui.py:1586
 msgid "Save as"
 msgstr ""
 
-#: gui.py:819
-msgid "Search file"
-msgstr ""
-
-#: gui.py:277 gui.py:284
+#: gui.py:789 gui.py:796
 msgid "Select"
 msgstr ""
 
-#: gui.py:264
+#: gui.py:776
 msgid "Set"
 msgstr ""
 
-#: gui.py:257
+#: gui.py:769
 msgid "Set Switch"
 msgstr ""
 
-#: gui.py:267
+#: gui.py:779
 msgid "Set outputs to monitor"
 msgstr ""
 
-#: gui.py:848
+#: gui.py:771
+msgid "Switch"
+msgstr ""
+
+#: gui.py:1487
 msgid "You chose the following file:"
 msgstr ""
 
-#: gui.py:862
+#: gui.py:1501
 msgid "error, can't find or open file"
+msgstr ""
+
+#: gui.py:198
+msgid "time"
 msgstr ""
