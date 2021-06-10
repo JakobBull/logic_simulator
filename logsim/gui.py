@@ -9,8 +9,20 @@ This is, because in general it makes code more readable.**
 
 Classes:
 --------
-MyGLCanvas - handles all canvas drawing operations.
-Gui - configures the main window and all the widgets.
+PDFViewer - Shows User Guide.
+MyGLCanvas2D - handles all 2D canvas drawing operations.
+MyGLCanvas3D - handles all 3D canvas drawing operations.
+SidePanel - all runtime control for the Logic Simulator.
+MonitorPanel - Holds all Monitor objects.
+MonitorItem - parent class to MonitorItem2D and MonitorItem 3D, defines layout.
+MonitorItem2D - creates 2D monitor objects.
+MonitorItem3D - creates 3D monitor objects.
+MenuFrame - Loading frame that contains the text editor.
+TextEditor - Text Editor to load and edit logic definition files.
+FilePanel - Control Panel that holds buttons to control MenuFrame.
+GuiControlPanel - Control Panel that holds buttons to control Gui.
+Gui - Configures the main window with the Logic Simulator.
+FrameManager - switches between frames, holds global data.
 """
 from OpenGL.raw.GL.VERSION.GL_1_1 import GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT
 import wx
@@ -38,23 +50,45 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 
+
 class PDFViewer(sc.SizedFrame):
+    """Open new frame, show PDF User Guide.
+
+    Parameters:
+    ------
+    parent: None.
+
+    Public Methods:
+    ------
+
+    """
+
     def __init__(self, parent, **kwds):
+        """Create PDFViewer.
+
+        Shows User Guide.
+        """
         super(PDFViewer, self).__init__(parent, **kwds)
 
         paneCont = self.GetContentsPane()
-        self.buttonpanel = pdfButtonPanel(paneCont, wx.NewId(),
-                                wx.DefaultPosition, wx.DefaultSize, 0)
+        self.buttonpanel = pdfButtonPanel(
+            paneCont, wx.NewId(), wx.DefaultPosition, wx.DefaultSize, 0
+        )
         self.buttonpanel.SetSizerProps(expand=True)
-        self.viewer = pdfViewer(paneCont, wx.NewId(), wx.DefaultPosition,
-                                wx.DefaultSize,
-                                wx.HSCROLL|wx.VSCROLL|wx.SUNKEN_BORDER)
+        self.viewer = pdfViewer(
+            paneCont,
+            wx.NewId(),
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            wx.HSCROLL | wx.VSCROLL | wx.SUNKEN_BORDER,
+        )
         self.viewer.UsePrintDirect = False
         self.viewer.SetSizerProps(expand=True, proportion=1)
 
         # introduce buttonpanel and viewer to each other
         self.buttonpanel.viewer = self.viewer
         self.viewer.buttonpanel = self.buttonpanel
+
 
 class MyGLCanvas2D(wxcanvas.GLCanvas):
     """Handle all drawing operations.
@@ -68,10 +102,13 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
     parent: parent window.
     devices: instance of the devices.Devices() class.
     monitors: instance of the monitors.Monitors() class.
+    size: size.
 
     Public methods
     --------------
     init_gl(self): Configures the OpenGL context.
+
+    reset(self): Resets zoom, pan and rotation.
 
     render_value(self, values): Handles all drawing operations.
 
@@ -79,8 +116,12 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
 
     on_paint(self, event): Handles the paint event.
 
+    on_size(self, event): Handles the canvas resize event.
+
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
+
+    on_mouse(self, event): Handles all mouse events.
 
     """
 
@@ -89,11 +130,18 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
 
         Initialise canvas properties and useful variables.
         """
-        super().__init__(parent, size=size,
-                         attribList=[wxcanvas.WX_GL_RGBA,
-                                     wxcanvas.WX_GL_DOUBLEBUFFER,
-                                     wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
-                                     
+        super().__init__(
+            parent,
+            size=size,
+            attribList=[
+                wxcanvas.WX_GL_RGBA,
+                wxcanvas.WX_GL_DOUBLEBUFFER,
+                wxcanvas.WX_GL_DEPTH_SIZE,
+                16,
+                0,
+            ],
+        )
+
         GLUT.glutInit()
         self.parent = parent
         self.init = False
@@ -116,7 +164,10 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
     def reset(self):
-        """Reset scrolling and panning."""
+        """Reset scrolling and panning.
+
+        Resets canvas.
+        """
         print("reset called")
         self.zoom = 1
         self.pan_x = 1
@@ -125,9 +176,10 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
         self.Refresh()  # triggers the paint event
 
     def on_size(self, event):
-        """Handle the canvas resize event."""
-        # Forces reconfiguration of the viewport, modelview and projection
-        # matrices on the next paint event
+        """Handle the canvas resize event.
+
+        Forces reconfiguration of the viewport, modelview and projection matrices on the next paint event.
+        """
         self.init = False
 
     def init_gl(self):
@@ -177,11 +229,10 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
             GL.glVertex2f(x_next, y)
         GL.glEnd()
 
-
         GL.glColor3f(0.5, 0.5, 0.0)
         GL.glColor3f(0.3, 0.5, 0.7)
         GL.glBegin(GL.GL_LINES)
-        GL.glVertex2f(10.0,0.0)
+        GL.glVertex2f(10.0, 0.0)
         GL.glVertex2f(10.0, 45.0)
         GL.glEnd()
         GL.glColor3f(1.0, 0.7, 0.5)
@@ -189,10 +240,10 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
         self.render_text("0", 0.0, 10.0)
         GL.glColor3f(0.3, 0.5, 0.7)
         GL.glBegin(GL.GL_LINES)
-        GL.glVertex2f(0.0,10.0)
-        GL.glVertex2f(10+20*(len(values)+1), 10.0)
+        GL.glVertex2f(0.0, 10.0)
+        GL.glVertex2f(10 + 20 * (len(values) + 1), 10.0)
         GL.glEnd()
-        for i in range(len(values)+ 1):
+        for i in range(len(values) + 1):
             self.render_text(str(i), (i * 20) + 10, 0.0)
 
         self.render_text("time", (len(values) * 20) + 35, 5.0)
@@ -232,8 +283,14 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
             self.init = True
 
         size = self.GetClientSize()
-        text = "".join(["Canvas redrawn on paint event, size is ",
-                        str(size.width), ", ", str(size.height)])
+        text = "".join(
+            [
+                "Canvas redrawn on paint event, size is ",
+                str(size.width),
+                ", ",
+                str(size.height),
+            ]
+        )
         # self.render(text)
         self.parent.render()
 
@@ -247,14 +304,17 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
         font = GLUT.GLUT_BITMAP_HELVETICA_12
 
         for character in text:
-            if character == '\n':
+            if character == "\n":
                 y_pos = y_pos - 20
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
     def on_mouse(self, event):
-        """Handle mouse events."""
+        """Handle mouse events.
+
+        Changes pan position.
+        """
         self.SetCurrent(self.context)
 
         if event.ButtonDown():
@@ -270,19 +330,7 @@ class MyGLCanvas2D(wxcanvas.GLCanvas):
             self.last_mouse_y = event.GetY()
             self.init = False
 
-        """
-        if event.GetWheelRotation() < 0:
-            self.zoom *= (1.0 + (
-                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
-            self.init = False
-
-        if event.GetWheelRotation() > 0:
-            self.zoom /= (1.0 - (
-                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
-            self.init = False"""
-
         self.Refresh()  # triggers the paint event
-
 
 
 class MyGLCanvas3D(wxcanvas.GLCanvas):
@@ -297,6 +345,7 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
     parent: parent window.
     devices: instance of the devices.Devices() class.
     monitors: instance of the monitors.Monitors() class.
+    size: size.
 
     Public methods
     --------------
@@ -304,9 +353,25 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
 
     render_value(self, values): Handles all drawing operations.
 
+    reset(self): Reset zoom, pan rotate.
+
+    render(self): Handles all drawing operations.
+
     render_empty(self): Draws empty canvas.
 
+    draw_cuboid(self, x_pos, half_width, half_depth, height, orientation): Draw a cuboid of specified size and orientation.
+
     on_paint(self, event): Handles the paint event.
+
+    on_size(self, event): Handles the size event.
+
+    on_down_rotate(self, event): Handles down rotate event.
+
+    on_up_rotate(self, event): Handles up rotate event.
+
+    rotate(self, steps, j): Rotate a 3D trace.
+
+    on_mouse(self, event): Handles mouse event.
 
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
@@ -314,17 +379,26 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
     """
 
     def __init__(self, parent, devices, monitors, size):
-        """Initialise canvas properties and useful variables."""
-        super().__init__(parent, size=size,
-                         attribList=[wxcanvas.WX_GL_RGBA,
-                                     wxcanvas.WX_GL_DOUBLEBUFFER,
-                                     wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
-                                     
+        """Initialise canvas properties and useful variables.
+
+        Set up widgets.
+        """
+        super().__init__(
+            parent,
+            size=size,
+            attribList=[
+                wxcanvas.WX_GL_RGBA,
+                wxcanvas.WX_GL_DOUBLEBUFFER,
+                wxcanvas.WX_GL_DEPTH_SIZE,
+                16,
+                0,
+            ],
+        )
+
         GLUT.glutInit()
         self.parent = parent
         self.init = False
         self.context = wxcanvas.GLContext(self)
-        
 
         # Constants for OpenGL materials and lights
         self.mat_diffuse = [0.0, 0.0, 0.0, 1.0]
@@ -348,7 +422,7 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
         self.last_mouse_y = 0  # previous mouse y position
 
         # Initialise the scene rotation matrix
-        self.scene_rotate = np.identity(4, 'f')
+        self.scene_rotate = np.identity(4, "f")
 
         # Initialise variables for zooming
         self.zoom = 1
@@ -362,7 +436,10 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
     def init_gl(self):
-        """Configure and initialise the OpenGL context."""
+        """Configure and initialise the OpenGL context.
+
+        Configure all OpenGL rendering tools.
+        """
         size = self.GetClientSize()
         self.SetCurrent(self.context)
 
@@ -385,8 +462,7 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
 
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, self.mat_specular)
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, self.mat_shininess)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE,
-                        self.mat_diffuse)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, self.mat_diffuse)
         GL.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE)
 
         GL.glClearColor(1, 1, 1, 1)
@@ -411,11 +487,14 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
         GL.glScalef(self.zoom, self.zoom, self.zoom)
 
     def reset(self):
-        """Reset scrolling and panning."""
+        """Reset scrolling and panning.
+
+        Reset pan, zoom, rotate.
+        """
         self.zoom = 1
         self.pan_x = 1
         self.pan_y = 1
-        self.scene_rotate = np.identity(4, 'f')
+        self.scene_rotate = np.identity(4, "f")
         self.init = False
         self.Refresh()  # triggers the paint event
 
@@ -434,31 +513,33 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
         # Draw a sample signal trace
-        GL.glColor3f(1.0, 0.7, 0.5)   # signal trace is beige
+        GL.glColor3f(1.0, 0.7, 0.5)  # signal trace is beige
         list_length = len(values)
         for i in range(list_length):
-                z = (i-list_length//2) * 300
-                if values[i] == 0:
-                    self.draw_cuboid(z, 150, 75, 15, "normal")
-                else:
-                    self.draw_cuboid(z, 150, 75, 165, "normal")
-        
+            z = (i - list_length // 2) * 300
+            if values[i] == 0:
+                self.draw_cuboid(z, 150, 75, 15, "normal")
+            else:
+                self.draw_cuboid(z, 150, 75, 165, "normal")
+
         GL.glColor3f(0.3, 0.5, 0.7)
         GL.glBegin(GL.GL_LINES)
-        GL.glVertex3f(-list_length//2 * 300, 75.0,75.0)
-        GL.glVertex3f(-list_length//2 * 300, 275.0, 75.0)
+        GL.glVertex3f(-list_length // 2 * 300, 75.0, 75.0)
+        GL.glVertex3f(-list_length // 2 * 300, 275.0, 75.0)
         GL.glEnd()
-        #GL.glColor3f(1.0, 0.7, 0.5)
-        self.render_text("1", -list_length//2 * 300, 225.0, 100.0)
-        self.render_text("0", -list_length//2 * 300, 75.0, 100.0)
+        # GL.glColor3f(1.0, 0.7, 0.5)
+        self.render_text("1", -list_length // 2 * 300, 225.0, 100.0)
+        self.render_text("0", -list_length // 2 * 300, 75.0, 100.0)
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
 
     def render(self):
-        """Handle all drawing operations."""
-        
+        """Handle all drawing operations.
+
+        Render trace.
+        """
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the OpenGL rendering context
@@ -475,13 +556,13 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
             if i == 0:
                 GL.glColor3f(1.0, 0.7, 0.5)  # signal trace is beige
                 orientation = "back"
-            elif i ==2:
-                 #GL.glColor3f(1, 0.5, 0.7)
-                 orientation = "normal"
+            elif i == 2:
+                # GL.glColor3f(1, 0.5, 0.7)
+                orientation = "normal"
             else:
-                #GL.glColor3f(0.3, 0.5, 0.7)
+                # GL.glColor3f(0.3, 0.5, 0.7)
                 orientation = "front"
-            
+
             for i in range(-10, 10):
                 z = i * 300
                 if i % 2 == 0:
@@ -503,14 +584,13 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
         Draw a cuboid at the specified position, with the specified
         dimensions.
         """
-
         verticies = (
             (x_pos + half_width, half_depth, half_depth),
             (x_pos - half_width, half_depth, half_depth),
             (x_pos - half_width, half_depth, -half_depth),
-            (x_pos + half_width, half_depth, - half_depth),
+            (x_pos + half_width, half_depth, -half_depth),
             (x_pos + half_width, half_depth + height, half_depth),
-            (x_pos + half_width, half_depth + height, - half_depth),
+            (x_pos + half_width, half_depth + height, -half_depth),
             (x_pos - half_width, half_depth + height, -half_depth),
             (x_pos - half_width, half_depth + height, half_depth),
         )
@@ -532,7 +612,7 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
             (-1, 0, 0),
             (1, 0, 0),
         )
-        
+
         if orientation == "normal":
             GL.glBegin(GL.GL_QUADS)
             for normal, face in zip(normals, faces):
@@ -542,9 +622,9 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
             GL.glEnd()
 
         elif orientation == "back":
-            mirror = ((1, 0, 0),(0, 0, 1),(0, -1, 0))
+            mirror = ((1, 0, 0), (0, 0, 1), (0, -1, 0))
             new_verticies = [np.matmul(mirror, vertex) for vertex in verticies]
-            #new_verticies = [[x, y-11, z-11] for [x, y, z] in new_verticies]
+            # new_verticies = [[x, y-11, z-11] for [x, y, z] in new_verticies]
             new_normals = [np.matmul(mirror, vertex) for vertex in normals]
             GL.glBegin(GL.GL_QUADS)
             for normal, face in zip(new_normals, faces):
@@ -552,11 +632,11 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
                 for index in face:
                     GL.glVertex3fv(new_verticies[index])
             GL.glEnd()
-        
+
         elif orientation == "front":
-            mirror = ((1, 0, 0),(0, 0, -1),(0, 1, 0))
+            mirror = ((1, 0, 0), (0, 0, -1), (0, 1, 0))
             new_verticies = [np.matmul(mirror, vertex) for vertex in verticies]
-            #new_verticies = [[x, y-11, z+11] for [x, y, z] in new_verticies]
+            # new_verticies = [[x, y-11, z+11] for [x, y, z] in new_verticies]
             new_normals = [np.matmul(mirror, vertex) for vertex in normals]
             GL.glBegin(GL.GL_QUADS)
             for normal, face in zip(new_normals, faces):
@@ -565,18 +645,15 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
                     GL.glVertex3fv(new_verticies[index])
             GL.glEnd()
         else:
-            print("Sorry wronf orientation.")
+            print("Sorry wrong orientation.")
             sys.exit()
-        """
-        GL.glColor3f(0.3, 0.5, 0.7)
-        GL.glBegin(GL.GL_LINES)
-        GL.glVertex3f(0.0,0.0, half_depth)
-        GL.glVertex3f(0.0, 1.5* height, half_depth)
-        GL.glEnd()
-        GL.glColor3f(1.0, 0.7, 0.5)"""
+
 
     def on_paint(self, event):
-        """Handle the paint event."""
+        """Handle the paint event.
+
+        Render frame.
+        """
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the OpenGL rendering context
@@ -584,71 +661,71 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
             self.init = True
 
         size = self.GetClientSize()
-        text = "".join(["Canvas redrawn on paint event, size is ",
-                        str(size.width), ", ", str(size.height)])
-        #self.render()
+        text = "".join(
+            [
+                "Canvas redrawn on paint event, size is ",
+                str(size.width),
+                ", ",
+                str(size.height),
+            ]
+        )
+        # self.render()
         self.parent.render()
 
     def on_size(self, event):
-        """Handle the canvas resize event."""
-        # Forces reconfiguration of the viewport, modelview and projection
-        # matrices on the next paint event
+        """Handle the canvas resize event.
+
+        Forces reconfiguration of the viewport, modelview and projection matrices on the next paint event.
+        """
         self.init = False
-
-    def down_rotate(self, step):
-        """Handle the downwards rotation."""
-        self.SetCurrent(self.context)
-
-        GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()
-        
-        GL.glRotatef(90/step, 1, 0, 0)
-
-        GL.glMultMatrixf(self.scene_rotate)
-        GL.glGetFloatv(GL.GL_MODELVIEW_MATRIX, self.scene_rotate)
-
-        self.init = False
-
-        self.Refresh()  # triggers the paint event
-        self.SwapBuffers()
-        GL.glFlush()
-
 
     def on_down_rotate(self, event):
-        """Handle the downwards rotation."""
+        """Handle the downwards rotation.
+
+        Call down_rotate to rotate trace 90 degrees.
+        """
         start_time = time.time()
         steps = 15
         k = 0
 
         while time.time() < start_time + 1:
-            if steps*(time.time()-start_time)> k:
-                self.rotate(steps, k+2)
+            if steps * (time.time() - start_time) > k:
+                self.rotate(steps, k + 2)
                 k += 1
 
     def on_up_rotate(self, event):
-        """Handle upwards rotation event."""
+        """Handle upwards rotation event.
+
+        Call up_rotate to rotate trace 90 degrees.
+        """
         start_time = time.time()
         steps = 15
         k = 0
 
         while time.time() < start_time + 1:
-            if steps*(time.time()-start_time)> k:
-                self.rotate(steps, -(k+2))
+            if steps * (time.time() - start_time) > k:
+                self.rotate(steps, -(k + 2))
                 k += 1
 
     def rotate(self, steps, j):
+        """Rotate a 3D trace.
+
+        Redraw canvas with rotated object.
+        """
         self.SetCurrent(self.context)
         GL.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         GL.glPushMatrix()
         print("j is", j)
-        GL.glRotatef(j*90/steps,1 ,0 , 0)
+        GL.glRotatef(j * 90 / steps, 1, 0, 0)
         self.render()
         GL.glPopMatrix()
         self.SwapBuffers()
-        
 
     def on_mouse(self, event):
-        """Handle mouse events."""
+        """Handle mouse events.
+
+        Change pan.
+        """
         self.SetCurrent(self.context)
 
         if event.ButtonDown():
@@ -662,13 +739,13 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
             y = event.GetY() - self.last_mouse_y
             if event.LeftIsDown():
                 GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
-                #GL.glRotatef(0, 0, (x + y), 1)
+                # GL.glRotatef(0, 0, (x + y), 1)
             if event.MiddleIsDown():
                 GL.glRotatef(y, y, 0, 0)
             if event.RightIsDown():
                 self.pan_x += x
                 self.moved += x
-                #self.pan_y -= y
+                # self.pan_y -= y
             GL.glMultMatrixf(self.scene_rotate)
             GL.glGetFloatv(GL.GL_MODELVIEW_MATRIX, self.scene_rotate)
             self.last_mouse_x = event.GetX()
@@ -676,25 +753,26 @@ class MyGLCanvas3D(wxcanvas.GLCanvas):
             self.init = False
 
         if event.GetWheelRotation() < 0:
-            self.zoom *= (1.0 + (
-                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            self.zoom *= 1.0 + (event.GetWheelRotation() / (20 * event.GetWheelDelta()))
             self.init = False
 
         if event.GetWheelRotation() > 0:
-            self.zoom /= (1.0 - (
-                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            self.zoom /= 1.0 - (event.GetWheelRotation() / (20 * event.GetWheelDelta()))
             self.init = False
 
         self.Refresh()  # triggers the paint event
 
     def render_text(self, text, x_pos, y_pos, z_pos):
-        """Handle text drawing operations."""
+        """Handle text drawing operations.
+
+        Render text.
+        """
         GL.glDisable(GL.GL_LIGHTING)
         GL.glRasterPos3f(x_pos, y_pos, z_pos)
         font = GLUT.GLUT_BITMAP_HELVETICA_10
 
         for character in text:
-            if character == '\n':
+            if character == "\n":
                 y_pos = y_pos - 20
                 GL.glRasterPos3f(x_pos, y_pos, z_pos)
             else:
@@ -715,6 +793,8 @@ class SidePanel(wx.Panel):
     ------
     read_name(self, name_string): Return the name ID of the current string if valid,
                                 Return None if the current string is not a valid name string.
+
+    on_toggle_gui(self, event): Handles event that toggles between 2D and 3D view mode.
 
     read_signal_name(self): Return the device and port IDs of the current signal name.
                             Return None if either is invalid.
@@ -768,39 +848,53 @@ class SidePanel(wx.Panel):
         add_switch_executes the add button"""
         self.switch_box_text = wx.StaticText(self, wx.ID_ANY, _("Set Switch"))
         self.switch_box = wx.ComboBox(
-            self, wx.ID_ANY, "Switch", choices=[
-                self.parent.names.get_name_string(i) for i in self.parent.devices.find_devices(
-                    self.parent.devices.SWITCH)])
+            self,
+            wx.ID_ANY,
+            "Switch",
+            choices=[
+                self.parent.names.get_name_string(i)
+                for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)
+            ],
+        )
         self.zero_button = wx.RadioButton(self, -1, "0", style=wx.RB_GROUP)
         self.one_button = wx.RadioButton(self, -1, "1")
         self.add_switch_button = wx.Button(self, -1, _("Set"))
 
-        self.monitor_text = wx.StaticText(
-            self, wx.ID_ANY, _("Set outputs to monitor"))
+        self.monitor_text = wx.StaticText(self, wx.ID_ANY, _("Set outputs to monitor"))
         # monitor_sizer
-        all = [self.parent.names.get_name_string(
-            i) for i in self.parent.devices.find_devices(None)]
-        switches = [self.parent.names.get_name_string(
-            i) for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)]
-        clocks = [self.parent.names.get_name_string(
-            i) for i in self.parent.devices.find_devices(self.parent.devices.CLOCK)]
+        all = [
+            self.parent.names.get_name_string(i)
+            for i in self.parent.devices.find_devices(None)
+        ]
+        switches = [
+            self.parent.names.get_name_string(i)
+            for i in self.parent.devices.find_devices(self.parent.devices.SWITCH)
+        ]
+        clocks = [
+            self.parent.names.get_name_string(i)
+            for i in self.parent.devices.find_devices(self.parent.devices.CLOCK)
+        ]
         choices = [i for i in all if i not in switches and i not in clocks]
         self.monitor_combobox = wx.ComboBox(
-            self, wx.ID_ANY, _("Select"), choices=choices)
+            self, wx.ID_ANY, _("Select"), choices=choices
+        )
         self.add_monitor_button = wx.Button(self, wx.ID_ANY, _("Add"))
 
-        self.remove_monitor_text = wx.StaticText(
-            self, wx.ID_ANY, _("Remove monitor"))
+        self.remove_monitor_text = wx.StaticText(self, wx.ID_ANY, _("Remove monitor"))
         # remove_monitor_sizer
         self.remove_monitor_combobox = wx.ComboBox(
-            self, wx.ID_ANY, _("Select"), choices=[
-                item.name for item in self.scrolled_panel.item_list])
+            self,
+            wx.ID_ANY,
+            _("Select"),
+            choices=[item.name for item in self.scrolled_panel.item_list],
+        )
         self.remove_monitor_button = wx.Button(self, wx.ID_ANY, _("Remove"))
         self.remove_all_button = wx.Button(self, wx.ID_ANY, _("Remove all"))
-        self.remove_all_button.SetForegroundColour('#ff1a1a')
+        self.remove_all_button.SetForegroundColour("#ff1a1a")
 
         self.toggle_gui_text = wx.StaticText(
-            self, wx.ID_ANY, "Change between 2D and 3D view mode")
+            self, wx.ID_ANY, "Change between 2D and 3D view mode"
+        )
         if self.parent.dimension == 2:
             self.toggle_gui_button = wx.Button(self, wx.ID_ANY, "3D")
         else:
@@ -817,7 +911,7 @@ class SidePanel(wx.Panel):
 
         self.remove_monitor_button.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
         self.remove_all_button.Bind(wx.EVT_BUTTON, self.on_remove_all_monitors)
-    
+
         self.toggle_gui_button.Bind(wx.EVT_BUTTON, self.on_toggle_gui)
 
         self.side_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -844,10 +938,8 @@ class SidePanel(wx.Panel):
         self.side_sizer.Add(self.monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 0)
         self.side_sizer.Add(self.monitor_sizer, 1, wx.ALL | wx.EXPAND, 0)
         self.side_sizer.Add(wx.StaticLine(self, -1), 0, wx.ALL | wx.EXPAND, 5)
-        self.side_sizer.Add(self.remove_monitor_text, 1,
-                            wx.ALL | wx.ALIGN_CENTER, 5)
-        self.side_sizer.Add(self.remove_monitor_sizer,
-                            1, wx.ALL | wx.EXPAND, 0)
+        self.side_sizer.Add(self.remove_monitor_text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
+        self.side_sizer.Add(self.remove_monitor_sizer, 1, wx.ALL | wx.EXPAND, 0)
 
         self.cycle_sizer.Add(self.text, 1, wx.ALL | wx.ALIGN_CENTER, 5)
         self.cycle_sizer.Add(self.spin, 2, wx.ALL, 5)
@@ -866,25 +958,28 @@ class SidePanel(wx.Panel):
         self.monitor_sizer.Add(self.add_monitor_button, 1, wx.ALL, 5)
 
         self.remove_monitor_sizer.Add(
-            self.remove_monitor_bordersizer,
-            1,
-            wx.RIGHT | wx.LEFT | wx.EXPAND,
-            5)
-        self.remove_monitor_sizer.Add(
-            self.remove_monitor_subsizer, 1, wx.ALL, 5)
+            self.remove_monitor_bordersizer, 1, wx.RIGHT | wx.LEFT | wx.EXPAND, 5
+        )
+        self.remove_monitor_sizer.Add(self.remove_monitor_subsizer, 1, wx.ALL, 5)
 
         self.remove_monitor_bordersizer.Add(
-            self.remove_monitor_combobox, 0, wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
+            self.remove_monitor_combobox, 0, wx.TOP | wx.BOTTOM | wx.EXPAND, 10
+        )
 
         self.remove_monitor_subsizer.Add(
-            self.remove_monitor_button, 0, wx.ALL | wx.EXPAND, 5)
+            self.remove_monitor_button, 0, wx.ALL | wx.EXPAND, 5
+        )
         self.remove_monitor_subsizer.Add(
-            self.remove_all_button, 0, wx.ALL | wx.EXPAND, 5)
+            self.remove_all_button, 0, wx.ALL | wx.EXPAND, 5
+        )
 
         self.SetSizer(self.side_sizer)
 
     def on_toggle_gui(self, event):
-        """Toggle between 2D and 3D signal traces."""
+        """Toggle between 2D and 3D signal traces.
+
+        Call Frame managers show_gui mode with dimension.
+        """
         self.parent.parent.gui.Hide()
 
         if self.parent.dimension == 2:
@@ -1066,12 +1161,6 @@ class MonitorPanel(scrolled.ScrolledPanel):
         """
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
-        """
-        if self.parent.dimension == 2:
-            print("dimension is", self.parent.dimension)
-            self.SetupScrolling(scroll_x=False)
-        else:
-            self.SetupScrolling()"""
         self.monitors = monitors
         self.devices = devices
         self.names = names
@@ -1085,29 +1174,30 @@ class MonitorPanel(scrolled.ScrolledPanel):
                 self.item_list.append(
                     MonitorItem2D(
                         self,
-                        self.names.get_name_string(
-                            key[0]),
+                        self.names.get_name_string(key[0]),
                         self.monitors,
                         self.devices,
-                        self.names))
-                self.item_list[-1].SetBackgroundColour('#b0bcda')
+                        self.names,
+                    )
+                )
+                self.item_list[-1].SetBackgroundColour("#BBBBBB")
                 self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
-        
+
         elif self.parent.dimension == 3:
             for key, value in self.monitors.monitors_dictionary.items():
                 self.item_list.append(
                     MonitorItem3D(
                         self,
-                        self.names.get_name_string(
-                            key[0]),
+                        self.names.get_name_string(key[0]),
                         self.monitors,
                         self.devices,
-                        self.names))
-                self.item_list[-1].SetBackgroundColour('#b0bcda')
+                        self.names,
+                    )
+                )
+                self.item_list[-1].SetBackgroundColour("#BBBBBB")
                 self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizer(self.sizer)
-
 
     def render_children(self):
         """Render sall MonitorItems.
@@ -1126,21 +1216,13 @@ class MonitorPanel(scrolled.ScrolledPanel):
         self.monitors.make_monitor(child_device_id, child_output_id)
         if self.parent.dimension == 2:
             self.item_list.append(
-                MonitorItem2D(
-                    self,
-                    text,
-                    self.monitors,
-                    self.devices,
-                    self.names))
+                MonitorItem2D(self, text, self.monitors, self.devices, self.names)
+            )
         elif self.parent.dimension == 3:
             self.item_list.append(
-                MonitorItem3D(
-                    self,
-                    text,
-                    self.monitors,
-                    self.devices,
-                    self.names))
-        self.item_list[-1].SetBackgroundColour('#b0bcda')
+                MonitorItem3D(self, text, self.monitors, self.devices, self.names)
+            )
+        self.item_list[-1].SetBackgroundColour("#BBBBBB")
         self.sizer.Add(self.item_list[-1], 0, wx.EXPAND | wx.ALL, 5)
         self.SetSizer(self.sizer)
         if self.parent.dimension == 2:
@@ -1230,18 +1312,17 @@ class MonitorItem(wx.Panel):
         self.monitors = monitors
         self.devices = devices
 
-        [self.device_id, self.output_id] = self.devices.get_signal_ids(
-            self.name)
+        [self.device_id, self.output_id] = self.devices.get_signal_ids(self.name)
 
         self.name_text = wx.StaticText(
-            self, wx.ID_ANY, label=self.name, size=(50, 50), style = wx.ALIGN_CENTER)
+            self, wx.ID_ANY, label=self.name, size=(50, 50), style=wx.ALIGN_CENTER
+        )
         fo = wx.Font(13, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.name_text.SetFont(fo)
         self.remove_item = wx.Button(self, wx.ID_ANY, "Remove")
         self.reset_button = wx.Button(self, wx.ID_ANY, "Reset View")
-        
-        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
+        self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
     def on_remove_item(self, event):
         """Event handler.
@@ -1249,11 +1330,11 @@ class MonitorItem(wx.Panel):
         Destroy self widget.
         """
         self.parent.item_list = [
-            item for item in self.parent.item_list if item.name != self.name]
+            item for item in self.parent.item_list if item.name != self.name
+        ]
         self.parent.parent.side_panel.remove_monitor_combobox.Clear()
         for item in self.parent.item_list:
-            self.parent.parent.side_panel.remove_monitor_combobox.Append(
-                item.name)
+            self.parent.parent.side_panel.remove_monitor_combobox.Append(item.name)
         self.parent.remove_child(self)
 
     def render(self):
@@ -1261,13 +1342,16 @@ class MonitorItem(wx.Panel):
 
         If DTYPE find outputID.
         """
-        [self.device_id, self.output_id] = self.devices.get_signal_ids(
-            self.name)
+        [self.device_id, self.output_id] = self.devices.get_signal_ids(self.name)
         if self.devices.get_device(self.device_id).device_kind == self.devices.D_TYPE:
-            self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.devices.dtype_output_ids[0]]
+            self.values = self.parent.monitors.monitors_dictionary[
+                self.device_id, self.devices.dtype_output_ids[0]
+            ]
             self.canvas.render_value(self.values)
         else:
-            self.values = self.parent.monitors.monitors_dictionary[self.device_id, self.output_id]
+            self.values = self.parent.monitors.monitors_dictionary[
+                self.device_id, self.output_id
+            ]
             self.canvas.render_value(self.values)
 
 
@@ -1296,16 +1380,16 @@ class MonitorItem3D(MonitorItem):
 
         Create a canvas object and all buttons.
         """
-        super().__init__(parent=parent, name=name, monitors=monitors, devices=devices, names=names)
-        
-        self.canvas = MyGLCanvas3D(
-            self, self.devices, self.monitors, size=(100, -1))
+        super().__init__(
+            parent=parent, name=name, monitors=monitors, devices=devices, names=names
+        )
+
+        self.canvas = MyGLCanvas3D(self, self.devices, self.monitors, size=(100, -1))
 
         self.reset_button.Bind(wx.EVT_BUTTON, self.on_reset_button)
 
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.button_sizer = wx.BoxSizer(wx.VERTICAL)
-
 
         self.sizer.Add(self.name_text, 1, wx.EXPAND, 0)
         self.sizer.Add(self.canvas, 6, wx.EXPAND, 0)
@@ -1317,12 +1401,9 @@ class MonitorItem3D(MonitorItem):
         self.Layout()
         self.SetSizer(self.sizer)
 
-
     def on_reset_button(self, event):
-        """Resets panning and zooming."""
+        """Reset panning and zooming."""
         self.canvas.reset()
-
-
 
 
 class MonitorItem2D(MonitorItem):
@@ -1350,10 +1431,11 @@ class MonitorItem2D(MonitorItem):
 
         Create a canvas object and all buttons.
         """
-        super().__init__(parent=parent, name=name, monitors=monitors, devices=devices, names=names)
-        
-        self.canvas = MyGLCanvas2D(
-            self, self.devices, self.monitors, size=(100, -1))
+        super().__init__(
+            parent=parent, name=name, monitors=monitors, devices=devices, names=names
+        )
+
+        self.canvas = MyGLCanvas2D(self, self.devices, self.monitors, size=(100, -1))
 
         self.reset_button.Bind(wx.EVT_BUTTON, self.on_reset_button)
 
@@ -1371,8 +1453,9 @@ class MonitorItem2D(MonitorItem):
         self.SetSizer(self.sizer)
 
     def on_reset_button(self, event):
-        """Resets panning and zooming."""
+        """Reset panning and zooming."""
         self.canvas.reset()
+
 
 class MenuFrame(wx.Frame):
     """Main frame that opens when application is started.
@@ -1403,7 +1486,8 @@ class MenuFrame(wx.Frame):
         self.file_panel = FilePanel(self)
         self.text_editor = TextEditor(self)
         self.error_panel = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_READONLY | wx.TE_MULTILINE)
+            self, wx.ID_ANY, "", style=wx.TE_READONLY | wx.TE_MULTILINE
+        )
         fo = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
         self.text_editor.SetFont(fo)
         self.error_panel.SetFont(fo)
@@ -1462,9 +1546,9 @@ class FilePanel(wx.Panel):
 
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        main_sizer.Add(search_file_button, -1, wx.ALL , 5)
+        main_sizer.Add(search_file_button, -1, wx.ALL, 5)
         main_sizer.Add(save_as_button, -1, wx.ALL, 5)
-        main_sizer.Add(gui_button, -1, wx.ALL , 5)
+        main_sizer.Add(gui_button, -1, wx.ALL, 5)
         self.SetSizer(main_sizer)
 
     def on_open_file(self, event):
@@ -1474,13 +1558,14 @@ class FilePanel(wx.Panel):
         """
         self.currentDirectory = os.getcwd()
         dlg = wx.FileDialog(
-            self, message="Choose a file",
+            self,
+            message="Choose a file",
             defaultDir=self.currentDirectory,
             defaultFile="",
-            style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
+            style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR,
         )
         if dlg.ShowModal() == wx.ID_OK:
-              # initially:
+            # initially:
             # path = dlg.GetPath()
             # needed to change to paths for mac 10.10.5
             path = dlg.GetPaths()[0]
@@ -1495,8 +1580,7 @@ class FilePanel(wx.Panel):
                 """Open and return the file specified by path for reading"""
                 with open(path, "r") as f:
                     self.parent.parent.content = f.read()
-                    self.parent.parent.file = io.StringIO(
-                        self.parent.parent.content)
+                    self.parent.parent.file = io.StringIO(self.parent.parent.content)
             except IOError:
                 print(_("error, can't find or open file"))
                 sys.exit()
@@ -1568,7 +1652,10 @@ class GuiControlPanel(wx.Panel):
     Public Methods:
     ------
     on_return_button(self, event): event handler for the return_button, shows menu, hides gui
+
     on_save_file(self, event): event handler for the save_as button, opens save menu.
+
+    on_help_button(self, event): Handles event that opens help frame.
 
     """
 
@@ -1599,7 +1686,10 @@ class GuiControlPanel(wx.Panel):
         self.SetSizer(self.main_sizer)
 
     def on_help_button(self, event):
-        """Open the help PDF viewer."""
+        """Open the help PDF viewer.
+
+        Open help.
+        """
         self.parent.parent.show_help()
 
     def on_return_button(self, event):
@@ -1634,7 +1724,9 @@ class Gui(wx.Frame):
 
     """
 
-    def __init__(self, parent, title, names, devices, network, monitors, path, dimension):
+    def __init__(
+        self, parent, title, names, devices, network, monitors, path, dimension
+    ):
         """Initialise widgets and layout.
 
         Create widgets and sizers.
@@ -1659,7 +1751,8 @@ class Gui(wx.Frame):
 
         # Canvas for drawing signals
         self.scrolled_panel = MonitorPanel(
-            self, self.monitors, self.devices, self.names)
+            self, self.monitors, self.devices, self.names
+        )
         self.scrolled_panel.SetupScrolling()
         # Control side_panel
         self.side_panel = SidePanel(self, self.scrolled_panel)
@@ -1703,6 +1796,8 @@ class FrameManager:
 
     save_file(self, button): Opens file saving menu.
 
+    show_help(self): Opens help frame.
+
     """
 
     def __init__(self, title, language):
@@ -1714,11 +1809,11 @@ class FrameManager:
         self.app = wx.App()
         builtins._ = wx.GetTranslation
         if language == "de":
-            de = gettext.translation('de_DE', localedir='locale', languages=['de'])
+            de = gettext.translation("de_DE", localedir="locale", languages=["de"])
             de.install()
             _ = de.gettext
         if language == "el":
-            el = gettext.translation('el_GR', localedir='locale', languages=['el'])
+            el = gettext.translation("el_GR", localedir="locale", languages=["el"])
             el.install()
             _ = el.gettext
         self.menu = MenuFrame(self, title)
@@ -1730,7 +1825,6 @@ class FrameManager:
 
         Create objects for devices, monitors, network.
         """
-
         self.path = path
         if self.menu.text_editor.text is not None:
             self.names = Names()
@@ -1752,11 +1846,8 @@ class FrameManager:
         self.file = io.StringIO(self.content)
         self.scanner = Scanner(self.path, self.file, self.names)
         self.parser = Parser(
-            self.names,
-            self.devices,
-            self.network,
-            self.monitors,
-            self.scanner)
+            self.names, self.devices, self.network, self.monitors, self.scanner
+        )
 
         if self.parser.parse_network():
             self.gui = Gui(
@@ -1765,8 +1856,10 @@ class FrameManager:
                 self.names,
                 self.devices,
                 self.network,
-                self.monitors, self.path,
-                dimension)
+                self.monitors,
+                self.path,
+                dimension,
+            )
             self.menu.Hide()
             self.gui.Show()
             self.gui.path = self.path
@@ -1796,9 +1889,11 @@ class FrameManager:
         print("content", self.content)
         self.currentDirectory = os.getcwd()
         dlg = wx.FileDialog(
-            button, message="Save file as ...",
+            button,
+            message="Save file as ...",
             defaultDir=self.currentDirectory,
-            defaultFile="", style=wx.FD_SAVE
+            defaultFile="",
+            style=wx.FD_SAVE,
         )
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -1808,12 +1903,13 @@ class FrameManager:
         dlg.Destroy()
 
     def show_help(self):
-        pdfV = PDFViewer(None, size=(800, 800), title= "User Guide")
-        pdfV.viewer.UsePrintDirect = False
-        os.chdir(r'..')
-        pdfV.viewer.LoadFile(r'user_guide/user_guide.pdf')
-        pdfV.Show()
-        os.chdir(r'final_test_files')
+        """Open Help frame.
 
-if __name__ == "__main__":
-    FrameManager(_("Logic Simulator"))
+        Creates PDFViewer object and opens new frame.
+        """
+        pdfV = PDFViewer(None, size=(800, 800), title="User Guide")
+        pdfV.viewer.UsePrintDirect = False
+        os.chdir(r"..")
+        pdfV.viewer.LoadFile(r"user_guide/user_guide.pdf")
+        pdfV.Show()
+        os.chdir(r"final_test_files")
