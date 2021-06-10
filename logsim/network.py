@@ -9,7 +9,6 @@ Network - builds and executes the network.
 
 
 class Network:
-
     """Build and execute the network.
 
     This class contains many functions required for connecting devices together
@@ -332,10 +331,7 @@ class Network:
 
     def execute_siggen(self, device_id):
         """If it is time to do so, set clock signals to RISING or FALLING."""
-        #siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
-        
         device = self.devices.get_device(device_id)
-        
         output = str(device.siggen_pulse)[device.siggen_counter-1]
         int_out = int(output)
         device.outputs[None] = int_out
@@ -355,8 +351,9 @@ class Network:
                 elif output_signal == self.devices.LOW:
                     device.outputs[None] = self.devices.RISING
             device.clock_counter += 1
-    
+
     def update_siggen(self):
+        """Update siggen_counter for siggen devices."""
         siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
         for device_id in siggen_devices:
             device = self.devices.get_device(device_id)
@@ -364,7 +361,6 @@ class Network:
                 device.siggen_counter = 0
             else:
                 device.siggen_counter += 1
-
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
