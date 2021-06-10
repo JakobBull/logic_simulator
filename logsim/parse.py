@@ -379,6 +379,7 @@ class Parser:
             if out_device.device_kind == self.devices.D_TYPE:
                 dtype = True
 
+
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
@@ -399,21 +400,21 @@ class Parser:
         #symbol 4: I + input#
         if dtype:
             if self.symbol.id not in self.devices.dtype_input_ids:
-                Error(13, self.symbol)
+                Error(18, self.symbol)
         else:
             if self.symbol.string[0] != 'I':
-                Error(13, self.symbol)
+                Error(14, self.symbol)
             else:
                 input_num = "" + self.symbol.string[1:]
                 if not input_num.isdigit():
-                    Error(13, self.symbol)
+                    Error(16, self.symbol)
 
         error_type = self.network.make_connection(
             in_device_id, in_port_id,
             out_device_id, self.symbol.id)
 
         if error_type != self.network.NO_ERROR:
-            Error(13, self.symbol)
+            Error(16, self.symbol)
 
         self.symbol = self.scanner.get_symbol() # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -426,7 +427,7 @@ class Parser:
 
         #symbol 5: ';'
         if self.symbol.type != self.scanner.SEMICOLON:
-            Error(18, self.symbol)
+            Error(19, self.symbol)
             for i in range(10): #tries to get a semi colon before going to next
                 self.symbol = self.scanner.get_symbol() # next symbol
                 if self.symbol.type == self.scanner.SEMICOLON:
@@ -510,7 +511,9 @@ class Parser:
             Error(26, self.symbol)
         else:
             print(self.symbol.string)
-            [device_id, output_id] = self.signame_in()
+            out = self.signame_in()
+            if out is not None:
+                [device_id, output_id] = out
 
             error_type = self.monitors.make_monitor(device_id, output_id)
 
@@ -536,13 +539,13 @@ class Parser:
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type != self.scanner.PERIOD:
                 self.parse_errors += 1
-                Error(16, self.symbol)
+                Error(17, self.symbol)
 
             else:
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol.id not in self.devices.dtype_output_ids:
                     self.parse_errors += 1
-                    Error(17, self.symbol)
+                    Error(18, self.symbol)
 
                 else:
                     return [in_device.device_id, self.symbol.id]
