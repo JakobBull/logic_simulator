@@ -1315,7 +1315,7 @@ class MonitorItem(wx.Panel):
         self.name_text.SetFont(fo)
         self.remove_item = wx.Button(self, wx.ID_ANY, _("Remove"))
         self.reset_button = wx.Button(self, wx.ID_ANY, _("Reset View"))
-        
+
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
 
         self.remove_item.Bind(wx.EVT_BUTTON, self.on_remove_item)
@@ -1861,7 +1861,7 @@ class FrameManager:
             self.gui.path = self.path
             self.menu.error_panel.SetValue("")
         else:
-            error = Error.gui_report_error(self.scanner)
+            error = Error.gui_report_error(self.content)
             print(error)
             Error.reset()
             print("Sorry, can't parse network.")

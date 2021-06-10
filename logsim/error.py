@@ -96,14 +96,16 @@ class Error:
         # number of errors increased
 
     @classmethod
-    def gui_report_error(cls, path):
+    def gui_report_error(cls, file):
         error_string = ""
-        lines = cls.get_lines(path)
+        lines = cls.get_lines(file)
         error_string += str(str(cls.num_errors) + " ERRORS!\n")
         error_string += "=========="
         error_string += "\n"
         for i in range(cls.num_errors):
             error_string += "Error " + str(i) + " on line " + str(cls.symbols[i].line_number) + ":\n"
+            print(len(lines))
+            print(cls.symbols[i].line_number-1)
             line = lines[cls.symbols[i].line_number-1]
             start_spaces = 0
             for c in line:
@@ -131,12 +133,10 @@ class Error:
         return error_string
 
     @classmethod
-    def get_lines(cls, scanner):
+    def get_lines(cls, file):
         """Open and return the file specified by path for reading."""
         try:
-            file = open(scanner.path, "r", encoding="utf-8")
-            lines = file.readlines()
-            return lines
+            return file.split('\n')
         except IOError:
             print("error, can't find or open file")
             sys.exit()

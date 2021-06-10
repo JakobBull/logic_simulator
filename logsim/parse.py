@@ -96,7 +96,7 @@ class Parser:
         # print("Netowrk_ID: ", self.scanner.NETWORK_ID)
         self.heading_search()
 
-        print(Error.gui_report_error(self.scanner))
+        #print(Error.gui_report_error(self.scanner.file.read()))
         if Error.num_errors == 0:
             return True
 
