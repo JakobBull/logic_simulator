@@ -1,16 +1,8 @@
 # Logic Simulator team 12, by : Ali Ahmed, Jakob Bull, Charlie Marcus
 
-## How we work
+## Usage Guide
 
-For now we will manage our own branches as there should be no conflicts. Please make sure to pull any updates before you start working to avoid merge conflicts. Make sure you work in your branch not the main branch by using 
+Please install PyPDF2 before launching this application.
 
-"git checkout {branch-name}"
-
-Once you have updates to your code that you are happy with you can merge this by running. 
-
-"git checkout main"
-
-"git merge {branch-name}"
-
-and then pushing it to the remote tracking repository.
+![alt text](https://github.com/Jakob2000Cam/gf2/blob/main/readme_resources/charlie_user_guide.png?raw=true)
 
