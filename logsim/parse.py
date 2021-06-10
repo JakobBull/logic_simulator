@@ -42,7 +42,7 @@ class Parser:
         self.monitors = monitors
         self.scanner = scanner
 
-        self.symbol = self.scanner.get_symbol() #set as next symbol from scanner
+        self.symbol = self.scanner.get_symbol()
         self.type = None
         self.id = None
         self.parse_errors = 0
@@ -101,14 +101,17 @@ class Parser:
             return True
 
     def heading_search(self):
+        """Search for the next heading and calls module parsing."""
         if self.symbol.id != self.scanner.NETWORK_ID:
-            Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            Error(0, self.symbol)
+            # report error 0 if network isn't the first heading found
             return False
         print('Network')
         self.OPENCURLY_search()
 
         if self.symbol.id != self.scanner.DEVICES_ID:
-            Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            Error(0, self.symbol)
+            # report error 0 if network isn't the first heading found
             return False
         print('Devices')
         self.OPENCURLY_search()
@@ -116,7 +119,8 @@ class Parser:
         self.device_list()
 
         if self.symbol.id != self.scanner.CONNECTIONS_ID:
-            Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            Error(0, self.symbol)
+            # report error 0 if network isn't the first heading found
             return False
         print('Connections')
         self.OPENCURLY_search()
@@ -124,33 +128,34 @@ class Parser:
         self.connection_list()
 
         if self.symbol.id != self.scanner.SIGNALS_ID:
-            Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            Error(0, self.symbol)
+            # report error 0 if network isn't the first heading found
             return False
         self.OPENCURLY_search()
         print('Signals')
         self.setsignal_list()
 
         if self.symbol.id != self.scanner.MONITOR_ID:
-            Error(0, self.symbol) # report error 0 if network isn't the first heading found
+            Error(0, self.symbol)
+            # report error 0 if network isn't the first heading found
             return False
         self.OPENCURLY_search()
         print('Monitor')
         self.monitor_list()
 
-
-
     def OPENCURLY_search(self):
-        """Check if next symbol is '{'. If it isn't return error, if it is, go to next symbol"""
+        """Check if next symbol is '{' and go to next symbol."""
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type != self.scanner.LEFT_BRACKET:
-            Error(1, self.symbol) # if not '{' - call error and continue parsing while staying at this symbol
+            Error(1, self.symbol)
+            # if not '{'
+            # - call error and continue parsing while staying at this symbol
         else:
-            self.symbol = self.scanner.get_symbol() # if '{' - go to next symbol
-
+            self.symbol = self.scanner.get_symbol()
+            # if '{' - go to next symbol
 
     def device_list(self):
         """Parse the device list."""
-
         while True:
             error = self.device_parse()
             if error == 1:
@@ -167,7 +172,7 @@ class Parser:
 
     def device_parse(self):
         """Parse a single line of a device definition."""
-        errors_start = Error.num_errors # errors started with
+        errors_start = Error.num_errors  # errors started with
         # Expected format : name EQUALS device
         # symbol 1: Name
         if self.symbol.type == self.scanner.SEMICOLON:
@@ -176,16 +181,17 @@ class Parser:
             return 1
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
             return 2
-        if self.symbol.type != self.scanner.NAME: # if first symbol of line is a not a name, error 2
+        if self.symbol.type != self.scanner.NAME:
+            # if first symbol of line is a not a name, error 2
             Error(2, self.symbol)
         else:   # if first symbol is a name
-            if self.symbol.id in self.device_names: # if a name has already been used as a device, call error 3
+            if self.symbol.id in self.device_names:
+                # if a name has already been used as a device, call error 3
                 Error(3, self.symbol)
             else:
                 self.new_device_id = self.symbol.id
 
-
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
@@ -193,11 +199,11 @@ class Parser:
         if self.symbol.type == self.scanner.RIGHT_BRACKET:
             return 2
 
-        #symbol 2: '='
+        # symbol 2: '='
         if self.symbol.type != self.scanner.EQUALS:
             Error(4, self.symbol)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
@@ -221,10 +227,10 @@ class Parser:
             # symbol is a siggen, next symbol must be halfperiod
             siggen = True
         self.new_device_type = self.symbol.id
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
 
-
-        #symbol 4: "inputs" if gate, ';' if not. "halfperiod" if clock, ';' if not.
+        # symbol 4:
+        # "inputs" if gate, ';' if not. "halfperiod" if clock, ';' if not.
         if gate:
             if self.symbol.string != "inputs":
                 Error(6, self.symbol)
@@ -233,7 +239,7 @@ class Parser:
                 Error(8, self.symbol)
         elif siggen:
             if self.symbol.string != "pulse":
-                Error(30, self.symbol)   # need siggen error
+                Error(30, self.symbol)  # need siggen error
         elif (self.symbol.type == self.scanner.SEMICOLON and
                 self.new_device_type == self.scanner.SWITCH_ID):
             # Must be a switch so make switch initially 0
@@ -254,8 +260,9 @@ class Parser:
         else:
             if self.symbol.type != self.scanner.SEMICOLON:
                 Error(10, self.symbol)
-                for i in range(10): # tries to get a semi colon before going to next
-                    self.symbol = self.scanner.get_symbol() # next symbol
+                for i in range(10):
+                    # tries to get a semi colon before going to next
+                    self.symbol = self.scanner.get_symbol()  # next symbol
                     if self.symbol.type == self.scanner.SEMICOLON:
                         return 0
                     if self.symbol.type == self.scanner.EOF:
@@ -265,9 +272,9 @@ class Parser:
 
             else:
                 return Error.num_errors - errors_start
-        #symbol 5 should be a number if gate or clock device
+        # symbol 5 should be a number if gate or clock device
         if gate or clock or siggen:
-            self.symbol = self.scanner.get_symbol() # next symbol
+            self.symbol = self.scanner.get_symbol()  # next symbol
             if self.symbol.type == self.scanner.SEMICOLON:
                 return 0
             if self.symbol.type == self.scanner.EOF:
@@ -276,7 +283,8 @@ class Parser:
                 return 2
 
             if gate:
-                if self.symbol.type != self.scanner.NUMBER or self.symbol.number < 1:
+                if (self.symbol.type != self.scanner.NUMBER or
+                        self.symbol.number < 1):
                     Error(7, self.symbol)
                 else:
                     # Build gate object
@@ -285,7 +293,8 @@ class Parser:
                         self.symbol.number)
                     self.device_names.append(self.new_device_id)
             elif clock:
-                if self.symbol.type != self.scanner.NUMBER or self.symbol.number < 1:
+                if (self.symbol.type != self.scanner.NUMBER or
+                        self.symbol.number < 1):
                     Error(9, self.symbol)
                 else:
                     # Build clock object
@@ -293,7 +302,8 @@ class Parser:
                         self.new_device_id, self.symbol.number)
                     self.device_names.append(self.new_device_id)
             elif siggen:
-                if self.symbol.type != self.scanner.NUMBER or not self.is_bin_num(self.symbol.number):
+                if (self.symbol.type != self.scanner.NUMBER or
+                        not self.is_bin_num(self.symbol.number)):
                     Error(31, self.symbol)
                 else:
                     # Build siggen object
@@ -301,9 +311,9 @@ class Parser:
                         self.new_device_id, self.symbol.number)
                     self.device_names.append(self.new_device_id)
 
-        #symbol 6 should be a ';' if gate or clock device
+        # symbol 6 should be a ';' if gate or clock device
         if gate or clock or siggen:
-            self.symbol = self.scanner.get_symbol() # next symbol
+            self.symbol = self.scanner.get_symbol()  # next symbol
             if self.symbol.type == self.scanner.SEMICOLON:
                 return 0
             if self.symbol.type == self.scanner.EOF:
@@ -312,8 +322,9 @@ class Parser:
                 return 2
             if self.symbol.type != self.scanner.SEMICOLON:
                 Error(10, self.symbol)
-                for i in range(10): #tries to get a semi colon before going to next
-                    self.symbol = self.scanner.get_symbol() # next symbol
+                for i in range(10):
+                    # tries to get a semi colon before going to next
+                    self.symbol = self.scanner.get_symbol()  # next symbol
                     if self.symbol.type == self.scanner.SEMICOLON:
                         return 0
                     if self.symbol.type == self.scanner.EOF:
@@ -322,16 +333,17 @@ class Parser:
                         return 2
 
     def is_bin_num(self, num):
+        """Check if the symbol is a binary number."""
         for i in str(num):
-            if i in ("01") == False:
+            if i in ("01") is False:
                 return False
         return True
 
     def connection_list(self):
         """Parse the device list."""
-
         while True:
-            if self.connection_parse() == 1: break
+            if self.connection_parse() == 1:
+                break
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
                 self.sections_complete += 1
@@ -340,9 +352,9 @@ class Parser:
 
     def connection_parse(self):
         """Parse a single connection."""
-        errors_start = Error.num_errors # errors started with
+        errors_start = Error.num_errors  # errors started with
         # Expected format : name DASH name PERIOD Inumber
-        #symbol 1: Name
+        # symbol 1: Name
         dtype = False
         out_device_id = None
         in_device_id = None
@@ -352,23 +364,23 @@ class Parser:
         else:
             [in_device_id, in_port_id] = self.signame_in()
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
             return 1
 
-        #symbol 2: '-'
+        # symbol 2: '-'
         if self.symbol.type != self.scanner.DASH:
             Error(12, self.symbol)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
             return 1
 
-        #symbol 3: name
+        # symbol 3: name
         if self.symbol.id not in self.device_names:
             Error(11, self.symbol)
 
@@ -379,24 +391,24 @@ class Parser:
             if out_device.device_kind == self.devices.D_TYPE:
                 dtype = True
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
             return 1
 
-        #symbol 3: '.'
+        # symbol 3: '.'
         print(self.symbol.string)
         if self.symbol.type != self.scanner.PERIOD:
             Error(13, self.symbol)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
             return 1
 
-        #symbol 4: I + input#
+        # symbol 4: I + input#
         if dtype:
             if self.symbol.id not in self.devices.dtype_input_ids:
                 Error(13, self.symbol)
@@ -415,7 +427,7 @@ class Parser:
         if error_type != self.network.NO_ERROR:
             Error(13, self.symbol)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
@@ -424,11 +436,12 @@ class Parser:
         if self.symbol.type == self.scanner.EOF:
             return 0
 
-        #symbol 5: ';'
+        # symbol 5: ';'
         if self.symbol.type != self.scanner.SEMICOLON:
             Error(18, self.symbol)
-            for i in range(10): #tries to get a semi colon before going to next
-                self.symbol = self.scanner.get_symbol() # next symbol
+            for i in range(10):
+                # tries to get a semi colon before going to next
+                self.symbol = self.scanner.get_symbol()  # next symbol
                 if self.symbol.type == self.scanner.SEMICOLON:
                     return 0
                 if self.symbol.type == self.scanner.EOF:
@@ -437,7 +450,8 @@ class Parser:
     def setsignal_list(self):
         """Parse the setsignal section."""
         while True:
-            if self.setsignal_parse() == 1: break
+            if self.setsignal_parse() == 1:
+                break
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
                 self.sections_complete += 1
@@ -446,7 +460,7 @@ class Parser:
 
     def setsignal_parse(self):
         """Parse a single line of the setsignal section."""
-        errors_start = Error.num_errors # errors started with
+        errors_start = Error.num_errors  # errors started with
         # Expected format : name EQUALS BINARYNUMBER SEMICOLON
         if self.symbol.id not in self.device_names:
             Error(20, self.symbol)
@@ -454,7 +468,7 @@ class Parser:
         # Find the switch device ID
         switch_set_ID = self.devices.get_device(self.symbol.id)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
@@ -463,7 +477,7 @@ class Parser:
         if self.symbol.type != self.scanner.EQUALS:
             Error(21, self.symbol)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
@@ -476,7 +490,7 @@ class Parser:
         elif self.symbol.number == 1:
             self.devices.set_switch(switch_set_ID, 1)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
@@ -485,13 +499,13 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             Error(24, self.symbol)
 
-
     def monitor_list(self):
         """Parse the monitor section of the code."""
         print(self.device_names)
         print(self.symbol.string)
         while True:
-            if self.monitor_parse() == 1: break
+            if self.monitor_parse() == 1:
+                break
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == self.scanner.RIGHT_BRACKET:
                 self.sections_complete += 1
@@ -499,8 +513,8 @@ class Parser:
                 break
 
     def monitor_parse(self):
-        # Parse a line in Monitor.
-        errors_start = Error.num_errors # errors started with
+        """Parse a line in Monitor."""
+        errors_start = Error.num_errors  # errors started with
         error_type = 0
         # Expected format : name SEMICOLON
         device_id = None
@@ -520,7 +534,7 @@ class Parser:
         elif error_type == self.monitors.MONITOR_PRESENT:
             Error(28, self.symbol)
 
-        self.symbol = self.scanner.get_symbol() # next symbol
+        self.symbol = self.scanner.get_symbol()  # next symbol
         if self.symbol.type == self.scanner.SEMICOLON:
             return 0
         if self.symbol.type == self.scanner.EOF:
