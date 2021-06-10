@@ -1,6 +1,0 @@
-
-    SW1 = SWITCH;
-    912 = SWITCH;
-    SW1 = NAND inputs 2;
-    G2 - NAND inputs 2;
-  }

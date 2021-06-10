@@ -1,0 +1,115 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-06-09 16:30+0100\n"
+"PO-Revision-Date: 2021-06-09 16:36+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: el_GR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: gui.py:790
+msgid "Add"
+msgstr "Προσθήκη"
+
+#: gui.py:1585
+msgid "Back to text editor"
+msgstr "Επιστροφή στο πρόγραμμα επεξεργασίας κειμένου"
+
+#: gui.py:803
+msgid "Change between 2D and 3D view mode"
+msgstr "Αλλαγή λειτουργίας προβολής 2D και 3D"
+
+#: gui.py:763
+msgid "Continue"
+msgstr "Να συνεχίσει"
+
+#: gui.py:1457
+msgid "Continue to GUI"
+msgstr "Συνεχίστε στο GUI"
+
+#: gui.py:758
+msgid "Cycles"
+msgstr "Κύκλοι"
+
+#: gui.py:1489
+msgid "Filepath is"
+msgstr "Η διαδρομή αρχείου είναι"
+
+#: gui.py:1587
+msgid "Help"
+msgstr "Βοήθεια"
+
+#: gui.py:1455
+msgid "Load file"
+msgstr "Φόρτωση αρχείου"
+
+#: gui.py:1819
+msgid "Logic Simulator"
+msgstr "Λογικός προσομοιωτής"
+
+#: gui.py:798 gui.py:1240
+msgid "Remove"
+msgstr "Αφαιρώ"
+
+#: gui.py:799
+msgid "Remove all"
+msgstr "Αφαίρεση όλων"
+
+#: gui.py:793
+msgid "Remove monitor"
+msgstr "Αφαιρέστε την οθόνη"
+
+#: gui.py:1241
+msgid "Reset View"
+msgstr "Επαναφορά προβολής"
+
+#: gui.py:762
+msgid "Run"
+msgstr "Τρέξιμο"
+
+#: gui.py:1456 gui.py:1586
+msgid "Save as"
+msgstr "Αποθήκευση ως"
+
+#: gui.py:789 gui.py:796
+msgid "Select"
+msgstr "Επιλέγω"
+
+#: gui.py:776
+msgid "Set"
+msgstr "ορίζω"
+
+#: gui.py:769
+msgid "Set Switch"
+msgstr "Ορισμός διακόπτη"
+
+#: gui.py:779
+msgid "Set outputs to monitor"
+msgstr "Ρυθμίστε τις εξόδους για παρακολούθηση"
+
+#: gui.py:771
+msgid "Switch"
+msgstr "Διακόπτης"
+
+#: gui.py:1487
+msgid "You chose the following file:"
+msgstr "Επιλέξατε το ακόλουθο αρχείο:"
+
+#: gui.py:1501
+msgid "error, can't find or open file"
+msgstr "σφάλμα, δεν είναι δυνατή η εύρεση ή το άνοιγμα αρχείου"
+
+#: gui.py:198
+msgid "time"
+msgstr "χρόνος"

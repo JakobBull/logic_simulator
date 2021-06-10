@@ -1,0 +1,114 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-06-09 16:30+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: gui.py:790
+msgid "Add"
+msgstr ""
+
+#: gui.py:1585
+msgid "Back to text editor"
+msgstr ""
+
+#: gui.py:803
+msgid "Change between 2D and 3D view mode"
+msgstr ""
+
+#: gui.py:763
+msgid "Continue"
+msgstr ""
+
+#: gui.py:1457
+msgid "Continue to GUI"
+msgstr ""
+
+#: gui.py:758
+msgid "Cycles"
+msgstr ""
+
+#: gui.py:1489
+msgid "Filepath is"
+msgstr ""
+
+#: gui.py:1587
+msgid "Help"
+msgstr ""
+
+#: gui.py:1455
+msgid "Load file"
+msgstr ""
+
+#: gui.py:1819
+msgid "Logic Simulator"
+msgstr ""
+
+#: gui.py:798 gui.py:1240
+msgid "Remove"
+msgstr ""
+
+#: gui.py:799
+msgid "Remove all"
+msgstr ""
+
+#: gui.py:793
+msgid "Remove monitor"
+msgstr ""
+
+#: gui.py:1241
+msgid "Reset View"
+msgstr ""
+
+#: gui.py:762
+msgid "Run"
+msgstr ""
+
+#: gui.py:1456 gui.py:1586
+msgid "Save as"
+msgstr ""
+
+#: gui.py:789 gui.py:796
+msgid "Select"
+msgstr ""
+
+#: gui.py:776
+msgid "Set"
+msgstr ""
+
+#: gui.py:769
+msgid "Set Switch"
+msgstr ""
+
+#: gui.py:779
+msgid "Set outputs to monitor"
+msgstr ""
+
+#: gui.py:771
+msgid "Switch"
+msgstr ""
+
+#: gui.py:1487
+msgid "You chose the following file:"
+msgstr ""
+
+#: gui.py:1501
+msgid "error, can't find or open file"
+msgstr ""
+
+#: gui.py:198
+msgid "time"
+msgstr ""
